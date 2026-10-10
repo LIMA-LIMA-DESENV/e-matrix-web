@@ -31,6 +31,13 @@ interface ConfirmActionModalProps {
   /** Shows a reason field, optional or required. */
   reason?: ConfirmActionReason
   isSubmitting: boolean
+  /**
+   * False when the action is unavailable (e.g. still checking or blocked):
+   * only the cancel button is shown.
+   */
+  canConfirm?: boolean
+  /** Replaces "Cancelar", e.g. "Fechar" when there is nothing to confirm. */
+  cancelLabel?: string
   /** Already translated (`translateError`). The modal stays open. */
   errorMessage?: string | null
   onCancel: () => void
@@ -56,6 +63,8 @@ function ConfirmActionDialog({
   destructive = false,
   reason,
   isSubmitting,
+  canConfirm = true,
+  cancelLabel,
   errorMessage,
   onCancel,
   onConfirm,
@@ -84,7 +93,7 @@ function ConfirmActionDialog({
   }, [onCancel])
 
   async function handleConfirm() {
-    if (submittingRef.current || isReasonMissing) return
+    if (submittingRef.current || isReasonMissing || !canConfirm) return
 
     submittingRef.current = true
     try {
@@ -156,16 +165,18 @@ function ConfirmActionDialog({
             onClick={onCancel}
             disabled={isBusy}
           >
-            {t('cancel')}
+            {cancelLabel ?? t('cancel')}
           </Button>
-          <Button
-            type="button"
-            color={destructive ? 'error' : 'primary'}
-            onClick={() => void handleConfirm()}
-            disabled={isBusy || isReasonMissing}
-          >
-            {isBusy && pendingLabel ? pendingLabel : confirmLabel}
-          </Button>
+          {canConfirm && (
+            <Button
+              type="button"
+              color={destructive ? 'error' : 'primary'}
+              onClick={() => void handleConfirm()}
+              disabled={isBusy || isReasonMissing}
+            >
+              {isBusy && pendingLabel ? pendingLabel : confirmLabel}
+            </Button>
+          )}
         </ModalFooter>
       </ModalContent>
     </>
