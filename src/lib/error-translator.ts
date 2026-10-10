@@ -31,6 +31,15 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Invalid email.': 'invalidEmail',
   'Invalid user role.': 'invalidRole',
   'User does not have the required role.': 'forbidden',
+  'Period description is required.': 'periodDescriptionRequired',
+  'Period description is too long.': 'periodDescriptionTooLong',
+  'Invalid period start date.': 'periodStartDateInvalid',
+  'Invalid period end date.': 'periodEndDateInvalid',
+  'Period must last at least one day.': 'periodTooShort',
+  'Period description already exists.': 'periodDescriptionTaken',
+  'Period overlaps another period.': 'periodOverlaps',
+  'Period not found.': 'periodNotFound',
+  'Period has linked records.': 'periodHasLinkedRecords',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

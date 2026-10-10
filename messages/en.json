@@ -100,6 +100,7 @@
     "trainings": "Trainings",
     "meetings": "Meetings",
     "matrix": "Matrix",
+    "periods": "Periods",
     "administration": "Administration",
     "users": "Users",
     "parameters": "Parameters",
@@ -195,6 +196,85 @@
       "notFound": "User not found."
     }
   },
+  "parameters": {
+    "eyebrow": "Administration",
+    "title": "Parameters",
+    "description": "Set up the supporting records used by the system modules.",
+    "tabs": {
+      "label": "Parameter sections",
+      "periods": "Periods"
+    }
+  },
+  "periods": {
+    "title": "Periods",
+    "description": "Date ranges that group the program records.",
+    "count": "{count, plural, =0 {No periods registered} one {# period registered} other {# periods registered}}.",
+    "newPeriod": "New period",
+    "searchPlaceholder": "Search periods by description...",
+    "searchLabel": "Search periods",
+    "itemLabel": "{count, plural, one {period} other {periods}}",
+    "columns": {
+      "description": "Description",
+      "startDate": "Start",
+      "endDate": "End",
+      "createdAt": "Created"
+    },
+    "loadErrorTitle": "Could not load the periods",
+    "loadErrorDescription": "Try again. If the problem persists, check your access permissions.",
+    "emptyTitle": "There are no periods yet.",
+    "emptyDescription": "Create the first period to organize the program records.",
+    "noResultsTitle": "No period matches the search.",
+    "noResultsDescription": "Try a different description.",
+    "created": "Period {description} created.",
+    "deleteAction": "Delete",
+    "deleted": "Period {description} deleted.",
+    "form": {
+      "newTitle": "New period",
+      "newDescription": "Enter the description and the date range of the period.",
+      "description": "Description",
+      "descriptionPlaceholder": "E.g. 2026",
+      "startDate": "Start",
+      "endDate": "End",
+      "create": "Create period",
+      "creating": "Creating...",
+      "editTitle": "Edit period",
+      "editDescription": "Change the description or the date range of the period.",
+      "update": "Save changes",
+      "loadError": "Could not load the period"
+    },
+    "validation": {
+      "descriptionRequired": "Enter the period's description.",
+      "descriptionTooLong": "The description must have at most {max} characters.",
+      "descriptionHint": "Unique among periods, up to {max} characters.",
+      "startDateRequired": "Enter a valid start date.",
+      "endDateRequired": "Enter a valid end date.",
+      "endDateHint": "After the start. Periods cannot overlap, boundary dates included.",
+      "tooShort": "The period must last at least one day: the end must be after the start."
+    },
+    "linkedRecords": {
+      "title": "Linked records",
+      "total": "{count, plural, =0 {No linked records} one {# linked record} other {# linked records}}",
+      "none": "No records are linked to this period.",
+      "warning": "There are records linked to this period. Changing the dates may make records no longer belong to it.",
+      "types": {
+        "management_plan": "Management Plan",
+        "matrix": "Matrix",
+        "trainings": "Trainings",
+        "meetings": "Meetings",
+        "evaluations": "Evaluations",
+        "projects": "Improvement projects"
+      }
+    },
+    "delete": {
+      "title": "Delete period",
+      "question": "Do you want to delete the period <strong>{description}</strong>?",
+      "description": "Deletion is permanent and cannot be undone.",
+      "checking": "Checking linked records...",
+      "blocked": "The period <strong>{description}</strong> cannot be deleted because there are records linked to it. Remove or change those records before deleting the period.",
+      "confirm": "Delete period",
+      "deleting": "Deleting..."
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -214,6 +294,15 @@
     "invalidEmail": "Enter a valid e-mail.",
     "invalidRole": "Select a valid role for the user.",
     "forbidden": "You are not allowed to do this.",
+    "periodDescriptionRequired": "Enter the period's description.",
+    "periodDescriptionTooLong": "The period's description must have at most 255 characters.",
+    "periodStartDateInvalid": "Enter a valid start date.",
+    "periodEndDateInvalid": "Enter a valid end date.",
+    "periodTooShort": "The period must last at least one day: the end must be after the start.",
+    "periodDescriptionTaken": "There is already a period with this description.",
+    "periodOverlaps": "A period cannot be within or overlap another registered period, boundary dates included.",
+    "periodNotFound": "Period not found.",
+    "periodHasLinkedRecords": "This period has linked records and cannot be deleted.",
     "status400": "Check the information and try again.",
     "status404": "The requested record was not found.",
     "status409": "There is already a record with this information.",

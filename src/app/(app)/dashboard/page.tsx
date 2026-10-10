@@ -16,6 +16,7 @@ const modules = [
   { key: 'trainings', done: false },
   { key: 'meetings', done: false },
   { key: 'matrix', done: false },
+  { key: 'periods', done: true },
   { key: 'parameters', done: false },
 ] as const
 

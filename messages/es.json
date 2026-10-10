@@ -100,6 +100,7 @@
     "trainings": "Entrenamientos",
     "meetings": "Reuniones",
     "matrix": "Matriz",
+    "periods": "Períodos",
     "administration": "Administración",
     "users": "Usuarios",
     "parameters": "Parámetros",
@@ -195,6 +196,85 @@
       "notFound": "Usuario no encontrado."
     }
   },
+  "parameters": {
+    "eyebrow": "Administración",
+    "title": "Parámetros",
+    "description": "Configure los registros de apoyo que usan los módulos del sistema.",
+    "tabs": {
+      "label": "Secciones de parámetros",
+      "periods": "Períodos"
+    }
+  },
+  "periods": {
+    "title": "Períodos",
+    "description": "Intervalos de fechas que agrupan los registros del programa.",
+    "count": "{count, plural, =0 {Ningún período registrado} one {# período registrado} other {# períodos registrados}}.",
+    "newPeriod": "Nuevo período",
+    "searchPlaceholder": "Buscar período por descripción...",
+    "searchLabel": "Buscar período",
+    "itemLabel": "{count, plural, one {período} other {períodos}}",
+    "columns": {
+      "description": "Descripción",
+      "startDate": "Inicio",
+      "endDate": "Fin",
+      "createdAt": "Registro"
+    },
+    "loadErrorTitle": "No fue posible cargar los períodos",
+    "loadErrorDescription": "Intente de nuevo. Si el problema persiste, verifique sus permisos de acceso.",
+    "emptyTitle": "Todavía no hay períodos registrados.",
+    "emptyDescription": "Registre el primer período para organizar los registros del programa.",
+    "noResultsTitle": "Ningún período coincide con la búsqueda.",
+    "noResultsDescription": "Intente ajustar la búsqueda por descripción.",
+    "created": "Período {description} registrado.",
+    "deleteAction": "Eliminar",
+    "deleted": "Período {description} eliminado.",
+    "form": {
+      "newTitle": "Nuevo período",
+      "newDescription": "Ingrese la descripción y el intervalo de fechas del período.",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Ej.: 2026",
+      "startDate": "Inicio",
+      "endDate": "Fin",
+      "create": "Registrar período",
+      "creating": "Registrando...",
+      "editTitle": "Editar período",
+      "editDescription": "Modifique la descripción o el intervalo de fechas del período.",
+      "update": "Guardar cambios",
+      "loadError": "No fue posible cargar el período"
+    },
+    "validation": {
+      "descriptionRequired": "Ingrese la descripción del período.",
+      "descriptionTooLong": "La descripción debe tener como máximo {max} caracteres.",
+      "descriptionHint": "Única entre los períodos, con hasta {max} caracteres.",
+      "startDateRequired": "Ingrese una fecha de inicio válida.",
+      "endDateRequired": "Ingrese una fecha de fin válida.",
+      "endDateHint": "Posterior al inicio. Los períodos no pueden superponerse, ni en las fechas límite.",
+      "tooShort": "El período debe durar al menos un día: el fin debe ser posterior al inicio."
+    },
+    "linkedRecords": {
+      "title": "Registros vinculados",
+      "total": "{count, plural, =0 {Ningún registro vinculado} one {# registro vinculado} other {# registros vinculados}}",
+      "none": "No hay registros vinculados a este período.",
+      "warning": "Hay registros vinculados a este período. Cambiar las fechas puede hacer que algunos registros dejen de pertenecer a él.",
+      "types": {
+        "management_plan": "Plan de Gestión",
+        "matrix": "Matriz",
+        "trainings": "Entrenamientos",
+        "meetings": "Reuniones",
+        "evaluations": "Evaluaciones",
+        "projects": "Proyectos de mejora"
+      }
+    },
+    "delete": {
+      "title": "Eliminar período",
+      "question": "¿Desea eliminar el período <strong>{description}</strong>?",
+      "description": "La eliminación es definitiva y no se puede deshacer.",
+      "checking": "Verificando registros vinculados...",
+      "blocked": "No es posible eliminar el período <strong>{description}</strong> porque tiene registros vinculados. Elimine o modifique esos registros antes de eliminar el período.",
+      "confirm": "Eliminar período",
+      "deleting": "Eliminando..."
+    }
+  },
   "errors": {
     "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
     "sessionExpired": "Su sesión expiró por inactividad. Inicie sesión de nuevo para continuar.",
@@ -214,6 +294,15 @@
     "invalidEmail": "Ingrese un correo electrónico válido.",
     "invalidRole": "Seleccione un rol válido para el usuario.",
     "forbidden": "No tiene permiso para realizar esta acción.",
+    "periodDescriptionRequired": "Ingrese la descripción del período.",
+    "periodDescriptionTooLong": "La descripción del período debe tener como máximo 255 caracteres.",
+    "periodStartDateInvalid": "Ingrese una fecha de inicio válida.",
+    "periodEndDateInvalid": "Ingrese una fecha de fin válida.",
+    "periodTooShort": "El período debe durar al menos un día: el fin debe ser posterior al inicio.",
+    "periodDescriptionTaken": "Ya existe un período con esta descripción.",
+    "periodOverlaps": "Un período no puede estar dentro de otro ya registrado ni superponerse con él, incluidas las fechas límite.",
+    "periodNotFound": "Período no encontrado.",
+    "periodHasLinkedRecords": "Este período tiene registros vinculados y no se puede eliminar.",
     "status400": "Verifique los datos ingresados e intente de nuevo.",
     "status404": "No se encontró el registro solicitado.",
     "status409": "Ya existe un registro con los datos ingresados.",

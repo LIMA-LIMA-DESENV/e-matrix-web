@@ -87,7 +87,6 @@ const adminItems: NavItem[] = [
     href: '/parametros',
     icon: 'tune',
     adminOnly: true,
-    pending: true,
   },
 ]
 
