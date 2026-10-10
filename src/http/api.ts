@@ -68,6 +68,63 @@ export interface ForgotPasswordRequest {
   email: string;
 }
 
+export interface Period {
+  id: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Kind of record linked to a period
+ */
+export type PeriodLinkedRecordType = typeof PeriodLinkedRecordType[keyof typeof PeriodLinkedRecordType];
+
+
+export const PeriodLinkedRecordType = {
+  management_plan: 'management_plan',
+  matrix: 'matrix',
+  trainings: 'trainings',
+  meetings: 'meetings',
+  evaluations: 'evaluations',
+  projects: 'projects',
+} as const;
+
+export type PeriodLinkedRecordsItemsItem = {
+  type: PeriodLinkedRecordType;
+  /** @minimum 1 */
+  count: number;
+};
+
+export interface PeriodLinkedRecords {
+  /**
+     * Sum of the counts in items
+     * @minimum 0
+     */
+  total: number;
+  /** One entry per type with at least one linked record */
+  items: PeriodLinkedRecordsItemsItem[];
+}
+
+export type PeriodDetail = Period & {
+  linked_records: PeriodLinkedRecords;
+};
+
+export interface PeriodInput {
+  /**
+     * Trimmed before validation; unique ignoring case
+     * @minLength 1
+     * @maxLength 255
+     */
+  description: string;
+  /** Calendar day (YYYY-MM-DD) */
+  start_date: string;
+  /** Calendar day (YYYY-MM-DD), after start_date */
+  end_date: string;
+}
+
 export interface ResetPasswordRequest {
   password: string;
 }
@@ -1454,4 +1511,622 @@ export const usePostPasswordReset = <TError = void,
         TContext
       > => {
       return useMutation(getPostPasswordResetMutationOptions(options), queryClient);
+    }
+
+export type getPeriodsResponse200 = {
+  data: Period[]
+  status: 200
+}
+
+export type getPeriodsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getPeriodsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getPeriodsResponseSuccess = (getPeriodsResponse200) & {
+  headers: Headers;
+};
+export type getPeriodsResponseError = (getPeriodsResponse401 | getPeriodsResponse403) & {
+  headers: Headers;
+};
+
+export type getPeriodsResponse = (getPeriodsResponseSuccess | getPeriodsResponseError)
+
+export const getGetPeriodsUrl = () => {
+
+
+
+
+  return `/periods`
+}
+
+/**
+ * Lists every period ordered by start_date, oldest first. Dates are calendar days (YYYY-MM-DD) without time or time zone. Requires admin role.
+ * @summary List periods
+ */
+export const getPeriods = async ( options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsResponse> => {
+
+  return customFetch<getPeriodsResponse>(getGetPeriodsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPeriodsQueryKey = () => {
+    return [
+    `/periods`
+    ] as const;
+    }
+
+
+export const getGetPeriodsQueryOptions = <TData = Awaited<ReturnType<typeof getPeriods>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPeriodsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPeriods>>> = ({ signal }) => getPeriods({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPeriodsQueryResult = NonNullable<Awaited<ReturnType<typeof getPeriods>>>
+export type GetPeriodsQueryError = ErrorResponse
+
+
+export function useGetPeriods<TData = Awaited<ReturnType<typeof getPeriods>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPeriods>>,
+          TError,
+          Awaited<ReturnType<typeof getPeriods>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPeriods<TData = Awaited<ReturnType<typeof getPeriods>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPeriods>>,
+          TError,
+          Awaited<ReturnType<typeof getPeriods>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPeriods<TData = Awaited<ReturnType<typeof getPeriods>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List periods
+ */
+
+export function useGetPeriods<TData = Awaited<ReturnType<typeof getPeriods>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriods>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPeriodsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postPeriodsResponse201 = {
+  data: Period
+  status: 201
+}
+
+export type postPeriodsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postPeriodsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postPeriodsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postPeriodsResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postPeriodsResponseSuccess = (postPeriodsResponse201) & {
+  headers: Headers;
+};
+export type postPeriodsResponseError = (postPeriodsResponse400 | postPeriodsResponse401 | postPeriodsResponse403 | postPeriodsResponse409) & {
+  headers: Headers;
+};
+
+export type postPeriodsResponse = (postPeriodsResponseSuccess | postPeriodsResponseError)
+
+export const getPostPeriodsUrl = () => {
+
+
+
+
+  return `/periods`
+}
+
+/**
+ * Creates a period. The description is trimmed and must be unique ignoring case. end_date must be after start_date (at least one day). The period must not overlap any other period, boundaries included: a period starting on the day another ends overlaps it. Records who created the period in created_by. Requires admin role.
+ * @summary Create period
+ */
+export const postPeriods = async (periodInput: PeriodInput, options?: Parameters<typeof customFetch>[1]): Promise<postPeriodsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postPeriodsResponse>(getPostPeriodsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(periodInput)
+  }
+);}
+
+
+
+
+
+export const getPostPeriodsMutationKey = () => ['postPeriods'] as const;
+
+export const getPostPeriodsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPeriods>>, TError,PostPeriodsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postPeriods>>, TError,PostPeriodsMutationVariables, TContext> => {
+
+const mutationKey = getPostPeriodsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postPeriods>>, PostPeriodsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postPeriods(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostPeriodsMutationResult = NonNullable<Awaited<ReturnType<typeof postPeriods>>>
+    export type PostPeriodsMutationBody = PeriodInput
+    export type PostPeriodsMutationError = ErrorResponse
+    export type PostPeriodsMutationVariables = {data: PeriodInput}
+
+    /**
+ * @summary Create period
+ */
+export const usePostPeriods = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPeriods>>, TError,PostPeriodsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postPeriods>>,
+        TError,
+        PostPeriodsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostPeriodsMutationOptions(options), queryClient);
+    }
+
+export type getPeriodsIdResponse200 = {
+  data: PeriodDetail
+  status: 200
+}
+
+export type getPeriodsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getPeriodsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getPeriodsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getPeriodsIdResponseSuccess = (getPeriodsIdResponse200) & {
+  headers: Headers;
+};
+export type getPeriodsIdResponseError = (getPeriodsIdResponse401 | getPeriodsIdResponse403 | getPeriodsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getPeriodsIdResponse = (getPeriodsIdResponseSuccess | getPeriodsIdResponseError)
+
+export const getGetPeriodsIdUrl = (id: string,) => {
+
+
+
+
+  return `/periods/${id}`
+}
+
+/**
+ * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. Requires admin role.
+ * @summary Get period
+ */
+export const getPeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsIdResponse> => {
+
+  return customFetch<getPeriodsIdResponse>(getGetPeriodsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPeriodsIdQueryKey = (id: string,) => {
+    return [
+    `/periods/${id}`
+    ] as const;
+    }
+
+
+export const getGetPeriodsIdQueryOptions = <TData = Awaited<ReturnType<typeof getPeriodsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPeriodsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPeriodsId>>> = ({ signal }) => getPeriodsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPeriodsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getPeriodsId>>>
+export type GetPeriodsIdQueryError = ErrorResponse
+
+
+export function useGetPeriodsId<TData = Awaited<ReturnType<typeof getPeriodsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPeriodsId>>,
+          TError,
+          Awaited<ReturnType<typeof getPeriodsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPeriodsId<TData = Awaited<ReturnType<typeof getPeriodsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPeriodsId>>,
+          TError,
+          Awaited<ReturnType<typeof getPeriodsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPeriodsId<TData = Awaited<ReturnType<typeof getPeriodsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get period
+ */
+
+export function useGetPeriodsId<TData = Awaited<ReturnType<typeof getPeriodsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPeriodsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPeriodsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putPeriodsIdResponse200 = {
+  data: Period
+  status: 200
+}
+
+export type putPeriodsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putPeriodsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putPeriodsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putPeriodsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putPeriodsIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type putPeriodsIdResponseSuccess = (putPeriodsIdResponse200) & {
+  headers: Headers;
+};
+export type putPeriodsIdResponseError = (putPeriodsIdResponse400 | putPeriodsIdResponse401 | putPeriodsIdResponse403 | putPeriodsIdResponse404 | putPeriodsIdResponse409) & {
+  headers: Headers;
+};
+
+export type putPeriodsIdResponse = (putPeriodsIdResponseSuccess | putPeriodsIdResponseError)
+
+export const getPutPeriodsIdUrl = (id: string,) => {
+
+
+
+
+  return `/periods/${id}`
+}
+
+/**
+ * Replaces the description and dates of a period, with or without linked records, under the same rules as the creation: all three fields are required, the description is trimmed and must not belong to another period ignoring case, end_date must be after start_date, and the period must not overlap any other period, boundaries included. Other fields (id, audit fields) are ignored. Records who updated the period in updated_by/updated_at. Requires admin role.
+ * @summary Update period
+ */
+export const putPeriodsId = async (id: string,
+    periodInput: PeriodInput, options?: Parameters<typeof customFetch>[1]): Promise<putPeriodsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putPeriodsIdResponse>(getPutPeriodsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(periodInput)
+  }
+);}
+
+
+
+
+
+export const getPutPeriodsIdMutationKey = () => ['putPeriodsId'] as const;
+
+export const getPutPeriodsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putPeriodsId>>, TError,PutPeriodsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putPeriodsId>>, TError,PutPeriodsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutPeriodsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putPeriodsId>>, PutPeriodsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putPeriodsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutPeriodsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putPeriodsId>>>
+    export type PutPeriodsIdMutationBody = PeriodInput
+    export type PutPeriodsIdMutationError = ErrorResponse
+    export type PutPeriodsIdMutationVariables = {id: string;data: PeriodInput}
+
+    /**
+ * @summary Update period
+ */
+export const usePutPeriodsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putPeriodsId>>, TError,PutPeriodsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putPeriodsId>>,
+        TError,
+        PutPeriodsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutPeriodsIdMutationOptions(options), queryClient);
+    }
+
+export type deletePeriodsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deletePeriodsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deletePeriodsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deletePeriodsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deletePeriodsIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type deletePeriodsIdResponseSuccess = (deletePeriodsIdResponse204) & {
+  headers: Headers;
+};
+export type deletePeriodsIdResponseError = (deletePeriodsIdResponse401 | deletePeriodsIdResponse403 | deletePeriodsIdResponse404 | deletePeriodsIdResponse409) & {
+  headers: Headers;
+};
+
+export type deletePeriodsIdResponse = (deletePeriodsIdResponseSuccess | deletePeriodsIdResponseError)
+
+export const getDeletePeriodsIdUrl = (id: string,) => {
+
+
+
+
+  return `/periods/${id}`
+}
+
+/**
+ * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
+ * @summary Delete period
+ */
+export const deletePeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deletePeriodsIdResponse> => {
+
+  return customFetch<deletePeriodsIdResponse>(getDeletePeriodsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeletePeriodsIdMutationKey = () => ['deletePeriodsId'] as const;
+
+export const getDeletePeriodsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePeriodsId>>, TError,DeletePeriodsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePeriodsId>>, TError,DeletePeriodsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeletePeriodsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePeriodsId>>, DeletePeriodsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deletePeriodsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePeriodsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deletePeriodsId>>>
+
+    export type DeletePeriodsIdMutationError = ErrorResponse
+    export type DeletePeriodsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete period
+ */
+export const useDeletePeriodsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePeriodsId>>, TError,DeletePeriodsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deletePeriodsId>>,
+        TError,
+        DeletePeriodsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeletePeriodsIdMutationOptions(options), queryClient);
     }
