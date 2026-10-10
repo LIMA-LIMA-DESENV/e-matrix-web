@@ -46,7 +46,8 @@ src/
 │   ├── (app)/            # Authenticated area: layout.tsx is the shell
 │   │   ├── dashboard/
 │   │   ├── alterar-senha/
-│   │   └── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
+│   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
+│   │   └── parametros/   # redirects to its first tab; periodos/ (list, novo/, [id]/editar/, _form/)
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
 │   └── layout.tsx        # Root: fonts, NextIntlClientProvider, Providers
 ├── components/
@@ -57,7 +58,7 @@ src/
 ├── contexts/AuthContext.tsx
 ├── http/                 # Orval client + fetch mutator
 ├── i18n/                 # Locales and request config
-└── lib/                  # error-translator, jwt, auth-storage, utils
+└── lib/                  # error-translator, format-date, jwt, auth-storage, utils
 ```
 
 Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
@@ -74,6 +75,11 @@ Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
 - Never hard-code user-facing text, including `aria-label`s, placeholders and
   zod messages (build schemas inside the component with `useMemo` and `t`).
 - Format dates and numbers with next-intl's `useFormatter()`, not by hand.
+- Calendar days without time (`YYYY-MM-DD`, e.g. period start and end) are
+  shown with `useFormatDateOnly()` from `src/lib/format-date.ts`, which formats
+  them in UTC. Never pass them to `new Date()` for display: that is midnight
+  UTC, which renders as the previous day in UTC-3. Send them to the API as the
+  `input type="date"` string, without converting.
 - The API returns English error messages; `useTranslateError()` maps them to
   `errors.*` keys. When the API adds a message, add it to the map and to the
   three catalogs.
