@@ -223,6 +223,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           {icon(false)}
           <span className="flex-1">{label}</span>
           <span
+            role="img"
             className="material-symbols-outlined text-base text-slate-500"
             aria-label={t('comingSoon')}
           >
