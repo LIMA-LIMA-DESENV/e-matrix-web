@@ -17,7 +17,8 @@ const modules = [
   { key: 'meetings', done: false },
   { key: 'matrix', done: false },
   { key: 'periods', done: true },
-  { key: 'parameters', done: false },
+  { key: 'activities', done: true },
+  { key: 'parameters', done: true },
 ] as const
 
 export default function DashboardPage() {

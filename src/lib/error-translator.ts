@@ -40,6 +40,21 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Period overlaps another period.': 'periodOverlaps',
   'Period not found.': 'periodNotFound',
   'Period has linked records.': 'periodHasLinkedRecords',
+  'Activity code is required.': 'activityCodeRequired',
+  'Activity code is too long.': 'activityCodeTooLong',
+  'Activity name is required.': 'activityNameRequired',
+  'Activity name is too long.': 'activityNameTooLong',
+  'Activity fabric is required.': 'activityFabricRequired',
+  'Activity fabric is too long.': 'activityFabricTooLong',
+  'Activity line is required.': 'activityLineRequired',
+  'Activity line is too long.': 'activityLineTooLong',
+  'Activity area is required.': 'activityAreaRequired',
+  'Activity area is too long.': 'activityAreaTooLong',
+  'Activity function is required.': 'activityFunctionRequired',
+  'Activity function is too long.': 'activityFunctionTooLong',
+  'Activity code already exists.': 'activityCodeTaken',
+  'Activity not found.': 'activityNotFound',
+  'Activity has linked records.': 'activityHasLinkedRecords',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

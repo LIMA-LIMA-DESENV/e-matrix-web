@@ -5,8 +5,12 @@ import { useTranslations } from 'next-intl'
 
 import { Tab, TabList } from '@/components/ui'
 
-// Legacy "Parâmetros" tabs; "Atividades" joins with its own module.
-const tabs = [{ key: 'periods', href: '/parametros/periodos' }] as const
+// Legacy "Parâmetros" tabs, in the legacy order: "Atividades" first and the
+// tab "/parametros" opens on.
+const tabs = [
+  { key: 'activities', href: '/parametros/atividades' },
+  { key: 'periods', href: '/parametros/periodos' },
+] as const
 
 type ParametersTabKey = (typeof tabs)[number]['key']
 
