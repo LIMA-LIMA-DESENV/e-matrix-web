@@ -47,7 +47,7 @@ src/
 │   │   ├── dashboard/
 │   │   ├── alterar-senha/
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
-│   │   └── parametros/   # redirects to its first tab; periodos/ (list, novo/, [id]/editar/, _form/)
+│   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/)
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
 │   └── layout.tsx        # Root: fonts, NextIntlClientProvider, Providers
 ├── components/
