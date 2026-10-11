@@ -46,6 +46,7 @@ src/
 │   ├── (app)/            # Authenticated area: layout.tsx is the shell
 │   │   ├── dashboard/
 │   │   ├── alterar-senha/
+│   │   ├── documentos/   # list, novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/)
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
@@ -58,7 +59,7 @@ src/
 ├── contexts/AuthContext.tsx
 ├── http/                 # Orval client + fetch mutator
 ├── i18n/                 # Locales and request config
-└── lib/                  # error-translator, format-date, jwt, auth-storage, utils
+└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, utils
 ```
 
 Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
