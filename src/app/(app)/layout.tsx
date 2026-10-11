@@ -53,12 +53,7 @@ const navItems: NavItem[] = [
     pending: true,
   },
   { key: 'programs', href: '/programa', icon: 'diamond', pending: true },
-  {
-    key: 'documents',
-    href: '/documentos',
-    icon: 'description',
-    pending: true,
-  },
+  { key: 'documents', href: '/documentos', icon: 'description' },
   { key: 'projects', href: '/projetos', icon: 'list_alt', pending: true },
   {
     key: 'trainings',

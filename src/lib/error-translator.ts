@@ -55,6 +55,21 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Activity code already exists.': 'activityCodeTaken',
   'Activity not found.': 'activityNotFound',
   'Activity has linked records.': 'activityHasLinkedRecords',
+  'Invalid document material.': 'documentMaterialInvalid',
+  'Document name is required.': 'documentNameRequired',
+  'Document name is too long.': 'documentNameTooLong',
+  'Document responsible is required.': 'documentResponsibleRequired',
+  'Document responsible is too long.': 'documentResponsibleTooLong',
+  'Invalid document date.': 'documentDateInvalid',
+  'Document file type not allowed.': 'documentFileTypeNotAllowed',
+  'Document file is empty.': 'documentFileEmpty',
+  'Document file name is too long.': 'documentFileNameTooLong',
+  'Only one file is allowed.': 'documentFileSingle',
+  'Document file exceeds the 25 MB limit.': 'documentFileTooLarge',
+  'Document not found.': 'documentNotFound',
+  'Document file not found.': 'documentFileNotFound',
+  'Document file is unavailable.': 'documentFileUnavailable',
+  'E-Social template is unavailable.': 'documentTemplateUnavailable',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {
