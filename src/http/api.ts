@@ -25,6 +25,89 @@ import type {
 } from '@tanstack/react-query';
 
 import { customFetch } from './fetch-client';
+export interface Activity {
+  id: string;
+  code: string;
+  name: string;
+  fabric: string;
+  line: string;
+  area: string;
+  function: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Kind of record linked to an activity. The eleven evaluation types are aggregated into evaluations.
+ */
+export type ActivityLinkedRecordType = typeof ActivityLinkedRecordType[keyof typeof ActivityLinkedRecordType];
+
+
+export const ActivityLinkedRecordType = {
+  evaluations: 'evaluations',
+  projects: 'projects',
+  matrix: 'matrix',
+} as const;
+
+export type ActivityLinkedRecordsItemsItem = {
+  type: ActivityLinkedRecordType;
+  /** @minimum 1 */
+  count: number;
+};
+
+export interface ActivityLinkedRecords {
+  /**
+     * Sum of the counts in items
+     * @minimum 0
+     */
+  total: number;
+  /** One entry per type with at least one linked record */
+  items: ActivityLinkedRecordsItemsItem[];
+}
+
+export type ActivityDetail = Activity & {
+  linked_records: ActivityLinkedRecords;
+};
+
+export interface ActivityInput {
+  /**
+     * Trimmed before validation; unique ignoring case
+     * @minLength 1
+     * @maxLength 255
+     */
+  code: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  fabric: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  line: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  area: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  function: string;
+}
+
 /**
  * Hierarchical access profile inherited from the legacy E-Matrix: admin (manages users and parameters) > user (edits content) > viewer (read-only).
  */
@@ -2129,4 +2212,622 @@ export const useDeletePeriodsId = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getDeletePeriodsIdMutationOptions(options), queryClient);
+    }
+
+export type getActivitiesResponse200 = {
+  data: Activity[]
+  status: 200
+}
+
+export type getActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getActivitiesResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getActivitiesResponseSuccess = (getActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getActivitiesResponseError = (getActivitiesResponse401 | getActivitiesResponse403) & {
+  headers: Headers;
+};
+
+export type getActivitiesResponse = (getActivitiesResponseSuccess | getActivitiesResponseError)
+
+export const getGetActivitiesUrl = () => {
+
+
+
+
+  return `/activities`
+}
+
+/**
+ * Lists every activity ordered by name, A to Z, breaking ties by code. Requires admin role.
+ * @summary List activities
+ */
+export const getActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesResponse> => {
+
+  return customFetch<getActivitiesResponse>(getGetActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActivitiesQueryKey = () => {
+    return [
+    `/activities`
+    ] as const;
+    }
+
+
+export const getGetActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActivities>>> = ({ signal }) => getActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getActivities>>>
+export type GetActivitiesQueryError = ErrorResponse
+
+
+export function useGetActivities<TData = Awaited<ReturnType<typeof getActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActivities<TData = Awaited<ReturnType<typeof getActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActivities<TData = Awaited<ReturnType<typeof getActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List activities
+ */
+
+export function useGetActivities<TData = Awaited<ReturnType<typeof getActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postActivitiesResponse201 = {
+  data: Activity
+  status: 201
+}
+
+export type postActivitiesResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postActivitiesResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postActivitiesResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postActivitiesResponseSuccess = (postActivitiesResponse201) & {
+  headers: Headers;
+};
+export type postActivitiesResponseError = (postActivitiesResponse400 | postActivitiesResponse401 | postActivitiesResponse403 | postActivitiesResponse409) & {
+  headers: Headers;
+};
+
+export type postActivitiesResponse = (postActivitiesResponseSuccess | postActivitiesResponseError)
+
+export const getPostActivitiesUrl = () => {
+
+
+
+
+  return `/activities`
+}
+
+/**
+ * Creates an activity. The six fields are required and trimmed, and each one must be at most 255 characters after trimming. The code must be unique ignoring case. Records who created the activity in created_by. Requires admin role.
+ * @summary Create activity
+ */
+export const postActivities = async (activityInput: ActivityInput, options?: Parameters<typeof customFetch>[1]): Promise<postActivitiesResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postActivitiesResponse>(getPostActivitiesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(activityInput)
+  }
+);}
+
+
+
+
+
+export const getPostActivitiesMutationKey = () => ['postActivities'] as const;
+
+export const getPostActivitiesMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postActivities>>, TError,PostActivitiesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postActivities>>, TError,PostActivitiesMutationVariables, TContext> => {
+
+const mutationKey = getPostActivitiesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postActivities>>, PostActivitiesMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postActivities(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostActivitiesMutationResult = NonNullable<Awaited<ReturnType<typeof postActivities>>>
+    export type PostActivitiesMutationBody = ActivityInput
+    export type PostActivitiesMutationError = ErrorResponse
+    export type PostActivitiesMutationVariables = {data: ActivityInput}
+
+    /**
+ * @summary Create activity
+ */
+export const usePostActivities = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postActivities>>, TError,PostActivitiesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postActivities>>,
+        TError,
+        PostActivitiesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostActivitiesMutationOptions(options), queryClient);
+    }
+
+export type getActivitiesIdResponse200 = {
+  data: ActivityDetail
+  status: 200
+}
+
+export type getActivitiesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getActivitiesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getActivitiesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getActivitiesIdResponseSuccess = (getActivitiesIdResponse200) & {
+  headers: Headers;
+};
+export type getActivitiesIdResponseError = (getActivitiesIdResponse401 | getActivitiesIdResponse403 | getActivitiesIdResponse404) & {
+  headers: Headers;
+};
+
+export type getActivitiesIdResponse = (getActivitiesIdResponseSuccess | getActivitiesIdResponseError)
+
+export const getGetActivitiesIdUrl = (id: string,) => {
+
+
+
+
+  return `/activities/${id}`
+}
+
+/**
+ * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its evaluations, its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. Requires admin role.
+ * @summary Get activity
+ */
+export const getActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesIdResponse> => {
+
+  return customFetch<getActivitiesIdResponse>(getGetActivitiesIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetActivitiesIdQueryKey = (id: string,) => {
+    return [
+    `/activities/${id}`
+    ] as const;
+    }
+
+
+export const getGetActivitiesIdQueryOptions = <TData = Awaited<ReturnType<typeof getActivitiesId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetActivitiesIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getActivitiesId>>> = ({ signal }) => getActivitiesId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetActivitiesIdQueryResult = NonNullable<Awaited<ReturnType<typeof getActivitiesId>>>
+export type GetActivitiesIdQueryError = ErrorResponse
+
+
+export function useGetActivitiesId<TData = Awaited<ReturnType<typeof getActivitiesId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActivitiesId>>,
+          TError,
+          Awaited<ReturnType<typeof getActivitiesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActivitiesId<TData = Awaited<ReturnType<typeof getActivitiesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getActivitiesId>>,
+          TError,
+          Awaited<ReturnType<typeof getActivitiesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetActivitiesId<TData = Awaited<ReturnType<typeof getActivitiesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get activity
+ */
+
+export function useGetActivitiesId<TData = Awaited<ReturnType<typeof getActivitiesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getActivitiesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetActivitiesIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putActivitiesIdResponse200 = {
+  data: Activity
+  status: 200
+}
+
+export type putActivitiesIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putActivitiesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putActivitiesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putActivitiesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putActivitiesIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type putActivitiesIdResponseSuccess = (putActivitiesIdResponse200) & {
+  headers: Headers;
+};
+export type putActivitiesIdResponseError = (putActivitiesIdResponse400 | putActivitiesIdResponse401 | putActivitiesIdResponse403 | putActivitiesIdResponse404 | putActivitiesIdResponse409) & {
+  headers: Headers;
+};
+
+export type putActivitiesIdResponse = (putActivitiesIdResponseSuccess | putActivitiesIdResponseError)
+
+export const getPutActivitiesIdUrl = (id: string,) => {
+
+
+
+
+  return `/activities/${id}`
+}
+
+/**
+ * Replaces the six fields of an activity, with or without linked records, under the same rules as the creation: all six are required and trimmed, each one must be at most 255 characters after trimming, and the code must not belong to another activity ignoring case. Changing the code undoes no link, because linked records point at the activity id. Other fields (id, audit fields) are ignored. Records who updated the activity in updated_by/updated_at. Requires admin role.
+ * @summary Update activity
+ */
+export const putActivitiesId = async (id: string,
+    activityInput: ActivityInput, options?: Parameters<typeof customFetch>[1]): Promise<putActivitiesIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putActivitiesIdResponse>(getPutActivitiesIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(activityInput)
+  }
+);}
+
+
+
+
+
+export const getPutActivitiesIdMutationKey = () => ['putActivitiesId'] as const;
+
+export const getPutActivitiesIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putActivitiesId>>, TError,PutActivitiesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putActivitiesId>>, TError,PutActivitiesIdMutationVariables, TContext> => {
+
+const mutationKey = getPutActivitiesIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putActivitiesId>>, PutActivitiesIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putActivitiesId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutActivitiesIdMutationResult = NonNullable<Awaited<ReturnType<typeof putActivitiesId>>>
+    export type PutActivitiesIdMutationBody = ActivityInput
+    export type PutActivitiesIdMutationError = ErrorResponse
+    export type PutActivitiesIdMutationVariables = {id: string;data: ActivityInput}
+
+    /**
+ * @summary Update activity
+ */
+export const usePutActivitiesId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putActivitiesId>>, TError,PutActivitiesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putActivitiesId>>,
+        TError,
+        PutActivitiesIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutActivitiesIdMutationOptions(options), queryClient);
+    }
+
+export type deleteActivitiesIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteActivitiesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteActivitiesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteActivitiesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteActivitiesIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type deleteActivitiesIdResponseSuccess = (deleteActivitiesIdResponse204) & {
+  headers: Headers;
+};
+export type deleteActivitiesIdResponseError = (deleteActivitiesIdResponse401 | deleteActivitiesIdResponse403 | deleteActivitiesIdResponse404 | deleteActivitiesIdResponse409) & {
+  headers: Headers;
+};
+
+export type deleteActivitiesIdResponse = (deleteActivitiesIdResponseSuccess | deleteActivitiesIdResponseError)
+
+export const getDeleteActivitiesIdUrl = (id: string,) => {
+
+
+
+
+  return `/activities/${id}`
+}
+
+/**
+ * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction. Deleting the same activity again responds 404. The request has no body. Requires admin role.
+ * @summary Delete activity
+ */
+export const deleteActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteActivitiesIdResponse> => {
+
+  return customFetch<deleteActivitiesIdResponse>(getDeleteActivitiesIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteActivitiesIdMutationKey = () => ['deleteActivitiesId'] as const;
+
+export const getDeleteActivitiesIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteActivitiesId>>, TError,DeleteActivitiesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteActivitiesId>>, TError,DeleteActivitiesIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteActivitiesIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteActivitiesId>>, DeleteActivitiesIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteActivitiesId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteActivitiesIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteActivitiesId>>>
+
+    export type DeleteActivitiesIdMutationError = ErrorResponse
+    export type DeleteActivitiesIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete activity
+ */
+export const useDeleteActivitiesId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteActivitiesId>>, TError,DeleteActivitiesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteActivitiesId>>,
+        TError,
+        DeleteActivitiesIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteActivitiesIdMutationOptions(options), queryClient);
     }
