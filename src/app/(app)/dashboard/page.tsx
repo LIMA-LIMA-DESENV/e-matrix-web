@@ -5,20 +5,23 @@ import { useTranslations } from 'next-intl'
 import { Badge, Card } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 
-// Mirrors the module order of the legacy E-Matrix; flip `done` as each module
-// is migrated.
+// Migration order, not the legacy sidebar order: what is already migrated,
+// then the planned order for the rest. The standalone modules come first
+// (documents brings the attachment endpoints the next ones reuse), then the
+// ones that own records linked to a period or an activity, and the matrix
+// last because it is the only one linked to both. Flip `done` as each lands.
 const modules = [
   { key: 'users', done: true },
-  { key: 'managementPlan', done: false },
-  { key: 'programs', done: false },
-  { key: 'documents', done: false },
-  { key: 'projects', done: false },
-  { key: 'trainings', done: false },
-  { key: 'meetings', done: false },
-  { key: 'matrix', done: false },
   { key: 'periods', done: true },
   { key: 'activities', done: true },
   { key: 'parameters', done: true },
+  { key: 'documents', done: true },
+  { key: 'trainings', done: false },
+  { key: 'meetings', done: false },
+  { key: 'managementPlan', done: false },
+  { key: 'programs', done: false },
+  { key: 'projects', done: false },
+  { key: 'matrix', done: false },
 ] as const
 
 export default function DashboardPage() {
