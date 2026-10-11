@@ -142,6 +142,59 @@ export interface CreateUserRequest {
   id?: string | null;
 }
 
+/**
+ * Fixed classification of a document, with the two slugs of the legacy E-Matrix: e-social (the E-Social matrix spreadsheet) and docs (every other material).
+ */
+export type DocumentMaterial = typeof DocumentMaterial[keyof typeof DocumentMaterial];
+
+
+export const DocumentMaterial = {
+  'e-social': 'e-social',
+  docs: 'docs',
+} as const;
+
+/**
+ * The attached file as the contract exposes it. The storage key never leaves the server: the download goes by document id.
+ */
+export interface DocumentFile {
+  /** Original name sent on the upload, also the name of the downloaded file */
+  name: string;
+  /** Derived from the extension, not from the Content-Type the client sent */
+  mime_type: string;
+}
+
+export interface Document {
+  id: string;
+  material: DocumentMaterial;
+  name: string;
+  responsible: string;
+  date: string;
+  /** The attached file, or null when the document has none */
+  file: DocumentFile | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DocumentInput {
+  material: DocumentMaterial;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  responsible: string;
+  /** Calendar day, without time; past and future dates are accepted */
+  date: string;
+  /** Optional. doc, docx, xls, xlsx, ppt, pptx or pdf, up to 26214400 bytes (25 MB). Leaving the part out keeps the document without a file. */
+  file?: Blob | File;
+}
+
 export interface ErrorResponse {
   /** Safe error message for the rejected request */
   message: string;
@@ -2831,3 +2884,949 @@ export const useDeleteActivitiesId = <TError = ErrorResponse,
       > => {
       return useMutation(getDeleteActivitiesIdMutationOptions(options), queryClient);
     }
+
+export type getDocumentsResponse200 = {
+  data: Document[]
+  status: 200
+}
+
+export type getDocumentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getDocumentsResponseSuccess = (getDocumentsResponse200) & {
+  headers: Headers;
+};
+export type getDocumentsResponseError = (getDocumentsResponse401) & {
+  headers: Headers;
+};
+
+export type getDocumentsResponse = (getDocumentsResponseSuccess | getDocumentsResponseError)
+
+export const getGetDocumentsUrl = () => {
+
+
+
+
+  return `/documents`
+}
+
+/**
+ * Lists every document, newest date first, breaking ties by created_at descending and id ascending so the order is stable between calls. The listing is global: it accepts no query parameter and is never narrowed by a period, and no document keeps a period from being deleted. Searching, sorting and paging are done by the client. Requires only an authenticated user, so any role.
+ * @summary List documents
+ */
+export const getDocuments = async ( options?: Parameters<typeof customFetch>[1]): Promise<getDocumentsResponse> => {
+
+  return customFetch<getDocumentsResponse>(getGetDocumentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDocumentsQueryKey = () => {
+    return [
+    `/documents`
+    ] as const;
+    }
+
+
+export const getGetDocumentsQueryOptions = <TData = Awaited<ReturnType<typeof getDocuments>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocuments>>> = ({ signal }) => getDocuments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentsQueryResult = NonNullable<Awaited<ReturnType<typeof getDocuments>>>
+export type GetDocumentsQueryError = ErrorResponse
+
+
+export function useGetDocuments<TData = Awaited<ReturnType<typeof getDocuments>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocuments>>,
+          TError,
+          Awaited<ReturnType<typeof getDocuments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocuments<TData = Awaited<ReturnType<typeof getDocuments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocuments>>,
+          TError,
+          Awaited<ReturnType<typeof getDocuments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocuments<TData = Awaited<ReturnType<typeof getDocuments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List documents
+ */
+
+export function useGetDocuments<TData = Awaited<ReturnType<typeof getDocuments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocuments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postDocumentsResponse201 = {
+  data: Document
+  status: 201
+}
+
+export type postDocumentsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postDocumentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postDocumentsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postDocumentsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postDocumentsResponseSuccess = (postDocumentsResponse201) & {
+  headers: Headers;
+};
+export type postDocumentsResponseError = (postDocumentsResponse400 | postDocumentsResponse401 | postDocumentsResponse403 | postDocumentsResponse413) & {
+  headers: Headers;
+};
+
+export type postDocumentsResponse = (postDocumentsResponseSuccess | postDocumentsResponseError)
+
+export const getPostDocumentsUrl = () => {
+
+
+
+
+  return `/documents`
+}
+
+/**
+ * Creates a document, with an optional file. The body is multipart/form-data: material, name, responsible and date are required, name and responsible are trimmed and limited to 255 characters, and date is a calendar day. The file part is optional; a part whose filename is empty, which is what browsers send for a blank file field, counts as no file. The original file name is preserved and is the name of the downloaded file, while the stored object is named by the server and its key is never exposed. Records who created the document in created_by. Requires the user or admin role.
+ * @summary Create document
+ */
+export const postDocuments = async (documentInput: DocumentInput, options?: Parameters<typeof customFetch>[1]): Promise<postDocumentsResponse> => {
+    const formData = new FormData();
+formData.append(`material`, documentInput.material);
+formData.append(`name`, documentInput.name);
+formData.append(`responsible`, documentInput.responsible);
+formData.append(`date`, documentInput.date);
+if(documentInput.file !== undefined) {
+ formData.append(`file`, documentInput.file);
+ }
+
+  return customFetch<postDocumentsResponse>(getPostDocumentsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostDocumentsMutationKey = () => ['postDocuments'] as const;
+
+export const getPostDocumentsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postDocuments>>, TError,PostDocumentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postDocuments>>, TError,PostDocumentsMutationVariables, TContext> => {
+
+const mutationKey = getPostDocumentsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postDocuments>>, PostDocumentsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postDocuments(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostDocumentsMutationResult = NonNullable<Awaited<ReturnType<typeof postDocuments>>>
+    export type PostDocumentsMutationBody = DocumentInput
+    export type PostDocumentsMutationError = ErrorResponse
+    export type PostDocumentsMutationVariables = {data: DocumentInput}
+
+    /**
+ * @summary Create document
+ */
+export const usePostDocuments = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postDocuments>>, TError,PostDocumentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postDocuments>>,
+        TError,
+        PostDocumentsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostDocumentsMutationOptions(options), queryClient);
+    }
+
+export type getDocumentsIdResponse200 = {
+  data: Document
+  status: 200
+}
+
+export type getDocumentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getDocumentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getDocumentsIdResponseSuccess = (getDocumentsIdResponse200) & {
+  headers: Headers;
+};
+export type getDocumentsIdResponseError = (getDocumentsIdResponse401 | getDocumentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getDocumentsIdResponse = (getDocumentsIdResponseSuccess | getDocumentsIdResponseError)
+
+export const getGetDocumentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/documents/${id}`
+}
+
+/**
+ * Returns one document, in the same format as an item of the listing. Requires only an authenticated user, so any role.
+ * @summary Get document
+ */
+export const getDocumentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getDocumentsIdResponse> => {
+
+  return customFetch<getDocumentsIdResponse>(getGetDocumentsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDocumentsIdQueryKey = (id: string,) => {
+    return [
+    `/documents/${id}`
+    ] as const;
+    }
+
+
+export const getGetDocumentsIdQueryOptions = <TData = Awaited<ReturnType<typeof getDocumentsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocumentsId>>> = ({ signal }) => getDocumentsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getDocumentsId>>>
+export type GetDocumentsIdQueryError = ErrorResponse
+
+
+export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocumentsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocumentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocumentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get document
+ */
+
+export function useGetDocumentsId<TData = Awaited<ReturnType<typeof getDocumentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putDocumentsIdResponse200 = {
+  data: Document
+  status: 200
+}
+
+export type putDocumentsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putDocumentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putDocumentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putDocumentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putDocumentsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putDocumentsIdResponseSuccess = (putDocumentsIdResponse200) & {
+  headers: Headers;
+};
+export type putDocumentsIdResponseError = (putDocumentsIdResponse400 | putDocumentsIdResponse401 | putDocumentsIdResponse403 | putDocumentsIdResponse404 | putDocumentsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putDocumentsIdResponse = (putDocumentsIdResponseSuccess | putDocumentsIdResponseError)
+
+export const getPutDocumentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/documents/${id}`
+}
+
+/**
+ * Updates a document. The body is multipart/form-data and all four fields are required; there is no partial update. Leaving the file part out keeps the current file intact, and sending a valid one replaces it, the previous object being deleted from the storage so it stops being served. A file part whose filename is empty, which is what browsers send for a blank file field, also counts as keeping the current file. Removing the file without replacing it is a separate operation: DELETE /documents/{id}/file. Extra fields in the body (id, the audit fields, the file columns) are ignored. The row is locked while its previous storage key is read, and the previous object is deleted only after the row already points at the new one, so two concurrent updates leave exactly one object alive. Records who made the change in updated_by. Requires the user or admin role.
+ * @summary Update document
+ */
+export const putDocumentsId = async (id: string,
+    documentInput: DocumentInput, options?: Parameters<typeof customFetch>[1]): Promise<putDocumentsIdResponse> => {
+    const formData = new FormData();
+formData.append(`material`, documentInput.material);
+formData.append(`name`, documentInput.name);
+formData.append(`responsible`, documentInput.responsible);
+formData.append(`date`, documentInput.date);
+if(documentInput.file !== undefined) {
+ formData.append(`file`, documentInput.file);
+ }
+
+  return customFetch<putDocumentsIdResponse>(getPutDocumentsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutDocumentsIdMutationKey = () => ['putDocumentsId'] as const;
+
+export const getPutDocumentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putDocumentsId>>, TError,PutDocumentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putDocumentsId>>, TError,PutDocumentsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutDocumentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putDocumentsId>>, PutDocumentsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putDocumentsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutDocumentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putDocumentsId>>>
+    export type PutDocumentsIdMutationBody = DocumentInput
+    export type PutDocumentsIdMutationError = ErrorResponse
+    export type PutDocumentsIdMutationVariables = {id: string;data: DocumentInput}
+
+    /**
+ * @summary Update document
+ */
+export const usePutDocumentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putDocumentsId>>, TError,PutDocumentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putDocumentsId>>,
+        TError,
+        PutDocumentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutDocumentsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteDocumentsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteDocumentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteDocumentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteDocumentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteDocumentsIdResponseSuccess = (deleteDocumentsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteDocumentsIdResponseError = (deleteDocumentsIdResponse401 | deleteDocumentsIdResponse403 | deleteDocumentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteDocumentsIdResponse = (deleteDocumentsIdResponseSuccess | deleteDocumentsIdResponseError)
+
+export const getDeleteDocumentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/documents/${id}`
+}
+
+/**
+ * Deletes a document permanently and deletes the object of its file, if it has one, which stops being served. The deletion is never blocked: no module points at documents, so there are no linked records to count and no 409 is ever answered. Deleting the same document again responds 404. The row is locked while its storage key is read and the object is deleted only after the transaction committed. The request has no body. The confirmation R-15 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete document
+ */
+export const deleteDocumentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteDocumentsIdResponse> => {
+
+  return customFetch<deleteDocumentsIdResponse>(getDeleteDocumentsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteDocumentsIdMutationKey = () => ['deleteDocumentsId'] as const;
+
+export const getDeleteDocumentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsId>>, TError,DeleteDocumentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsId>>, TError,DeleteDocumentsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteDocumentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocumentsId>>, DeleteDocumentsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteDocumentsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocumentsId>>>
+
+    export type DeleteDocumentsIdMutationError = ErrorResponse
+    export type DeleteDocumentsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete document
+ */
+export const useDeleteDocumentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsId>>, TError,DeleteDocumentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocumentsId>>,
+        TError,
+        DeleteDocumentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentsIdMutationOptions(options), queryClient);
+    }
+
+export type getDocumentsIdFileResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getDocumentsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getDocumentsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getDocumentsIdFileResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getDocumentsIdFileResponseSuccess = (getDocumentsIdFileResponse200) & {
+  headers: Headers;
+};
+export type getDocumentsIdFileResponseError = (getDocumentsIdFileResponse401 | getDocumentsIdFileResponse404 | getDocumentsIdFileResponse500) & {
+  headers: Headers;
+};
+
+export type getDocumentsIdFileResponse = (getDocumentsIdFileResponseSuccess | getDocumentsIdFileResponseError)
+
+export const getGetDocumentsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/documents/${id}/file`
+}
+
+/**
+ * Streams the file of a document to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. There is no other way to reach the file: no static route, no signed URL and no public object. Requires only an authenticated user, so any role.
+ * @summary Download document file
+ */
+export const getDocumentsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getDocumentsIdFileResponse> => {
+
+  return customFetch<getDocumentsIdFileResponse>(getGetDocumentsIdFileUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDocumentsIdFileQueryKey = (id: string,) => {
+    return [
+    `/documents/${id}/file`
+    ] as const;
+    }
+
+
+export const getGetDocumentsIdFileQueryOptions = <TData = Awaited<ReturnType<typeof getDocumentsIdFile>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentsIdFileQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocumentsIdFile>>> = ({ signal }) => getDocumentsIdFile(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentsIdFileQueryResult = NonNullable<Awaited<ReturnType<typeof getDocumentsIdFile>>>
+export type GetDocumentsIdFileQueryError = ErrorResponse
+
+
+export function useGetDocumentsIdFile<TData = Awaited<ReturnType<typeof getDocumentsIdFile>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsIdFile<TData = Awaited<ReturnType<typeof getDocumentsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsIdFile<TData = Awaited<ReturnType<typeof getDocumentsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download document file
+ */
+
+export function useGetDocumentsIdFile<TData = Awaited<ReturnType<typeof getDocumentsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentsIdFileQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteDocumentsIdFileResponse200 = {
+  data: Document
+  status: 200
+}
+
+export type deleteDocumentsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteDocumentsIdFileResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteDocumentsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteDocumentsIdFileResponseSuccess = (deleteDocumentsIdFileResponse200) & {
+  headers: Headers;
+};
+export type deleteDocumentsIdFileResponseError = (deleteDocumentsIdFileResponse401 | deleteDocumentsIdFileResponse403 | deleteDocumentsIdFileResponse404) & {
+  headers: Headers;
+};
+
+export type deleteDocumentsIdFileResponse = (deleteDocumentsIdFileResponseSuccess | deleteDocumentsIdFileResponseError)
+
+export const getDeleteDocumentsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/documents/${id}/file`
+}
+
+/**
+ * Removes the file of a document and keeps the document, which starts answering file: null and stops offering the download. It is a route of its own rather than a flag on the PUT, where an empty file field always means 'keep'. Answers 200 with the updated document, and not 204, because the resource still exists and changed. A document that has no file answers 404 'Document file not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent. The three file columns are cleared together and the object is deleted only afterwards. Records who made the change in updated_by. The confirmation R-13 requires is the interface's responsibility. Requires the user or admin role.
+ * @summary Remove document file
+ */
+export const deleteDocumentsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteDocumentsIdFileResponse> => {
+
+  return customFetch<deleteDocumentsIdFileResponse>(getDeleteDocumentsIdFileUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteDocumentsIdFileMutationKey = () => ['deleteDocumentsIdFile'] as const;
+
+export const getDeleteDocumentsIdFileMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsIdFile>>, TError,DeleteDocumentsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsIdFile>>, TError,DeleteDocumentsIdFileMutationVariables, TContext> => {
+
+const mutationKey = getDeleteDocumentsIdFileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteDocumentsIdFile>>, DeleteDocumentsIdFileMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteDocumentsIdFile(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteDocumentsIdFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteDocumentsIdFile>>>
+
+    export type DeleteDocumentsIdFileMutationError = ErrorResponse
+    export type DeleteDocumentsIdFileMutationVariables = {id: string}
+
+    /**
+ * @summary Remove document file
+ */
+export const useDeleteDocumentsIdFile = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteDocumentsIdFile>>, TError,DeleteDocumentsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteDocumentsIdFile>>,
+        TError,
+        DeleteDocumentsIdFileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteDocumentsIdFileMutationOptions(options), queryClient);
+    }
+
+export type getDocumentsTemplatesESocialResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getDocumentsTemplatesESocialResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getDocumentsTemplatesESocialResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getDocumentsTemplatesESocialResponseSuccess = (getDocumentsTemplatesESocialResponse200) & {
+  headers: Headers;
+};
+export type getDocumentsTemplatesESocialResponseError = (getDocumentsTemplatesESocialResponse401 | getDocumentsTemplatesESocialResponse500) & {
+  headers: Headers;
+};
+
+export type getDocumentsTemplatesESocialResponse = (getDocumentsTemplatesESocialResponseSuccess | getDocumentsTemplatesESocialResponseError)
+
+export const getGetDocumentsTemplatesESocialUrl = () => {
+
+
+
+
+  return `/documents/templates/e-social`
+}
+
+/**
+ * Streams the E-Social spreadsheet template to an authenticated user, under the stable name modelo-e-social.xlsx, as an attachment with X-Content-Type-Options: nosniff. The file is versioned in the server repository and is not editable by the application; it is never served as a public asset, because its metadata names people and a client. Requires only an authenticated user, so any role.
+ * @summary Download the E-Social template
+ */
+export const getDocumentsTemplatesESocial = async ( options?: Parameters<typeof customFetch>[1]): Promise<getDocumentsTemplatesESocialResponse> => {
+
+  return customFetch<getDocumentsTemplatesESocialResponse>(getGetDocumentsTemplatesESocialUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetDocumentsTemplatesESocialQueryKey = () => {
+    return [
+    `/documents/templates/e-social`
+    ] as const;
+    }
+
+
+export const getGetDocumentsTemplatesESocialQueryOptions = <TData = Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetDocumentsTemplatesESocialQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>> = ({ signal }) => getDocumentsTemplatesESocial({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetDocumentsTemplatesESocialQueryResult = NonNullable<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>>
+export type GetDocumentsTemplatesESocialQueryError = ErrorResponse
+
+
+export function useGetDocumentsTemplatesESocial<TData = Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsTemplatesESocial<TData = Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>,
+          TError,
+          Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetDocumentsTemplatesESocial<TData = Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download the E-Social template
+ */
+
+export function useGetDocumentsTemplatesESocial<TData = Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDocumentsTemplatesESocial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetDocumentsTemplatesESocialQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
