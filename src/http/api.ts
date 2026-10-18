@@ -305,6 +305,152 @@ export interface UserPublic {
   created_at?: string;
 }
 
+/**
+ * Fixed classification of a training, with the five slugs of the legacy E-Matrix: producao (general guidance for production), escritorios (general guidance for offices), novos-funcionarios (guidance for new employees), basico (basic training) and avancado (advanced training).
+ */
+export type TrainingContent = typeof TrainingContent[keyof typeof TrainingContent];
+
+
+export const TrainingContent = {
+  producao: 'producao',
+  escritorios: 'escritorios',
+  'novos-funcionarios': 'novos-funcionarios',
+  basico: 'basico',
+  avancado: 'avancado',
+} as const;
+
+/**
+ * The attendance list as the contract exposes it. The storage key never leaves the server: the download goes by training id.
+ */
+export interface TrainingFile {
+  /** Original name sent on the upload, also the name of the downloaded file */
+  name: string;
+  /** Derived from the extension, not from the Content-Type the client sent */
+  mime_type: string;
+}
+
+export interface Training {
+  id: string;
+  content: TrainingContent;
+  name: string;
+  responsible: string;
+  date: string;
+  /** Plain text of several lines; line breaks are preserved and no markup is interpreted */
+  subject: string;
+  /** Free text, as in the legacy system: no fixed set of values */
+  status: string;
+  /** The attendance list, or null when the training has none */
+  file: TrainingFile | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TrainingInput {
+  content: TrainingContent;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  responsible: string;
+  /** Calendar day, without time. It must fall inside a registered period, limits included; with no period registered every date is refused. */
+  date: string;
+  /**
+     * Plain text of several lines, trimmed before validation. Line breaks are preserved and no markup is interpreted.
+     * @minLength 1
+     * @maxLength 2000
+     */
+  subject: string;
+  /**
+     * Free text, trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  status: string;
+  /** Optional attendance list. doc, docx, ppt, pptx or pdf - no spreadsheet - up to 26214400 bytes (25 MB). Leaving the part out keeps the training without a file. */
+  file?: Blob | File;
+}
+
+/**
+ * Fixed classification of a meeting ('Reunião com'), with the three slugs of the legacy E-Matrix: comite-ergonomia (ergonomics committee), projetos (projects) and diversas-areas (several areas).
+ */
+export type MeetingType = typeof MeetingType[keyof typeof MeetingType];
+
+
+export const MeetingType = {
+  'comite-ergonomia': 'comite-ergonomia',
+  projetos: 'projetos',
+  'diversas-areas': 'diversas-areas',
+} as const;
+
+/**
+ * One attachment of a meeting as the contract exposes it. The storage key never leaves the server: the download goes by meeting id and attachment.
+ */
+export interface MeetingFile {
+  /** Original name sent on the upload, also the name of the downloaded file */
+  name: string;
+  /** Derived from the extension, not from the Content-Type the client sent */
+  mime_type: string;
+}
+
+export interface Meeting {
+  id: string;
+  type: MeetingType;
+  name: string;
+  responsible: string;
+  date: string;
+  /** Plain text of several lines; line breaks are preserved and no markup is interpreted */
+  subject: string;
+  /** Free text, as in the legacy system: no fixed set of values */
+  status: string;
+  /** The signed presence list, or null when the meeting has none */
+  presence_list: MeetingFile | null;
+  /** The minutes of the meeting, or null when the meeting has none */
+  minutes: MeetingFile | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MeetingInput {
+  type: MeetingType;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  responsible: string;
+  /** Calendar day, without time. It must fall inside a registered period, limits included; with no period registered every date is refused. */
+  date: string;
+  /**
+     * Plain text of several lines, trimmed before validation. Line breaks are preserved and no markup is interpreted.
+     * @minLength 1
+     * @maxLength 2000
+     */
+  subject: string;
+  /**
+     * Free text, trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  status: string;
+  /** Optional signed presence list. doc, docx, ppt, pptx or pdf - no spreadsheet - up to 26214400 bytes (25 MB). At most one file in this part. Leaving the part out, or sending it with an empty filename, keeps the meeting without a presence list. */
+  presence_list?: Blob | File;
+  /** Optional minutes of the meeting. doc, docx, ppt, pptx or pdf - no spreadsheet - up to 26214400 bytes (25 MB). At most one file in this part. Leaving the part out, or sending it with an empty filename, keeps the meeting without minutes. */
+  minutes?: Blob | File;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -350,6 +496,20 @@ export type PostPasswordChange200 = {
 
 export type PostPasswordResetParams = {
 token: string;
+};
+
+export type GetTrainingsParams = {
+/**
+ * Period whose date range slices the listing. Omit it to list every training.
+ */
+period_id?: string;
+};
+
+export type GetMeetingsParams = {
+/**
+ * Period whose date range slices the listing. Omit it to list every meeting.
+ */
+period_id?: string;
 };
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -1659,15 +1819,10 @@ export type getPeriodsResponse401 = {
   status: 401
 }
 
-export type getPeriodsResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-
 export type getPeriodsResponseSuccess = (getPeriodsResponse200) & {
   headers: Headers;
 };
-export type getPeriodsResponseError = (getPeriodsResponse401 | getPeriodsResponse403) & {
+export type getPeriodsResponseError = (getPeriodsResponse401) & {
   headers: Headers;
 };
 
@@ -1682,7 +1837,7 @@ export const getGetPeriodsUrl = () => {
 }
 
 /**
- * Lists every period ordered by start_date, oldest first. Dates are calendar days (YYYY-MM-DD) without time or time zone. Requires admin role.
+ * Lists every period ordered by start_date, oldest first. Dates are calendar days (YYYY-MM-DD) without time or time zone. Any authenticated role.
  * @summary List periods
  */
 export const getPeriods = async ( options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsResponse> => {
@@ -1908,11 +2063,6 @@ export type getPeriodsIdResponse401 = {
   status: 401
 }
 
-export type getPeriodsIdResponse403 = {
-  data: ErrorResponse
-  status: 403
-}
-
 export type getPeriodsIdResponse404 = {
   data: ErrorResponse
   status: 404
@@ -1921,7 +2071,7 @@ export type getPeriodsIdResponse404 = {
 export type getPeriodsIdResponseSuccess = (getPeriodsIdResponse200) & {
   headers: Headers;
 };
-export type getPeriodsIdResponseError = (getPeriodsIdResponse401 | getPeriodsIdResponse403 | getPeriodsIdResponse404) & {
+export type getPeriodsIdResponseError = (getPeriodsIdResponse401 | getPeriodsIdResponse404) & {
   headers: Headers;
 };
 
@@ -1936,7 +2086,7 @@ export const getGetPeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. Requires admin role.
+ * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and nothing else until the remaining modules exist. Any authenticated role.
  * @summary Get period
  */
 export const getPeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsIdResponse> => {
@@ -2201,7 +2351,7 @@ export const getDeletePeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
+ * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. Since the trainings and meetings modules exist, this 409 does happen in practice: a period with trainings or meetings dated inside it is not deleted, and the legacy system deleted those records along with the period. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
  * @summary Delete period
  */
 export const deletePeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deletePeriodsIdResponse> => {
@@ -3825,6 +3975,1973 @@ export function useGetDocumentsTemplatesESocial<TData = Awaited<ReturnType<typeo
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetDocumentsTemplatesESocialQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getTrainingsResponse200 = {
+  data: Training[]
+  status: 200
+}
+
+export type getTrainingsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getTrainingsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getTrainingsResponseSuccess = (getTrainingsResponse200) & {
+  headers: Headers;
+};
+export type getTrainingsResponseError = (getTrainingsResponse401 | getTrainingsResponse404) & {
+  headers: Headers;
+};
+
+export type getTrainingsResponse = (getTrainingsResponseSuccess | getTrainingsResponseError)
+
+export const getGetTrainingsUrl = (params?: GetTrainingsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/trainings?${stringifiedParams}` : `/trainings`
+}
+
+/**
+ * Lists trainings, newest date first, breaking ties by created_at descending and id ascending so the order is stable between calls. The optional period_id narrows the listing to the trainings whose date falls inside that period's closed range, both limits included; without it every training is returned, including any whose date falls outside every period - which only the data migration or a shortened period can produce, and which this option is what keeps reachable. A period_id that is not a UUID, that names no period, or that is empty answers 404 instead of widening the listing. No other query parameter is read. Which period the screen opens on is resolved by the client: the API holds no notion of today. There is no pagination on the server; searching, sorting and paging are done by the client. Requires only an authenticated user, so any role.
+ * @summary List trainings
+ */
+export const getTrainings = async (params?: GetTrainingsParams, options?: Parameters<typeof customFetch>[1]): Promise<getTrainingsResponse> => {
+
+  return customFetch<getTrainingsResponse>(getGetTrainingsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrainingsQueryKey = (params?: GetTrainingsParams,) => {
+    return [
+    `/trainings`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetTrainingsQueryOptions = <TData = Awaited<ReturnType<typeof getTrainings>>, TError = ErrorResponse>(params?: GetTrainingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrainingsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrainings>>> = ({ signal }) => getTrainings(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrainingsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrainings>>>
+export type GetTrainingsQueryError = ErrorResponse
+
+
+export function useGetTrainings<TData = Awaited<ReturnType<typeof getTrainings>>, TError = ErrorResponse>(
+ params: undefined |  GetTrainingsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainings>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainings<TData = Awaited<ReturnType<typeof getTrainings>>, TError = ErrorResponse>(
+ params?: GetTrainingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainings>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainings<TData = Awaited<ReturnType<typeof getTrainings>>, TError = ErrorResponse>(
+ params?: GetTrainingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List trainings
+ */
+
+export function useGetTrainings<TData = Awaited<ReturnType<typeof getTrainings>>, TError = ErrorResponse>(
+ params?: GetTrainingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrainingsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postTrainingsResponse201 = {
+  data: Training
+  status: 201
+}
+
+export type postTrainingsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postTrainingsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postTrainingsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postTrainingsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postTrainingsResponseSuccess = (postTrainingsResponse201) & {
+  headers: Headers;
+};
+export type postTrainingsResponseError = (postTrainingsResponse400 | postTrainingsResponse401 | postTrainingsResponse403 | postTrainingsResponse413) & {
+  headers: Headers;
+};
+
+export type postTrainingsResponse = (postTrainingsResponseSuccess | postTrainingsResponseError)
+
+export const getPostTrainingsUrl = () => {
+
+
+
+
+  return `/trainings`
+}
+
+/**
+ * Creates a training, with an optional attendance list. The body is multipart/form-data: content, name, responsible, date, subject and status are required; the four text fields are trimmed, name, responsible and status are limited to 255 characters and subject to 2000; subject is plain text of several lines, whose line breaks are preserved and whose markup is never interpreted. The date is a calendar day and must fall inside a registered period, limits included: the period's row is read under a shared lock inside the same transaction that writes the row, so a training can never be created in a period that is being deleted. The file part is optional; a part whose filename is empty, which is what browsers send for a blank file field, counts as no file. The original file name is preserved and is the name of the downloaded file, while the stored object is named by the server and its key is never exposed. Records who created the training in created_by. Requires the user or admin role.
+ * @summary Create training
+ */
+export const postTrainings = async (trainingInput: TrainingInput, options?: Parameters<typeof customFetch>[1]): Promise<postTrainingsResponse> => {
+    const formData = new FormData();
+formData.append(`content`, trainingInput.content);
+formData.append(`name`, trainingInput.name);
+formData.append(`responsible`, trainingInput.responsible);
+formData.append(`date`, trainingInput.date);
+formData.append(`subject`, trainingInput.subject);
+formData.append(`status`, trainingInput.status);
+if(trainingInput.file !== undefined) {
+ formData.append(`file`, trainingInput.file);
+ }
+
+  return customFetch<postTrainingsResponse>(getPostTrainingsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostTrainingsMutationKey = () => ['postTrainings'] as const;
+
+export const getPostTrainingsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postTrainings>>, TError,PostTrainingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postTrainings>>, TError,PostTrainingsMutationVariables, TContext> => {
+
+const mutationKey = getPostTrainingsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postTrainings>>, PostTrainingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postTrainings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostTrainingsMutationResult = NonNullable<Awaited<ReturnType<typeof postTrainings>>>
+    export type PostTrainingsMutationBody = TrainingInput
+    export type PostTrainingsMutationError = ErrorResponse
+    export type PostTrainingsMutationVariables = {data: TrainingInput}
+
+    /**
+ * @summary Create training
+ */
+export const usePostTrainings = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postTrainings>>, TError,PostTrainingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postTrainings>>,
+        TError,
+        PostTrainingsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostTrainingsMutationOptions(options), queryClient);
+    }
+
+export type getTrainingsIdResponse200 = {
+  data: Training
+  status: 200
+}
+
+export type getTrainingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getTrainingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getTrainingsIdResponseSuccess = (getTrainingsIdResponse200) & {
+  headers: Headers;
+};
+export type getTrainingsIdResponseError = (getTrainingsIdResponse401 | getTrainingsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getTrainingsIdResponse = (getTrainingsIdResponseSuccess | getTrainingsIdResponseError)
+
+export const getGetTrainingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/trainings/${id}`
+}
+
+/**
+ * Returns one training, in the same format as an item of the listing. Requires only an authenticated user, so any role.
+ * @summary Get training
+ */
+export const getTrainingsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getTrainingsIdResponse> => {
+
+  return customFetch<getTrainingsIdResponse>(getGetTrainingsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrainingsIdQueryKey = (id: string,) => {
+    return [
+    `/trainings/${id}`
+    ] as const;
+    }
+
+
+export const getGetTrainingsIdQueryOptions = <TData = Awaited<ReturnType<typeof getTrainingsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrainingsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrainingsId>>> = ({ signal }) => getTrainingsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrainingsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getTrainingsId>>>
+export type GetTrainingsIdQueryError = ErrorResponse
+
+
+export function useGetTrainingsId<TData = Awaited<ReturnType<typeof getTrainingsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsId>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsId<TData = Awaited<ReturnType<typeof getTrainingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsId>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsId<TData = Awaited<ReturnType<typeof getTrainingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get training
+ */
+
+export function useGetTrainingsId<TData = Awaited<ReturnType<typeof getTrainingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrainingsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putTrainingsIdResponse200 = {
+  data: Training
+  status: 200
+}
+
+export type putTrainingsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putTrainingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putTrainingsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putTrainingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putTrainingsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putTrainingsIdResponseSuccess = (putTrainingsIdResponse200) & {
+  headers: Headers;
+};
+export type putTrainingsIdResponseError = (putTrainingsIdResponse400 | putTrainingsIdResponse401 | putTrainingsIdResponse403 | putTrainingsIdResponse404 | putTrainingsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putTrainingsIdResponse = (putTrainingsIdResponseSuccess | putTrainingsIdResponseError)
+
+export const getPutTrainingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/trainings/${id}`
+}
+
+/**
+ * Updates a training. The body is multipart/form-data and all six fields are required; there is no partial update. Leaving the file part out keeps the current attendance list intact, and sending a valid one replaces it, the previous object being deleted from the storage so it stops being served. A file part whose filename is empty, which is what browsers send for a blank file field, also counts as keeping the current file. Removing the file without replacing it is a separate operation: DELETE /trainings/{id}/file. Extra fields in the body (id, the audit fields, the file columns) are ignored. The new date must fall within a registered period, limits included, exactly as on creation: an update may move the training to another period, and the listing sliced by period_id follows it with no other write. The period that contains the date is read under a shared lock before the training's row is locked, the same order the creation takes, so an update and a period deletion serialize. The previous object is deleted only after the row already points at the new one, so two concurrent updates leave exactly one object alive. Records who made the change in updated_by. Requires the user or admin role.
+ * @summary Update training
+ */
+export const putTrainingsId = async (id: string,
+    trainingInput: TrainingInput, options?: Parameters<typeof customFetch>[1]): Promise<putTrainingsIdResponse> => {
+    const formData = new FormData();
+formData.append(`content`, trainingInput.content);
+formData.append(`name`, trainingInput.name);
+formData.append(`responsible`, trainingInput.responsible);
+formData.append(`date`, trainingInput.date);
+formData.append(`subject`, trainingInput.subject);
+formData.append(`status`, trainingInput.status);
+if(trainingInput.file !== undefined) {
+ formData.append(`file`, trainingInput.file);
+ }
+
+  return customFetch<putTrainingsIdResponse>(getPutTrainingsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutTrainingsIdMutationKey = () => ['putTrainingsId'] as const;
+
+export const getPutTrainingsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTrainingsId>>, TError,PutTrainingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putTrainingsId>>, TError,PutTrainingsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutTrainingsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putTrainingsId>>, PutTrainingsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putTrainingsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutTrainingsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putTrainingsId>>>
+    export type PutTrainingsIdMutationBody = TrainingInput
+    export type PutTrainingsIdMutationError = ErrorResponse
+    export type PutTrainingsIdMutationVariables = {id: string;data: TrainingInput}
+
+    /**
+ * @summary Update training
+ */
+export const usePutTrainingsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putTrainingsId>>, TError,PutTrainingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putTrainingsId>>,
+        TError,
+        PutTrainingsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutTrainingsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteTrainingsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteTrainingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteTrainingsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteTrainingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteTrainingsIdResponseSuccess = (deleteTrainingsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteTrainingsIdResponseError = (deleteTrainingsIdResponse401 | deleteTrainingsIdResponse403 | deleteTrainingsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteTrainingsIdResponse = (deleteTrainingsIdResponseSuccess | deleteTrainingsIdResponseError)
+
+export const getDeleteTrainingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/trainings/${id}`
+}
+
+/**
+ * Deletes a training permanently and deletes the object of its attendance list, if it has one, which stops being served. The deletion is never blocked: no module points at trainings, so there are no linked records to count and no 409 is ever answered. Deleting a training is what frees the period it was dated in, whose deletion answers 409 while it has trainings. Deleting the same training again responds 404. The row is locked while its storage key is read and the object is deleted only after the transaction committed. The request has no body. The confirmation R-25 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete training
+ */
+export const deleteTrainingsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteTrainingsIdResponse> => {
+
+  return customFetch<deleteTrainingsIdResponse>(getDeleteTrainingsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteTrainingsIdMutationKey = () => ['deleteTrainingsId'] as const;
+
+export const getDeleteTrainingsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsId>>, TError,DeleteTrainingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsId>>, TError,DeleteTrainingsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteTrainingsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTrainingsId>>, DeleteTrainingsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteTrainingsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTrainingsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTrainingsId>>>
+
+    export type DeleteTrainingsIdMutationError = ErrorResponse
+    export type DeleteTrainingsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete training
+ */
+export const useDeleteTrainingsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsId>>, TError,DeleteTrainingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTrainingsId>>,
+        TError,
+        DeleteTrainingsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteTrainingsIdMutationOptions(options), queryClient);
+    }
+
+export type getTrainingsIdFileResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getTrainingsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getTrainingsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getTrainingsIdFileResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getTrainingsIdFileResponseSuccess = (getTrainingsIdFileResponse200) & {
+  headers: Headers;
+};
+export type getTrainingsIdFileResponseError = (getTrainingsIdFileResponse401 | getTrainingsIdFileResponse404 | getTrainingsIdFileResponse500) & {
+  headers: Headers;
+};
+
+export type getTrainingsIdFileResponse = (getTrainingsIdFileResponseSuccess | getTrainingsIdFileResponseError)
+
+export const getGetTrainingsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/trainings/${id}/file`
+}
+
+/**
+ * Streams the attendance list of a training to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. The file carries names and signatures of employees, and there is no other way to reach it: no static route, no signed URL and no public object. Requires only an authenticated user, so any role.
+ * @summary Download training attendance list
+ */
+export const getTrainingsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getTrainingsIdFileResponse> => {
+
+  return customFetch<getTrainingsIdFileResponse>(getGetTrainingsIdFileUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrainingsIdFileQueryKey = (id: string,) => {
+    return [
+    `/trainings/${id}/file`
+    ] as const;
+    }
+
+
+export const getGetTrainingsIdFileQueryOptions = <TData = Awaited<ReturnType<typeof getTrainingsIdFile>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrainingsIdFileQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrainingsIdFile>>> = ({ signal }) => getTrainingsIdFile(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrainingsIdFileQueryResult = NonNullable<Awaited<ReturnType<typeof getTrainingsIdFile>>>
+export type GetTrainingsIdFileQueryError = ErrorResponse
+
+
+export function useGetTrainingsIdFile<TData = Awaited<ReturnType<typeof getTrainingsIdFile>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsIdFile<TData = Awaited<ReturnType<typeof getTrainingsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsIdFile<TData = Awaited<ReturnType<typeof getTrainingsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download training attendance list
+ */
+
+export function useGetTrainingsIdFile<TData = Awaited<ReturnType<typeof getTrainingsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrainingsIdFileQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteTrainingsIdFileResponse200 = {
+  data: Training
+  status: 200
+}
+
+export type deleteTrainingsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteTrainingsIdFileResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteTrainingsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteTrainingsIdFileResponseSuccess = (deleteTrainingsIdFileResponse200) & {
+  headers: Headers;
+};
+export type deleteTrainingsIdFileResponseError = (deleteTrainingsIdFileResponse401 | deleteTrainingsIdFileResponse403 | deleteTrainingsIdFileResponse404) & {
+  headers: Headers;
+};
+
+export type deleteTrainingsIdFileResponse = (deleteTrainingsIdFileResponseSuccess | deleteTrainingsIdFileResponseError)
+
+export const getDeleteTrainingsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/trainings/${id}/file`
+}
+
+/**
+ * Removes the attendance list of a training and keeps the training, which starts answering file: null and stops offering the download. It is a route of its own rather than a flag on the PUT, where an absent file part always means 'keep'. Answers 200 with the updated training, and not 204, because the resource still exists and changed. A training that has no file answers 404 'Training file not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent. The date does not change, so no period is checked. The three file columns are cleared together and the object is deleted only afterwards. Records who made the change in updated_by. The confirmation R-20 requires is the interface's responsibility. Requires the user or admin role.
+ * @summary Remove training file
+ */
+export const deleteTrainingsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteTrainingsIdFileResponse> => {
+
+  return customFetch<deleteTrainingsIdFileResponse>(getDeleteTrainingsIdFileUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteTrainingsIdFileMutationKey = () => ['deleteTrainingsIdFile'] as const;
+
+export const getDeleteTrainingsIdFileMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsIdFile>>, TError,DeleteTrainingsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsIdFile>>, TError,DeleteTrainingsIdFileMutationVariables, TContext> => {
+
+const mutationKey = getDeleteTrainingsIdFileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteTrainingsIdFile>>, DeleteTrainingsIdFileMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteTrainingsIdFile(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteTrainingsIdFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteTrainingsIdFile>>>
+
+    export type DeleteTrainingsIdFileMutationError = ErrorResponse
+    export type DeleteTrainingsIdFileMutationVariables = {id: string}
+
+    /**
+ * @summary Remove training file
+ */
+export const useDeleteTrainingsIdFile = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteTrainingsIdFile>>, TError,DeleteTrainingsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteTrainingsIdFile>>,
+        TError,
+        DeleteTrainingsIdFileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteTrainingsIdFileMutationOptions(options), queryClient);
+    }
+
+export type getTrainingsTemplatesTemplateResponse200ApplicationVndOpenxmlformatsOfficedocumentPresentationmlPresentation = {
+  data: Blob
+  status: 200
+}
+
+export type getTrainingsTemplatesTemplateResponse200ApplicationVndOpenxmlformatsOfficedocumentWordprocessingmlDocument = {
+  data: Blob
+  status: 200
+}
+
+export type getTrainingsTemplatesTemplateResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getTrainingsTemplatesTemplateResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getTrainingsTemplatesTemplateResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getTrainingsTemplatesTemplateResponseSuccess = (getTrainingsTemplatesTemplateResponse200ApplicationVndOpenxmlformatsOfficedocumentPresentationmlPresentation | getTrainingsTemplatesTemplateResponse200ApplicationVndOpenxmlformatsOfficedocumentWordprocessingmlDocument) & {
+  headers: Headers;
+};
+export type getTrainingsTemplatesTemplateResponseError = (getTrainingsTemplatesTemplateResponse401 | getTrainingsTemplatesTemplateResponse404 | getTrainingsTemplatesTemplateResponse500) & {
+  headers: Headers;
+};
+
+export type getTrainingsTemplatesTemplateResponse = (getTrainingsTemplatesTemplateResponseSuccess | getTrainingsTemplatesTemplateResponseError)
+
+export const getGetTrainingsTemplatesTemplateUrl = (template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list',) => {
+
+
+
+
+  return `/trainings/templates/${template}`
+}
+
+/**
+ * Streams one of the six versioned templates to an authenticated user: the presentation of each content (producao, escritorios, novos-funcionarios, basico, avancado) or the blank attendance list (presence-list). Each one is delivered under its stable name — orientacoes-gerais-para-producao.pptx, orientacoes-gerais-para-escritorios.pptx, orientacoes-para-novos-funcionarios.pptx, treinamento-basico.pptx, treinamento-avancado.pptx and lista-de-presenca.docx — as an attachment with X-Content-Type-Options: nosniff. The files are versioned in the server repository and are not editable by the application; they are never served as public assets, because the presentations name people in their metadata. Requires only an authenticated user, so any role.
+ * @summary Download a training template
+ */
+export const getTrainingsTemplatesTemplate = async (template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options?: Parameters<typeof customFetch>[1]): Promise<getTrainingsTemplatesTemplateResponse> => {
+
+  return customFetch<getTrainingsTemplatesTemplateResponse>(getGetTrainingsTemplatesTemplateUrl(template),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrainingsTemplatesTemplateQueryKey = (template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list',) => {
+    return [
+    `/trainings/templates/${template}`
+    ] as const;
+    }
+
+
+export const getGetTrainingsTemplatesTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError = ErrorResponse>(template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrainingsTemplatesTemplateQueryKey(template);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>> = ({ signal }) => getTrainingsTemplatesTemplate(template, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: template !== null && template !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrainingsTemplatesTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>>
+export type GetTrainingsTemplatesTemplateQueryError = ErrorResponse
+
+
+export function useGetTrainingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrainingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a training template
+ */
+
+export function useGetTrainingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'producao' | 'escritorios' | 'novos-funcionarios' | 'basico' | 'avancado' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrainingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrainingsTemplatesTemplateQueryOptions(template,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getMeetingsResponse200 = {
+  data: Meeting[]
+  status: 200
+}
+
+export type getMeetingsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMeetingsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMeetingsResponseSuccess = (getMeetingsResponse200) & {
+  headers: Headers;
+};
+export type getMeetingsResponseError = (getMeetingsResponse401 | getMeetingsResponse404) & {
+  headers: Headers;
+};
+
+export type getMeetingsResponse = (getMeetingsResponseSuccess | getMeetingsResponseError)
+
+export const getGetMeetingsUrl = (params?: GetMeetingsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/meetings?${stringifiedParams}` : `/meetings`
+}
+
+/**
+ * Lists meetings, newest date first, breaking ties by created_at descending and id ascending so the order is stable between calls. The optional period_id narrows the listing to the meetings whose date falls inside that period's closed range, both limits included; without it every meeting is returned, including any whose date falls outside every period - which only the data migration or a shortened period can produce, and which this option is what keeps reachable. A period_id that is not a UUID, that names no period, or that is empty answers 404 instead of widening the listing. No other query parameter is read. Which period the screen opens on is resolved by the client: the API holds no notion of today. There is no pagination on the server; searching, sorting and paging are done by the client. Requires only an authenticated user, so any role.
+ * @summary List meetings
+ */
+export const getMeetings = async (params?: GetMeetingsParams, options?: Parameters<typeof customFetch>[1]): Promise<getMeetingsResponse> => {
+
+  return customFetch<getMeetingsResponse>(getGetMeetingsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMeetingsQueryKey = (params?: GetMeetingsParams,) => {
+    return [
+    `/meetings`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetMeetingsQueryOptions = <TData = Awaited<ReturnType<typeof getMeetings>>, TError = ErrorResponse>(params?: GetMeetingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMeetingsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeetings>>> = ({ signal }) => getMeetings(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMeetingsQueryResult = NonNullable<Awaited<ReturnType<typeof getMeetings>>>
+export type GetMeetingsQueryError = ErrorResponse
+
+
+export function useGetMeetings<TData = Awaited<ReturnType<typeof getMeetings>>, TError = ErrorResponse>(
+ params: undefined |  GetMeetingsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetings>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetings<TData = Awaited<ReturnType<typeof getMeetings>>, TError = ErrorResponse>(
+ params?: GetMeetingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetings>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetings>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetings<TData = Awaited<ReturnType<typeof getMeetings>>, TError = ErrorResponse>(
+ params?: GetMeetingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List meetings
+ */
+
+export function useGetMeetings<TData = Awaited<ReturnType<typeof getMeetings>>, TError = ErrorResponse>(
+ params?: GetMeetingsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetings>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMeetingsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postMeetingsResponse201 = {
+  data: Meeting
+  status: 201
+}
+
+export type postMeetingsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postMeetingsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postMeetingsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postMeetingsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postMeetingsResponseSuccess = (postMeetingsResponse201) & {
+  headers: Headers;
+};
+export type postMeetingsResponseError = (postMeetingsResponse400 | postMeetingsResponse401 | postMeetingsResponse403 | postMeetingsResponse413) & {
+  headers: Headers;
+};
+
+export type postMeetingsResponse = (postMeetingsResponseSuccess | postMeetingsResponseError)
+
+export const getPostMeetingsUrl = () => {
+
+
+
+
+  return `/meetings`
+}
+
+/**
+ * Creates a meeting, with an optional presence list and optional minutes, which may be sent together. The body is multipart/form-data: type, name, responsible, date, subject and status are required; the four text fields are trimmed, name, responsible and status are limited to 255 characters and subject to 2000; subject is plain text of several lines, whose line breaks are preserved and whose markup is never interpreted. The date is a calendar day and must fall inside a registered period, limits included: the period's row is read under a shared lock inside the same transaction that writes the row, so a meeting can never be created in a period that is being deleted. The file parts presence_list and minutes are optional and independent, at most one file each, each up to 25 MB; a part whose filename is empty, which is what browsers send for a blank file field, counts as no file. Both files are validated before either is stored, so an invalid one leaves nothing behind, and every object stored by a request that ends up refused is removed. The original file names are preserved and are the names of the downloaded files, while the stored objects are named by the server and their keys are never exposed. Records who created the meeting in created_by. Requires the user or admin role.
+ * @summary Create meeting
+ */
+export const postMeetings = async (meetingInput: MeetingInput, options?: Parameters<typeof customFetch>[1]): Promise<postMeetingsResponse> => {
+    const formData = new FormData();
+formData.append(`type`, meetingInput.type);
+formData.append(`name`, meetingInput.name);
+formData.append(`responsible`, meetingInput.responsible);
+formData.append(`date`, meetingInput.date);
+formData.append(`subject`, meetingInput.subject);
+formData.append(`status`, meetingInput.status);
+if(meetingInput.presence_list !== undefined) {
+ formData.append(`presence_list`, meetingInput.presence_list);
+ }
+if(meetingInput.minutes !== undefined) {
+ formData.append(`minutes`, meetingInput.minutes);
+ }
+
+  return customFetch<postMeetingsResponse>(getPostMeetingsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostMeetingsMutationKey = () => ['postMeetings'] as const;
+
+export const getPostMeetingsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMeetings>>, TError,PostMeetingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postMeetings>>, TError,PostMeetingsMutationVariables, TContext> => {
+
+const mutationKey = getPostMeetingsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMeetings>>, PostMeetingsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postMeetings(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostMeetingsMutationResult = NonNullable<Awaited<ReturnType<typeof postMeetings>>>
+    export type PostMeetingsMutationBody = MeetingInput
+    export type PostMeetingsMutationError = ErrorResponse
+    export type PostMeetingsMutationVariables = {data: MeetingInput}
+
+    /**
+ * @summary Create meeting
+ */
+export const usePostMeetings = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMeetings>>, TError,PostMeetingsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postMeetings>>,
+        TError,
+        PostMeetingsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostMeetingsMutationOptions(options), queryClient);
+    }
+
+export type getMeetingsIdResponse200 = {
+  data: Meeting
+  status: 200
+}
+
+export type getMeetingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMeetingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMeetingsIdResponseSuccess = (getMeetingsIdResponse200) & {
+  headers: Headers;
+};
+export type getMeetingsIdResponseError = (getMeetingsIdResponse401 | getMeetingsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getMeetingsIdResponse = (getMeetingsIdResponseSuccess | getMeetingsIdResponseError)
+
+export const getGetMeetingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/meetings/${id}`
+}
+
+/**
+ * Returns one meeting, in the same format as an item of the listing. Requires only an authenticated user, so any role.
+ * @summary Get meeting
+ */
+export const getMeetingsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getMeetingsIdResponse> => {
+
+  return customFetch<getMeetingsIdResponse>(getGetMeetingsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMeetingsIdQueryKey = (id: string,) => {
+    return [
+    `/meetings/${id}`
+    ] as const;
+    }
+
+
+export const getGetMeetingsIdQueryOptions = <TData = Awaited<ReturnType<typeof getMeetingsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMeetingsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeetingsId>>> = ({ signal }) => getMeetingsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMeetingsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMeetingsId>>>
+export type GetMeetingsIdQueryError = ErrorResponse
+
+
+export function useGetMeetingsId<TData = Awaited<ReturnType<typeof getMeetingsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsId<TData = Awaited<ReturnType<typeof getMeetingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsId<TData = Awaited<ReturnType<typeof getMeetingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get meeting
+ */
+
+export function useGetMeetingsId<TData = Awaited<ReturnType<typeof getMeetingsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMeetingsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putMeetingsIdResponse200 = {
+  data: Meeting
+  status: 200
+}
+
+export type putMeetingsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putMeetingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putMeetingsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putMeetingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putMeetingsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putMeetingsIdResponseSuccess = (putMeetingsIdResponse200) & {
+  headers: Headers;
+};
+export type putMeetingsIdResponseError = (putMeetingsIdResponse400 | putMeetingsIdResponse401 | putMeetingsIdResponse403 | putMeetingsIdResponse404 | putMeetingsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putMeetingsIdResponse = (putMeetingsIdResponseSuccess | putMeetingsIdResponseError)
+
+export const getPutMeetingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/meetings/${id}`
+}
+
+/**
+ * Updates a meeting. The body is multipart/form-data, the same as on creation, and all six fields are required; there is no partial update. Each attachment is decided by its own file part alone: leaving the presence_list or minutes part out keeps that attachment intact, and sending a valid one replaces only that attachment, its previous object being deleted from the storage so it stops being served, while the other attachment does not change. Sending both parts replaces both. A file part whose filename is empty, which is what browsers send for a blank file field, also counts as keeping that attachment. Removing an attachment without replacing it is a separate operation: DELETE /meetings/{id}/files/{attachment}. Extra fields in the body (id, the audit fields, the file columns) are ignored. The new date must fall within a registered period, limits included, exactly as on creation; a refused date changes nothing and leaves no new object behind. The period that contains the date is read under a shared lock before the meeting's row is locked, the same order the creation takes, so an update and a period deletion serialize. Only the columns of the attachments sent are written, and their previous objects are deleted only after the row already points at the new ones, so concurrent writes on the meeting never delete each other's objects nor bring back an attachment another request removed. Records who made the change in updated_by. Requires the user or admin role.
+ * @summary Update meeting
+ */
+export const putMeetingsId = async (id: string,
+    meetingInput: MeetingInput, options?: Parameters<typeof customFetch>[1]): Promise<putMeetingsIdResponse> => {
+    const formData = new FormData();
+formData.append(`type`, meetingInput.type);
+formData.append(`name`, meetingInput.name);
+formData.append(`responsible`, meetingInput.responsible);
+formData.append(`date`, meetingInput.date);
+formData.append(`subject`, meetingInput.subject);
+formData.append(`status`, meetingInput.status);
+if(meetingInput.presence_list !== undefined) {
+ formData.append(`presence_list`, meetingInput.presence_list);
+ }
+if(meetingInput.minutes !== undefined) {
+ formData.append(`minutes`, meetingInput.minutes);
+ }
+
+  return customFetch<putMeetingsIdResponse>(getPutMeetingsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutMeetingsIdMutationKey = () => ['putMeetingsId'] as const;
+
+export const getPutMeetingsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMeetingsId>>, TError,PutMeetingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putMeetingsId>>, TError,PutMeetingsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutMeetingsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putMeetingsId>>, PutMeetingsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putMeetingsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutMeetingsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putMeetingsId>>>
+    export type PutMeetingsIdMutationBody = MeetingInput
+    export type PutMeetingsIdMutationError = ErrorResponse
+    export type PutMeetingsIdMutationVariables = {id: string;data: MeetingInput}
+
+    /**
+ * @summary Update meeting
+ */
+export const usePutMeetingsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMeetingsId>>, TError,PutMeetingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putMeetingsId>>,
+        TError,
+        PutMeetingsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutMeetingsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteMeetingsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteMeetingsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteMeetingsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteMeetingsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteMeetingsIdResponseSuccess = (deleteMeetingsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteMeetingsIdResponseError = (deleteMeetingsIdResponse401 | deleteMeetingsIdResponse403 | deleteMeetingsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteMeetingsIdResponse = (deleteMeetingsIdResponseSuccess | deleteMeetingsIdResponseError)
+
+export const getDeleteMeetingsIdUrl = (id: string,) => {
+
+
+
+
+  return `/meetings/${id}`
+}
+
+/**
+ * Deletes a meeting permanently and deletes the objects of its attachments, none, one or both, which stop being served. The deletion is never blocked: no module points at meetings, so there are no linked records to count and no 409 is ever answered. Deleting a meeting is what frees the period it was dated in, whose deletion answers 409 while it has meetings. Deleting the same meeting again responds 404. The row is locked while its storage keys are read and the objects are deleted only after the transaction committed. The request has no body. The confirmation R-23 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete meeting
+ */
+export const deleteMeetingsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteMeetingsIdResponse> => {
+
+  return customFetch<deleteMeetingsIdResponse>(getDeleteMeetingsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteMeetingsIdMutationKey = () => ['deleteMeetingsId'] as const;
+
+export const getDeleteMeetingsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsId>>, TError,DeleteMeetingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsId>>, TError,DeleteMeetingsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteMeetingsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMeetingsId>>, DeleteMeetingsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteMeetingsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMeetingsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMeetingsId>>>
+
+    export type DeleteMeetingsIdMutationError = ErrorResponse
+    export type DeleteMeetingsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete meeting
+ */
+export const useDeleteMeetingsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsId>>, TError,DeleteMeetingsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMeetingsId>>,
+        TError,
+        DeleteMeetingsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteMeetingsIdMutationOptions(options), queryClient);
+    }
+
+export type getMeetingsIdFilesAttachmentResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getMeetingsIdFilesAttachmentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMeetingsIdFilesAttachmentResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMeetingsIdFilesAttachmentResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getMeetingsIdFilesAttachmentResponseSuccess = (getMeetingsIdFilesAttachmentResponse200) & {
+  headers: Headers;
+};
+export type getMeetingsIdFilesAttachmentResponseError = (getMeetingsIdFilesAttachmentResponse401 | getMeetingsIdFilesAttachmentResponse404 | getMeetingsIdFilesAttachmentResponse500) & {
+  headers: Headers;
+};
+
+export type getMeetingsIdFilesAttachmentResponse = (getMeetingsIdFilesAttachmentResponseSuccess | getMeetingsIdFilesAttachmentResponseError)
+
+export const getGetMeetingsIdFilesAttachmentUrl = (id: string,
+    attachment: 'presence-list' | 'minutes',) => {
+
+
+
+
+  return `/meetings/${id}/files/${attachment}`
+}
+
+/**
+ * Streams one attachment of a meeting - presence-list or minutes - to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. The presence list carries names and signatures of employees and the minutes what people said and decided, and there is no other way to reach them: no static route, no signed URL and no public object. The attachment segment is resolved by a fixed map; any other value answers 404, the same as an empty attachment. Requires only an authenticated user, so any role.
+ * @summary Download a meeting attachment
+ */
+export const getMeetingsIdFilesAttachment = async (id: string,
+    attachment: 'presence-list' | 'minutes', options?: Parameters<typeof customFetch>[1]): Promise<getMeetingsIdFilesAttachmentResponse> => {
+
+  return customFetch<getMeetingsIdFilesAttachmentResponse>(getGetMeetingsIdFilesAttachmentUrl(id,attachment),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMeetingsIdFilesAttachmentQueryKey = (id: string,
+    attachment: 'presence-list' | 'minutes',) => {
+    return [
+    `/meetings/${id}/files/${attachment}`
+    ] as const;
+    }
+
+
+export const getGetMeetingsIdFilesAttachmentQueryOptions = <TData = Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError = ErrorResponse>(id: string,
+    attachment: 'presence-list' | 'minutes', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMeetingsIdFilesAttachmentQueryKey(id,attachment);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>> = ({ signal }) => getMeetingsIdFilesAttachment(id,attachment, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && attachment !== null && attachment !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMeetingsIdFilesAttachmentQueryResult = NonNullable<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>>
+export type GetMeetingsIdFilesAttachmentQueryError = ErrorResponse
+
+
+export function useGetMeetingsIdFilesAttachment<TData = Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'presence-list' | 'minutes', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsIdFilesAttachment<TData = Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'presence-list' | 'minutes', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsIdFilesAttachment<TData = Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'presence-list' | 'minutes', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a meeting attachment
+ */
+
+export function useGetMeetingsIdFilesAttachment<TData = Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'presence-list' | 'minutes', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMeetingsIdFilesAttachmentQueryOptions(id,attachment,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteMeetingsIdFilesAttachmentResponse200 = {
+  data: Meeting
+  status: 200
+}
+
+export type deleteMeetingsIdFilesAttachmentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteMeetingsIdFilesAttachmentResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteMeetingsIdFilesAttachmentResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteMeetingsIdFilesAttachmentResponseSuccess = (deleteMeetingsIdFilesAttachmentResponse200) & {
+  headers: Headers;
+};
+export type deleteMeetingsIdFilesAttachmentResponseError = (deleteMeetingsIdFilesAttachmentResponse401 | deleteMeetingsIdFilesAttachmentResponse403 | deleteMeetingsIdFilesAttachmentResponse404) & {
+  headers: Headers;
+};
+
+export type deleteMeetingsIdFilesAttachmentResponse = (deleteMeetingsIdFilesAttachmentResponseSuccess | deleteMeetingsIdFilesAttachmentResponseError)
+
+export const getDeleteMeetingsIdFilesAttachmentUrl = (id: string,
+    attachment: 'presence-list' | 'minutes',) => {
+
+
+
+
+  return `/meetings/${id}/files/${attachment}`
+}
+
+/**
+ * Removes one attachment of a meeting - presence-list or minutes - and keeps the meeting and the other attachment; the meeting starts answering null for that attachment and stops offering its download. It is a route of its own rather than a flag on the PUT, where an absent file part always means 'keep'. Answers 200 with the updated meeting, and not 204, because the resource still exists and changed. An empty attachment answers 404 'Meeting file not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent; an attachment segment other than presence-list and minutes answers the same 404. The date does not change, so no period is checked. Only the three columns of that attachment are cleared, never the other's, and its object is deleted only afterwards. Records who made the change in updated_by. The confirmation R-18 requires is the interface's responsibility. Requires the user or admin role.
+ * @summary Remove a meeting attachment
+ */
+export const deleteMeetingsIdFilesAttachment = async (id: string,
+    attachment: 'presence-list' | 'minutes', options?: Parameters<typeof customFetch>[1]): Promise<deleteMeetingsIdFilesAttachmentResponse> => {
+
+  return customFetch<deleteMeetingsIdFilesAttachmentResponse>(getDeleteMeetingsIdFilesAttachmentUrl(id,attachment),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteMeetingsIdFilesAttachmentMutationKey = () => ['deleteMeetingsIdFilesAttachment'] as const;
+
+export const getDeleteMeetingsIdFilesAttachmentMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>, TError,DeleteMeetingsIdFilesAttachmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>, TError,DeleteMeetingsIdFilesAttachmentMutationVariables, TContext> => {
+
+const mutationKey = getDeleteMeetingsIdFilesAttachmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>, DeleteMeetingsIdFilesAttachmentMutationVariables> = (props) => {
+          const {id,attachment} = props ?? {};
+
+          return  deleteMeetingsIdFilesAttachment(id,attachment,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMeetingsIdFilesAttachmentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>>
+
+    export type DeleteMeetingsIdFilesAttachmentMutationError = ErrorResponse
+    export type DeleteMeetingsIdFilesAttachmentMutationVariables = {id: string;attachment: 'presence-list' | 'minutes'}
+
+    /**
+ * @summary Remove a meeting attachment
+ */
+export const useDeleteMeetingsIdFilesAttachment = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>, TError,DeleteMeetingsIdFilesAttachmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMeetingsIdFilesAttachment>>,
+        TError,
+        DeleteMeetingsIdFilesAttachmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteMeetingsIdFilesAttachmentMutationOptions(options), queryClient);
+    }
+
+export type getMeetingsTemplatesTemplateResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getMeetingsTemplatesTemplateResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMeetingsTemplatesTemplateResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMeetingsTemplatesTemplateResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getMeetingsTemplatesTemplateResponseSuccess = (getMeetingsTemplatesTemplateResponse200) & {
+  headers: Headers;
+};
+export type getMeetingsTemplatesTemplateResponseError = (getMeetingsTemplatesTemplateResponse401 | getMeetingsTemplatesTemplateResponse404 | getMeetingsTemplatesTemplateResponse500) & {
+  headers: Headers;
+};
+
+export type getMeetingsTemplatesTemplateResponse = (getMeetingsTemplatesTemplateResponseSuccess | getMeetingsTemplatesTemplateResponseError)
+
+export const getGetMeetingsTemplatesTemplateUrl = (template: 'minutes' | 'presence-list',) => {
+
+
+
+
+  return `/meetings/templates/${template}`
+}
+
+/**
+ * Streams one of the two versioned templates to an authenticated user: the minutes model (minutes), offered once and not per meeting type, or the blank presence list (presence-list). Each one is delivered under its stable name — ata-de-reunioes.docx and lista-de-presenca.docx — as an attachment with X-Content-Type-Options: nosniff, by the same rules as a meeting's own files. The files are versioned in the server repository and are not editable by the application; they are never served as public assets. Requires only an authenticated user, so any role.
+ * @summary Download a meeting template
+ */
+export const getMeetingsTemplatesTemplate = async (template: 'minutes' | 'presence-list', options?: Parameters<typeof customFetch>[1]): Promise<getMeetingsTemplatesTemplateResponse> => {
+
+  return customFetch<getMeetingsTemplatesTemplateResponse>(getGetMeetingsTemplatesTemplateUrl(template),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMeetingsTemplatesTemplateQueryKey = (template: 'minutes' | 'presence-list',) => {
+    return [
+    `/meetings/templates/${template}`
+    ] as const;
+    }
+
+
+export const getGetMeetingsTemplatesTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError = ErrorResponse>(template: 'minutes' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMeetingsTemplatesTemplateQueryKey(template);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>> = ({ signal }) => getMeetingsTemplatesTemplate(template, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: template !== null && template !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMeetingsTemplatesTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>>
+export type GetMeetingsTemplatesTemplateQueryError = ErrorResponse
+
+
+export function useGetMeetingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'minutes' | 'presence-list', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'minutes' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMeetingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'minutes' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a meeting template
+ */
+
+export function useGetMeetingsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'minutes' | 'presence-list', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMeetingsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMeetingsTemplatesTemplateQueryOptions(template,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
