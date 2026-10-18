@@ -31,6 +31,12 @@
     "noResultsDescription": "Adjust the search or clear the filters.",
     "errorDescription": "Try again. If the problem persists, check your connection or your access permissions."
   },
+  "periodFilter": {
+    "label": "Period",
+    "option": "{description} ({start} to {end})",
+    "all": "All periods",
+    "resolving": "Loading the period..."
+  },
   "validation": {
     "emailRequired": "Enter the e-mail.",
     "emailInvalid": "Enter a valid e-mail.",

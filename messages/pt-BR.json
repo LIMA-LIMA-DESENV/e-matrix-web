@@ -31,6 +31,12 @@
     "noResultsDescription": "Ajuste a busca ou limpe os filtros.",
     "errorDescription": "Tente novamente. Se o problema persistir, verifique sua conexão ou permissões de acesso."
   },
+  "periodFilter": {
+    "label": "Período",
+    "option": "{description} ({start} a {end})",
+    "all": "Todos os períodos",
+    "resolving": "Carregando o período..."
+  },
   "validation": {
     "emailRequired": "Informe o e-mail.",
     "emailInvalid": "Informe um e-mail válido.",
