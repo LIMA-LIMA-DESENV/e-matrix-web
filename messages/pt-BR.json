@@ -568,6 +568,133 @@
       "removing": "Removendo..."
     }
   },
+  "meetings": {
+    "title": "Reuniões",
+    "description": "Registro das reuniões do programa de ergonomia: tipo, responsável, data, assunto, situação, a lista de presença e a ata.",
+    "count": "{count, plural, =0 {Nenhuma reunião no recorte selecionado} one {# reunião no recorte selecionado} other {# reuniões no recorte selecionado}}.",
+    "itemLabel": "{count, plural, one {reunião} other {reuniões}}",
+    "searchPlaceholder": "Buscar por tipo, nome, responsável ou situação...",
+    "searchLabel": "Buscar reunião",
+    "columns": {
+      "type": "Reunião com",
+      "name": "Nome",
+      "responsible": "Responsável",
+      "date": "Data",
+      "status": "Situação",
+      "subject": "Assunto"
+    },
+    "types": {
+      "comite-ergonomia": "Comitê de Ergonomia",
+      "projetos": "Projetos",
+      "diversas-areas": "Diversas Áreas"
+    },
+    "typeFilterLabel": "Filtrar por tipo de reunião",
+    "allTypes": "Todas",
+    "attachments": {
+      "presence-list": "Lista de presença",
+      "minutes": "Ata"
+    },
+    "noPeriods": {
+      "title": "Nenhum período cadastrado.",
+      "description": "Todas as reuniões estão listadas. O filtro por período depende de haver um período cadastrado, e nenhuma reunião pode ser cadastrada enquanto não houver um, porque a data de uma reunião precisa estar dentro de um período. Um administrador pode cadastrá-lo em Parâmetros › Períodos."
+    },
+    "loadErrorTitle": "Não foi possível carregar as reuniões",
+    "loadErrorDescription": "Tente novamente. Se o problema persistir, verifique suas permissões de acesso.",
+    "emptyTitle": "Nenhuma reunião no recorte selecionado.",
+    "emptyDescription": "As reuniões com data dentro do período escolhido aparecerão nesta listagem. Escolha outro período ou todos os períodos para ver as demais.",
+    "noResultsTitle": "Nenhuma reunião encontrada para a busca ou os filtros aplicados.",
+    "noResultsDescription": "Tente ajustar a busca por tipo, nome, responsável ou situação, ou limpe os filtros.",
+    "downloadFile": "Baixar",
+    "downloadFileNamed": "Baixar {attachment}: {name}",
+    "downloadMinutesTemplate": "Modelo de ata",
+    "downloadPresenceListTemplate": "Lista de presença",
+    "downloading": "Baixando...",
+    "noAttachments": "Sem lista de presença nem ata",
+    "details": {
+      "title": "Reunião",
+      "attachments": "Anexos"
+    },
+    "newMeeting": "Nova reunião",
+    "newMeetingDisabledHint": "Cadastre um período antes: a data de uma reunião precisa estar dentro de um período.",
+    "deleteAction": "Excluir",
+    "created": "Reunião {name} cadastrada com sucesso.",
+    "updated": "Reunião {name} alterada com sucesso.",
+    "deleted": "Reunião {name} excluída com sucesso.",
+    "fileRemoved": {
+      "presence-list": "Lista de presença da reunião {name} removida com sucesso.",
+      "minutes": "Ata da reunião {name} removida com sucesso."
+    },
+    "form": {
+      "newTitle": "Nova reunião",
+      "newDescription": "Escolha com quem foi a reunião, informe nome, responsável, data, assunto e situação, e anexe a lista de presença e a ata se já houver.",
+      "editTitle": "Editar reunião",
+      "editDescription": "Altere os dados da reunião e troque a lista de presença, a ata ou as duas, ou mantenha os arquivos atuais.",
+      "type": "Reunião com",
+      "name": "Nome",
+      "namePlaceholder": "Ex.: Comitê — março",
+      "responsible": "Responsável",
+      "responsiblePlaceholder": "Ex.: Maria Silva",
+      "date": "Data",
+      "subject": "Assunto",
+      "subjectPlaceholder": "Descreva o que foi tratado na reunião.",
+      "status": "Situação",
+      "statusPlaceholder": "Ex.: Realizada",
+      "fileHint": "Opcional. {extensions} de até {max} MB.",
+      "fileSelected": "Arquivo escolhido: {name}",
+      "fileKeepHint": {
+        "presence-list": "Deixe o campo em branco para manter a lista de presença atual.",
+        "minutes": "Deixe o campo em branco para manter a ata atual."
+      },
+      "removeFile": {
+        "presence-list": "Remover lista de presença",
+        "minutes": "Remover ata"
+      },
+      "create": "Cadastrar reunião",
+      "creating": "Cadastrando...",
+      "update": "Salvar alterações",
+      "loadError": "Não foi possível carregar a reunião"
+    },
+    "validation": {
+      "typeRequired": "Selecione com quem foi a reunião.",
+      "nameRequired": "Informe o nome da reunião.",
+      "nameTooLong": "O nome deve ter no máximo {max} caracteres.",
+      "nameHint": "Com até {max} caracteres.",
+      "responsibleRequired": "Informe o responsável pela reunião.",
+      "responsibleTooLong": "O responsável deve ter no máximo {max} caracteres.",
+      "dateRequired": "Informe uma data válida para a reunião.",
+      "dateOutsidePeriods": "A data precisa estar dentro de um período cadastrado.",
+      "dateHint": "Dia de calendário, dentro de um período cadastrado.",
+      "subjectRequired": "Informe o assunto da reunião.",
+      "subjectTooLong": "O assunto deve ter no máximo {max} caracteres.",
+      "subjectHint": "Texto simples, com até {max} caracteres. As quebras de linha são mantidas.",
+      "statusRequired": "Informe a situação da reunião.",
+      "statusTooLong": "A situação deve ter no máximo {max} caracteres.",
+      "fileTypeNotAllowed": "Tipo de arquivo não aceito. Escolha um arquivo Word, PowerPoint ou PDF.",
+      "fileTooLarge": "O arquivo deve ter no máximo {max} MB."
+    },
+    "delete": {
+      "title": "Excluir reunião",
+      "question": "Deseja realmente excluir a reunião <strong>{name}</strong>?",
+      "description": "A exclusão é definitiva e não pode ser desfeita. A lista de presença e a ata da reunião, se houver, são apagadas junto e não podem ser recuperadas.",
+      "confirm": "Excluir reunião",
+      "deleting": "Excluindo..."
+    },
+    "removeFile": {
+      "removing": "Removendo...",
+      "presence-list": {
+        "title": "Remover lista de presença",
+        "question": "Deseja realmente remover a <strong>lista de presença</strong> da reunião <strong>{name}</strong>?",
+        "description": "A reunião e a ata continuam cadastradas, mas a lista de presença assinada é apagada e não pode ser recuperada.",
+        "confirm": "Remover lista de presença"
+      },
+      "minutes": {
+        "title": "Remover ata",
+        "question": "Deseja realmente remover a <strong>ata</strong> da reunião <strong>{name}</strong>?",
+        "description": "A reunião e a lista de presença continuam cadastradas, mas a ata é apagada e não pode ser recuperada.",
+        "confirm": "Remover ata"
+      }
+    }
+  },
   "errors": {
     "invalidCredentials": "E-mail ou senha incorretos.",
     "sessionExpired": "Sua sessão expirou por inatividade. Entre novamente para continuar.",
@@ -646,6 +773,27 @@
     "trainingFileUnavailable": "Não foi possível entregar a lista de presença deste treinamento. Tente novamente mais tarde.",
     "trainingTemplateNotFound": "Modelo de treinamento não encontrado.",
     "trainingTemplateUnavailable": "Não foi possível entregar o modelo de treinamento. Tente novamente mais tarde.",
+    "meetingTypeInvalid": "Selecione um tipo de reunião válido.",
+    "meetingNameRequired": "Informe o nome da reunião.",
+    "meetingNameTooLong": "O nome da reunião deve ter no máximo 255 caracteres.",
+    "meetingResponsibleRequired": "Informe o responsável pela reunião.",
+    "meetingResponsibleTooLong": "O responsável pela reunião deve ter no máximo 255 caracteres.",
+    "meetingDateInvalid": "Informe uma data válida para a reunião.",
+    "meetingDateOutsidePeriods": "A data da reunião precisa estar dentro de um período cadastrado.",
+    "meetingSubjectRequired": "Informe o assunto da reunião.",
+    "meetingSubjectTooLong": "O assunto da reunião deve ter no máximo 2.000 caracteres.",
+    "meetingStatusRequired": "Informe a situação da reunião.",
+    "meetingStatusTooLong": "A situação da reunião deve ter no máximo 255 caracteres.",
+    "meetingFileTypeNotAllowed": "Tipo de arquivo não aceito. Envie um arquivo Word, PowerPoint ou PDF.",
+    "meetingFileEmpty": "O arquivo enviado está vazio.",
+    "meetingFileNameTooLong": "O nome do arquivo deve ter no máximo 255 caracteres.",
+    "meetingFileTooLarge": "O arquivo deve ter no máximo 25 MB.",
+    "onlyOneFilePerField": "Envie apenas um arquivo em cada campo.",
+    "meetingNotFound": "Reunião não encontrada.",
+    "meetingFileNotFound": "Esta reunião não tem o arquivo solicitado.",
+    "meetingFileUnavailable": "Não foi possível entregar o arquivo desta reunião. Tente novamente mais tarde.",
+    "meetingTemplateNotFound": "Modelo de reunião não encontrado.",
+    "meetingTemplateUnavailable": "Não foi possível entregar o modelo de reunião. Tente novamente mais tarde.",
     "status400": "Verifique os dados informados e tente novamente.",
     "status404": "O registro solicitado não foi encontrado.",
     "status409": "Já existe um registro com os dados informados.",

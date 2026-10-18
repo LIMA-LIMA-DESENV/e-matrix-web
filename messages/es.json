@@ -568,6 +568,133 @@
       "removing": "Eliminando..."
     }
   },
+  "meetings": {
+    "title": "Reuniones",
+    "description": "Registro de las reuniones del programa de ergonomía: tipo, responsable, fecha, asunto, situación, la lista de asistencia y el acta.",
+    "count": "{count, plural, =0 {Ninguna reunión en el recorte seleccionado} one {# reunión en el recorte seleccionado} other {# reuniones en el recorte seleccionado}}.",
+    "itemLabel": "{count, plural, one {reunión} other {reuniones}}",
+    "searchPlaceholder": "Buscar por tipo, nombre, responsable o situación...",
+    "searchLabel": "Buscar reunión",
+    "columns": {
+      "type": "Reunión con",
+      "name": "Nombre",
+      "responsible": "Responsable",
+      "date": "Fecha",
+      "status": "Situación",
+      "subject": "Asunto"
+    },
+    "types": {
+      "comite-ergonomia": "Comité de Ergonomía",
+      "projetos": "Proyectos",
+      "diversas-areas": "Diversas Áreas"
+    },
+    "typeFilterLabel": "Filtrar por tipo de reunión",
+    "allTypes": "Todas",
+    "attachments": {
+      "presence-list": "Lista de asistencia",
+      "minutes": "Acta"
+    },
+    "noPeriods": {
+      "title": "No hay ningún período registrado.",
+      "description": "Se listan todas las reuniones. El filtro por período depende de que haya un período registrado, y no se puede registrar ninguna reunión mientras no lo haya, porque la fecha de una reunión debe estar dentro de un período. Un administrador puede registrarlo en Parámetros › Períodos."
+    },
+    "loadErrorTitle": "No fue posible cargar las reuniones",
+    "loadErrorDescription": "Inténtelo de nuevo. Si el problema persiste, verifique sus permisos de acceso.",
+    "emptyTitle": "Ninguna reunión en el recorte seleccionado.",
+    "emptyDescription": "Las reuniones con fecha dentro del período elegido aparecerán en este listado. Elija otro período o todos los períodos para ver las demás.",
+    "noResultsTitle": "No se encontró ninguna reunión para la búsqueda o los filtros aplicados.",
+    "noResultsDescription": "Intente ajustar la búsqueda por tipo, nombre, responsable o situación, o limpie los filtros.",
+    "downloadFile": "Descargar",
+    "downloadFileNamed": "Descargar {attachment}: {name}",
+    "downloadMinutesTemplate": "Modelo de acta",
+    "downloadPresenceListTemplate": "Lista de asistencia",
+    "downloading": "Descargando...",
+    "noAttachments": "Sin lista de asistencia ni acta",
+    "details": {
+      "title": "Reunión",
+      "attachments": "Adjuntos"
+    },
+    "newMeeting": "Nueva reunión",
+    "newMeetingDisabledHint": "Registre un período antes: la fecha de una reunión debe estar dentro de un período.",
+    "deleteAction": "Eliminar",
+    "created": "Reunión {name} registrada con éxito.",
+    "updated": "Reunión {name} modificada con éxito.",
+    "deleted": "Reunión {name} eliminada con éxito.",
+    "fileRemoved": {
+      "presence-list": "Lista de asistencia de la reunión {name} eliminada con éxito.",
+      "minutes": "Acta de la reunión {name} eliminada con éxito."
+    },
+    "form": {
+      "newTitle": "Nueva reunión",
+      "newDescription": "Elija con quién fue la reunión, indique nombre, responsable, fecha, asunto y situación, y adjunte la lista de asistencia y el acta si ya existen.",
+      "editTitle": "Editar reunión",
+      "editDescription": "Modifique los datos de la reunión y cambie la lista de asistencia, el acta o ambas, o mantenga los archivos actuales.",
+      "type": "Reunión con",
+      "name": "Nombre",
+      "namePlaceholder": "Ej.: Comité — marzo",
+      "responsible": "Responsable",
+      "responsiblePlaceholder": "Ej.: Maria Silva",
+      "date": "Fecha",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Describa lo que se trató en la reunión.",
+      "status": "Situación",
+      "statusPlaceholder": "Ej.: Realizada",
+      "fileHint": "Opcional. {extensions} de hasta {max} MB.",
+      "fileSelected": "Archivo elegido: {name}",
+      "fileKeepHint": {
+        "presence-list": "Deje el campo en blanco para mantener la lista de asistencia actual.",
+        "minutes": "Deje el campo en blanco para mantener el acta actual."
+      },
+      "removeFile": {
+        "presence-list": "Eliminar lista de asistencia",
+        "minutes": "Eliminar acta"
+      },
+      "create": "Registrar reunión",
+      "creating": "Registrando...",
+      "update": "Guardar cambios",
+      "loadError": "No se pudo cargar la reunión"
+    },
+    "validation": {
+      "typeRequired": "Seleccione con quién fue la reunión.",
+      "nameRequired": "Indique el nombre de la reunión.",
+      "nameTooLong": "El nombre debe tener como máximo {max} caracteres.",
+      "nameHint": "Con hasta {max} caracteres.",
+      "responsibleRequired": "Indique el responsable de la reunión.",
+      "responsibleTooLong": "El responsable debe tener como máximo {max} caracteres.",
+      "dateRequired": "Indique una fecha válida para la reunión.",
+      "dateOutsidePeriods": "La fecha debe estar dentro de un período registrado.",
+      "dateHint": "Día de calendario, dentro de un período registrado.",
+      "subjectRequired": "Indique el asunto de la reunión.",
+      "subjectTooLong": "El asunto debe tener como máximo {max} caracteres.",
+      "subjectHint": "Texto simple, con hasta {max} caracteres. Los saltos de línea se mantienen.",
+      "statusRequired": "Indique la situación de la reunión.",
+      "statusTooLong": "La situación debe tener como máximo {max} caracteres.",
+      "fileTypeNotAllowed": "Tipo de archivo no aceptado. Elija un archivo Word, PowerPoint o PDF.",
+      "fileTooLarge": "El archivo debe tener como máximo {max} MB."
+    },
+    "delete": {
+      "title": "Eliminar reunión",
+      "question": "¿Desea realmente eliminar la reunión <strong>{name}</strong>?",
+      "description": "La eliminación es definitiva y no se puede deshacer. La lista de asistencia y el acta de la reunión, si existen, se borran junto con ella y no se pueden recuperar.",
+      "confirm": "Eliminar reunión",
+      "deleting": "Eliminando..."
+    },
+    "removeFile": {
+      "removing": "Eliminando...",
+      "presence-list": {
+        "title": "Eliminar lista de asistencia",
+        "question": "¿Desea realmente eliminar la <strong>lista de asistencia</strong> de la reunión <strong>{name}</strong>?",
+        "description": "La reunión y el acta siguen registradas, pero la lista de asistencia firmada se borra y no se puede recuperar.",
+        "confirm": "Eliminar lista de asistencia"
+      },
+      "minutes": {
+        "title": "Eliminar acta",
+        "question": "¿Desea realmente eliminar el <strong>acta</strong> de la reunión <strong>{name}</strong>?",
+        "description": "La reunión y la lista de asistencia siguen registradas, pero el acta se borra y no se puede recuperar.",
+        "confirm": "Eliminar acta"
+      }
+    }
+  },
   "errors": {
     "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
     "sessionExpired": "Su sesión expiró por inactividad. Inicie sesión de nuevo para continuar.",
@@ -646,6 +773,27 @@
     "trainingFileUnavailable": "No fue posible entregar la lista de asistencia de este entrenamiento. Inténtelo de nuevo más tarde.",
     "trainingTemplateNotFound": "Modelo de entrenamiento no encontrado.",
     "trainingTemplateUnavailable": "No fue posible entregar el modelo de entrenamiento. Inténtelo de nuevo más tarde.",
+    "meetingTypeInvalid": "Seleccione un tipo de reunión válido.",
+    "meetingNameRequired": "Indique el nombre de la reunión.",
+    "meetingNameTooLong": "El nombre de la reunión debe tener como máximo 255 caracteres.",
+    "meetingResponsibleRequired": "Indique el responsable de la reunión.",
+    "meetingResponsibleTooLong": "El responsable de la reunión debe tener como máximo 255 caracteres.",
+    "meetingDateInvalid": "Indique una fecha válida para la reunión.",
+    "meetingDateOutsidePeriods": "La fecha de la reunión debe estar dentro de un período registrado.",
+    "meetingSubjectRequired": "Indique el asunto de la reunión.",
+    "meetingSubjectTooLong": "El asunto de la reunión debe tener como máximo 2.000 caracteres.",
+    "meetingStatusRequired": "Indique la situación de la reunión.",
+    "meetingStatusTooLong": "La situación de la reunión debe tener como máximo 255 caracteres.",
+    "meetingFileTypeNotAllowed": "Tipo de archivo no aceptado. Envíe un archivo Word, PowerPoint o PDF.",
+    "meetingFileEmpty": "El archivo enviado está vacío.",
+    "meetingFileNameTooLong": "El nombre del archivo debe tener como máximo 255 caracteres.",
+    "meetingFileTooLarge": "El archivo debe tener como máximo 25 MB.",
+    "onlyOneFilePerField": "Envíe solamente un archivo en cada campo.",
+    "meetingNotFound": "Reunión no encontrada.",
+    "meetingFileNotFound": "Esta reunión no tiene el archivo solicitado.",
+    "meetingFileUnavailable": "No fue posible entregar el archivo de esta reunión. Inténtelo de nuevo más tarde.",
+    "meetingTemplateNotFound": "Modelo de reunión no encontrado.",
+    "meetingTemplateUnavailable": "No fue posible entregar el modelo de reunión. Inténtelo de nuevo más tarde.",
     "status400": "Verifique los datos ingresados e intente de nuevo.",
     "status404": "No se encontró el registro solicitado.",
     "status409": "Ya existe un registro con los datos ingresados.",

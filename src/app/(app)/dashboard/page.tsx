@@ -17,7 +17,7 @@ const modules = [
   { key: 'parameters', done: true },
   { key: 'documents', done: true },
   { key: 'trainings', done: true },
-  { key: 'meetings', done: false },
+  { key: 'meetings', done: true },
   { key: 'managementPlan', done: false },
   { key: 'programs', done: false },
   { key: 'projects', done: false },

@@ -56,12 +56,7 @@ const navItems: NavItem[] = [
   { key: 'documents', href: '/documentos', icon: 'description' },
   { key: 'projects', href: '/projetos', icon: 'list_alt', pending: true },
   { key: 'trainings', href: '/treinamentos', icon: 'directions_bike' },
-  {
-    key: 'meetings',
-    href: '/reunioes',
-    icon: 'calendar_month',
-    pending: true,
-  },
+  { key: 'meetings', href: '/reunioes', icon: 'calendar_month' },
   { key: 'matrix', href: '/matriz', icon: 'grid_on', pending: true },
 ]
 

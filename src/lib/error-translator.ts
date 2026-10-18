@@ -91,6 +91,28 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Training file is unavailable.': 'trainingFileUnavailable',
   'Training template not found.': 'trainingTemplateNotFound',
   'Training template is unavailable.': 'trainingTemplateUnavailable',
+  'Invalid meeting type.': 'meetingTypeInvalid',
+  'Meeting name is required.': 'meetingNameRequired',
+  'Meeting name is too long.': 'meetingNameTooLong',
+  'Meeting responsible is required.': 'meetingResponsibleRequired',
+  'Meeting responsible is too long.': 'meetingResponsibleTooLong',
+  'Invalid meeting date.': 'meetingDateInvalid',
+  'Meeting date must fall within a registered period.':
+    'meetingDateOutsidePeriods',
+  'Meeting subject is required.': 'meetingSubjectRequired',
+  'Meeting subject is too long.': 'meetingSubjectTooLong',
+  'Meeting status is required.': 'meetingStatusRequired',
+  'Meeting status is too long.': 'meetingStatusTooLong',
+  'Meeting file type not allowed.': 'meetingFileTypeNotAllowed',
+  'Meeting file is empty.': 'meetingFileEmpty',
+  'Meeting file name is too long.': 'meetingFileNameTooLong',
+  'Meeting file exceeds the 25 MB limit.': 'meetingFileTooLarge',
+  'Only one file per field is allowed.': 'onlyOneFilePerField',
+  'Meeting not found.': 'meetingNotFound',
+  'Meeting file not found.': 'meetingFileNotFound',
+  'Meeting file is unavailable.': 'meetingFileUnavailable',
+  'Meeting template not found.': 'meetingTemplateNotFound',
+  'Meeting template is unavailable.': 'meetingTemplateUnavailable',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

@@ -2,8 +2,11 @@ import {
   type Document,
   getDocumentsIdFile,
   getDocumentsTemplatesESocial,
+  getMeetingsIdFilesAttachment,
+  getMeetingsTemplatesTemplate,
   getTrainingsIdFile,
   getTrainingsTemplatesTemplate,
+  type Meeting,
   type Training,
 } from '@/http/api'
 import { FetchError } from '@/http/fetch-client'
@@ -26,6 +29,28 @@ export const TRAINING_TEMPLATE_FILE_NAMES: Record<TrainingTemplateKey, string> =
     avancado: 'treinamento-avancado.pptx',
     'presence-list': 'lista-de-presenca.docx',
   }
+
+/** The two attachments of `/meetings/{id}/files/{attachment}` (D-5). */
+export type MeetingAttachmentKey = Parameters<
+  typeof getMeetingsIdFilesAttachment
+>[1]
+
+/** Field of the meeting record that describes each attachment. */
+export const MEETING_ATTACHMENT_FIELDS = {
+  'presence-list': 'presence_list',
+  minutes: 'minutes',
+} as const satisfies Record<MeetingAttachmentKey, keyof Meeting>
+
+/** The two keys of `GET /meetings/templates/{template}` (FR-019). */
+export type MeetingTemplateKey = Parameters<
+  typeof getMeetingsTemplatesTemplate
+>[0]
+
+/** Stable names the API serves the meeting templates under (§10, H-3). */
+export const MEETING_TEMPLATE_FILE_NAMES: Record<MeetingTemplateKey, string> = {
+  minutes: 'ata-de-reunioes.docx',
+  'presence-list': 'lista-de-presenca.docx',
+}
 
 /**
  * Hands a blob to the browser as a download under the given file name.
@@ -115,4 +140,38 @@ export async function downloadTrainingTemplate(template: TrainingTemplateKey) {
   }
 
   saveBlobAsFile(response.data, TRAINING_TEMPLATE_FILE_NAMES[template])
+}
+
+/**
+ * Downloads one attachment of a meeting and saves it under the name it was
+ * uploaded with, taken from the record (FR-027, R-15).
+ */
+export async function downloadMeetingFile(
+  record: Meeting,
+  attachment: MeetingAttachmentKey
+) {
+  const file = record[MEETING_ATTACHMENT_FIELDS[attachment]]
+  if (!file) return
+
+  const response = await getMeetingsIdFilesAttachment(record.id, attachment)
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, file.name)
+}
+
+/**
+ * Downloads one of the two meeting templates: the minutes model or the blank
+ * attendance list (FR-019, J6).
+ */
+export async function downloadMeetingTemplate(template: MeetingTemplateKey) {
+  const response = await getMeetingsTemplatesTemplate(template)
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, MEETING_TEMPLATE_FILE_NAMES[template])
 }

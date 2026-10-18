@@ -568,6 +568,133 @@
       "removing": "Removing..."
     }
   },
+  "meetings": {
+    "title": "Meetings",
+    "description": "Record of the ergonomics program meetings: type, responsible, date, subject, status, the attendance list and the minutes.",
+    "count": "{count, plural, =0 {No meetings in the selected slice} one {# meeting in the selected slice} other {# meetings in the selected slice}}.",
+    "itemLabel": "{count, plural, one {meeting} other {meetings}}",
+    "searchPlaceholder": "Search by type, name, responsible or status...",
+    "searchLabel": "Search meeting",
+    "columns": {
+      "type": "Meeting with",
+      "name": "Name",
+      "responsible": "Responsible",
+      "date": "Date",
+      "status": "Status",
+      "subject": "Subject"
+    },
+    "types": {
+      "comite-ergonomia": "Ergonomics Committee",
+      "projetos": "Projects",
+      "diversas-areas": "Several Areas"
+    },
+    "typeFilterLabel": "Filter by meeting type",
+    "allTypes": "All",
+    "attachments": {
+      "presence-list": "Attendance list",
+      "minutes": "Minutes"
+    },
+    "noPeriods": {
+      "title": "No period registered.",
+      "description": "Every meeting is listed. The period filter depends on a registered period, and no meeting can be registered until there is one, because a meeting date must fall within a period. An administrator can register it under Parameters › Periods."
+    },
+    "loadErrorTitle": "Could not load the meetings",
+    "loadErrorDescription": "Try again. If the problem persists, check your access permissions.",
+    "emptyTitle": "No meetings in the selected slice.",
+    "emptyDescription": "Meetings dated within the chosen period will appear in this list. Choose another period or all periods to see the others.",
+    "noResultsTitle": "No meetings found for the search or the applied filters.",
+    "noResultsDescription": "Try adjusting the search by type, name, responsible or status, or clear the filters.",
+    "downloadFile": "Download",
+    "downloadFileNamed": "Download {attachment}: {name}",
+    "downloadMinutesTemplate": "Minutes template",
+    "downloadPresenceListTemplate": "Attendance list",
+    "downloading": "Downloading...",
+    "noAttachments": "No attendance list or minutes",
+    "details": {
+      "title": "Meeting",
+      "attachments": "Attachments"
+    },
+    "newMeeting": "New meeting",
+    "newMeetingDisabledHint": "Register a period first: a meeting date must fall within a period.",
+    "deleteAction": "Delete",
+    "created": "Meeting {name} created successfully.",
+    "updated": "Meeting {name} updated successfully.",
+    "deleted": "Meeting {name} deleted successfully.",
+    "fileRemoved": {
+      "presence-list": "Attendance list of meeting {name} removed successfully.",
+      "minutes": "Minutes of meeting {name} removed successfully."
+    },
+    "form": {
+      "newTitle": "New meeting",
+      "newDescription": "Pick who the meeting was with, fill in name, responsible, date, subject and status, and attach the attendance list and the minutes if there are any already.",
+      "editTitle": "Edit meeting",
+      "editDescription": "Change the meeting data and replace the attendance list, the minutes or both, or keep the current files.",
+      "type": "Meeting with",
+      "name": "Name",
+      "namePlaceholder": "E.g.: Committee — March",
+      "responsible": "Responsible",
+      "responsiblePlaceholder": "E.g.: Maria Silva",
+      "date": "Date",
+      "subject": "Subject",
+      "subjectPlaceholder": "Describe what the meeting covered.",
+      "status": "Status",
+      "statusPlaceholder": "E.g.: Held",
+      "fileHint": "Optional. {extensions} up to {max} MB.",
+      "fileSelected": "Chosen file: {name}",
+      "fileKeepHint": {
+        "presence-list": "Leave the field blank to keep the current attendance list.",
+        "minutes": "Leave the field blank to keep the current minutes."
+      },
+      "removeFile": {
+        "presence-list": "Remove attendance list",
+        "minutes": "Remove minutes"
+      },
+      "create": "Create meeting",
+      "creating": "Creating...",
+      "update": "Save changes",
+      "loadError": "Could not load the meeting"
+    },
+    "validation": {
+      "typeRequired": "Select who the meeting was with.",
+      "nameRequired": "Enter the name of the meeting.",
+      "nameTooLong": "The name must have at most {max} characters.",
+      "nameHint": "Up to {max} characters.",
+      "responsibleRequired": "Enter who is responsible for the meeting.",
+      "responsibleTooLong": "The responsible must have at most {max} characters.",
+      "dateRequired": "Enter a valid date for the meeting.",
+      "dateOutsidePeriods": "The date must fall within a registered period.",
+      "dateHint": "Calendar day, within a registered period.",
+      "subjectRequired": "Enter the subject of the meeting.",
+      "subjectTooLong": "The subject must have at most {max} characters.",
+      "subjectHint": "Plain text, up to {max} characters. Line breaks are kept.",
+      "statusRequired": "Enter the status of the meeting.",
+      "statusTooLong": "The status must have at most {max} characters.",
+      "fileTypeNotAllowed": "File type not allowed. Choose a Word, PowerPoint or PDF file.",
+      "fileTooLarge": "The file must be at most {max} MB."
+    },
+    "delete": {
+      "title": "Delete meeting",
+      "question": "Do you really want to delete the meeting <strong>{name}</strong>?",
+      "description": "The deletion is final and cannot be undone. The attendance list and the minutes of the meeting, if any, are erased with it and cannot be recovered.",
+      "confirm": "Delete meeting",
+      "deleting": "Deleting..."
+    },
+    "removeFile": {
+      "removing": "Removing...",
+      "presence-list": {
+        "title": "Remove attendance list",
+        "question": "Do you really want to remove the <strong>attendance list</strong> of meeting <strong>{name}</strong>?",
+        "description": "The meeting and its minutes stay registered, but the signed attendance list is erased and cannot be recovered.",
+        "confirm": "Remove attendance list"
+      },
+      "minutes": {
+        "title": "Remove minutes",
+        "question": "Do you really want to remove the <strong>minutes</strong> of meeting <strong>{name}</strong>?",
+        "description": "The meeting and its attendance list stay registered, but the minutes are erased and cannot be recovered.",
+        "confirm": "Remove minutes"
+      }
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -646,6 +773,27 @@
     "trainingFileUnavailable": "The attendance list of this training could not be delivered. Try again later.",
     "trainingTemplateNotFound": "Training template not found.",
     "trainingTemplateUnavailable": "The training template could not be delivered. Try again later.",
+    "meetingTypeInvalid": "Select a valid meeting type.",
+    "meetingNameRequired": "Enter the meeting's name.",
+    "meetingNameTooLong": "The meeting name must have at most 255 characters.",
+    "meetingResponsibleRequired": "Enter the meeting's responsible.",
+    "meetingResponsibleTooLong": "The meeting responsible must have at most 255 characters.",
+    "meetingDateInvalid": "Enter a valid date for the meeting.",
+    "meetingDateOutsidePeriods": "The meeting date must fall within a registered period.",
+    "meetingSubjectRequired": "Enter the meeting's subject.",
+    "meetingSubjectTooLong": "The meeting subject must have at most 2,000 characters.",
+    "meetingStatusRequired": "Enter the meeting's status.",
+    "meetingStatusTooLong": "The meeting status must have at most 255 characters.",
+    "meetingFileTypeNotAllowed": "File type not accepted. Send a Word, PowerPoint or PDF file.",
+    "meetingFileEmpty": "The file you sent is empty.",
+    "meetingFileNameTooLong": "The file name must have at most 255 characters.",
+    "meetingFileTooLarge": "The file must be at most 25 MB.",
+    "onlyOneFilePerField": "Send only one file in each field.",
+    "meetingNotFound": "Meeting not found.",
+    "meetingFileNotFound": "This meeting does not have the requested file.",
+    "meetingFileUnavailable": "The file of this meeting could not be delivered. Try again later.",
+    "meetingTemplateNotFound": "Meeting template not found.",
+    "meetingTemplateUnavailable": "The meeting template could not be delivered. Try again later.",
     "status400": "Check the information and try again.",
     "status404": "The requested record was not found.",
     "status409": "There is already a record with this information.",
