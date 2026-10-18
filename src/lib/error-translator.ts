@@ -70,6 +70,27 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Document file not found.': 'documentFileNotFound',
   'Document file is unavailable.': 'documentFileUnavailable',
   'E-Social template is unavailable.': 'documentTemplateUnavailable',
+  'Invalid training content.': 'trainingContentInvalid',
+  'Training name is required.': 'trainingNameRequired',
+  'Training name is too long.': 'trainingNameTooLong',
+  'Training responsible is required.': 'trainingResponsibleRequired',
+  'Training responsible is too long.': 'trainingResponsibleTooLong',
+  'Invalid training date.': 'trainingDateInvalid',
+  'Training date must fall within a registered period.':
+    'trainingDateOutsidePeriods',
+  'Training subject is required.': 'trainingSubjectRequired',
+  'Training subject is too long.': 'trainingSubjectTooLong',
+  'Training status is required.': 'trainingStatusRequired',
+  'Training status is too long.': 'trainingStatusTooLong',
+  'Training file type not allowed.': 'trainingFileTypeNotAllowed',
+  'Training file is empty.': 'trainingFileEmpty',
+  'Training file name is too long.': 'trainingFileNameTooLong',
+  'Training file exceeds the 25 MB limit.': 'trainingFileTooLarge',
+  'Training not found.': 'trainingNotFound',
+  'Training file not found.': 'trainingFileNotFound',
+  'Training file is unavailable.': 'trainingFileUnavailable',
+  'Training template not found.': 'trainingTemplateNotFound',
+  'Training template is unavailable.': 'trainingTemplateUnavailable',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

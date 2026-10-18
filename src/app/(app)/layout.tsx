@@ -55,12 +55,7 @@ const navItems: NavItem[] = [
   { key: 'programs', href: '/programa', icon: 'diamond', pending: true },
   { key: 'documents', href: '/documentos', icon: 'description' },
   { key: 'projects', href: '/projetos', icon: 'list_alt', pending: true },
-  {
-    key: 'trainings',
-    href: '/treinamentos',
-    icon: 'directions_bike',
-    pending: true,
-  },
+  { key: 'trainings', href: '/treinamentos', icon: 'directions_bike' },
   {
     key: 'meetings',
     href: '/reunioes',
