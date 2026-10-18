@@ -47,6 +47,8 @@ src/
 │   │   ├── dashboard/
 │   │   ├── alterar-senha/
 │   │   ├── documentos/   # list, novo/, [id]/editar/, _form/; every role reads, canEdit writes
+│   │   ├── treinamentos/ # list sliced by period (?period=<id>|all), novo/, [id]/editar/, _form/; every role reads, canEdit writes
+│   │   ├── reunioes/     # list sliced by period (?period=<id>|all), detail modal, two attachments and two templates, novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/)
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
@@ -59,7 +61,7 @@ src/
 ├── contexts/AuthContext.tsx
 ├── http/                 # Orval client + fetch mutator
 ├── i18n/                 # Locales and request config
-└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, utils
+└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, periods, utils
 ```
 
 Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
@@ -86,6 +88,32 @@ Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
   three catalogs.
 - Legacy translations (`ergomatrix/app/Resources/translations/*.yml`) are the
   reference for domain terms.
+
+## Lists Sliced by Period
+
+Records dated within a period (trainings and meetings now; evaluations and
+projects next) are listed one period at a time. The slice is the
+`period_id` parameter of the API, so changing it fetches again, while search,
+sort and pages stay in the client. The filter lives in the URL as `?period=`
+(a `ListStateConfig.filters` validator accepting a UUID or `all`) and its
+default is resolved by the screen, not by the API: with no `period` in the
+URL, `resolveDefaultPeriod()` in `src/lib/periods.ts` picks the period that
+contains the user's local today (`toLocalCalendarDate()`), or else the one
+with the greatest `end_date`, and writes it to the URL. `all` exists only in
+the web URL and means omitting `period_id`. An unknown id, or a 404
+`Period not found.`, reloads the periods once and applies the default again
+instead of showing an error. `GET /periods` is readable by every role for
+this reason. With no period registered, the screen lists everything and shows
+a notice instead of the filter.
+
+Build a sliced listing with the shared pieces in `src/components/list`, as
+`treinamentos/page.tsx` does, instead of copying the logic:
+`usePeriodSlice({ period, onPeriodChange, useRecords })` loads the periods,
+resolves and writes the default, re-checks unknown or deleted periods once and
+runs the module's records query (a module-scope hook taking `periodId` and the
+query options); `PeriodFilter` (texts in the `periodFilter` namespace) renders
+the select; `isPeriodFilterValue` is the `?period=` validator and
+`ALL_PERIODS` the `all` value.
 
 ## Access Roles
 
