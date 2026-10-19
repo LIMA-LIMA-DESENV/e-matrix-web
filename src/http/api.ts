@@ -451,6 +451,99 @@ export interface MeetingInput {
   minutes?: Blob | File;
 }
 
+/**
+ * State of a management plan cell: not_evaluated is the grey of a cell not evaluated yet
+ */
+export type ManagementPlanCellState = typeof ManagementPlanCellState[keyof typeof ManagementPlanCellState];
+
+
+export const ManagementPlanCellState = {
+  not_evaluated: 'not_evaluated',
+  green: 'green',
+  yellow: 'yellow',
+  red: 'red',
+} as const;
+
+/**
+ * The four rows of the management plan that are evaluated cell by cell. inputs and outputs are derived from them and never written.
+ */
+export type ManagementPlanEvaluatedRow = typeof ManagementPlanEvaluatedRow[keyof typeof ManagementPlanEvaluatedRow];
+
+
+export const ManagementPlanEvaluatedRow = {
+  educational: 'educational',
+  clinical: 'clinical',
+  projects: 'projects',
+  management: 'management',
+} as const;
+
+export interface ManagementPlanCellInput {
+  state: ManagementPlanCellState;
+}
+
+export interface ManagementPlanGoalInput {
+  /**
+     * Score planned for the end of the period
+     * @minimum 0
+     * @maximum 16
+     */
+  goal: number;
+}
+
+/**
+ * The six rows of the grid, in this order, each with the states of levels 1 to 4 (position i is level i + 1). inputs and outputs are derived from the four evaluated rows and are always equal.
+ */
+export type ManagementPlanRows = {
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  inputs: ManagementPlanCellState[];
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  outputs: ManagementPlanCellState[];
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  educational: ManagementPlanCellState[];
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  clinical: ManagementPlanCellState[];
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  projects: ManagementPlanCellState[];
+  /**
+     * @minItems 4
+     * @maxItems 4
+     */
+  management: ManagementPlanCellState[];
+};
+
+export interface ManagementPlan {
+  period: Period;
+  /** The six rows of the grid, in this order, each with the states of levels 1 to 4 (position i is level i + 1). inputs and outputs are derived from the four evaluated rows and are always equal. */
+  rows: ManagementPlanRows;
+  /**
+     * Number of green cells in the four evaluated rows; inputs and outputs do not count
+     * @minimum 0
+     * @maximum 16
+     */
+  score: number;
+  /**
+     * Score planned for the end of the period; 0 for a plan never changed
+     * @minimum 0
+     * @maximum 16
+     */
+  goal: number;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -2086,7 +2179,7 @@ export const getGetPeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and nothing else until the remaining modules exist. Any authenticated role.
+ * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and its management plan, counted as 1 only when it is filled (an evaluated cell other than not_evaluated, or a goal above 0), and nothing else until the remaining modules exist. Any authenticated role.
  * @summary Get period
  */
 export const getPeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsIdResponse> => {
@@ -2351,7 +2444,7 @@ export const getDeletePeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. Since the trainings and meetings modules exist, this 409 does happen in practice: a period with trainings or meetings dated inside it is not deleted, and the legacy system deleted those records along with the period. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
+ * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. Since the trainings, meetings and management plans modules exist, this 409 does happen in practice: a period with trainings or meetings dated inside it, or with a filled management plan (an evaluated cell other than not_evaluated, or a goal above 0), is not deleted, and the legacy system deleted those records along with the period. A blank management plan is not a linked record: it is removed together with the period, without notice. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
  * @summary Delete period
  */
 export const deletePeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deletePeriodsIdResponse> => {
@@ -5947,3 +6040,382 @@ export function useGetMeetingsTemplatesTemplate<TData = Awaited<ReturnType<typeo
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export type getManagementPlansResponse200 = {
+  data: ManagementPlan[]
+  status: 200
+}
+
+export type getManagementPlansResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getManagementPlansResponseSuccess = (getManagementPlansResponse200) & {
+  headers: Headers;
+};
+export type getManagementPlansResponseError = (getManagementPlansResponse401) & {
+  headers: Headers;
+};
+
+export type getManagementPlansResponse = (getManagementPlansResponseSuccess | getManagementPlansResponseError)
+
+export const getGetManagementPlansUrl = () => {
+
+
+
+
+  return `/management-plans`
+}
+
+/**
+ * Returns one management plan per registered period, ordered by the period's start_date, oldest first - including the periods whose plan was never changed, which come as a blank plan (every cell not_evaluated, score 0 and goal 0). Without periods the list is empty. Only the four evaluated rows and the goal are stored: inputs and outputs are derived on every read, level by level, from the four evaluated cells of that level (all green gives green; otherwise all red gives red; otherwise any yellow gives yellow; otherwise not_evaluated), so the two rows always hold the same states; score is the number of green cells in the four evaluated rows, from 0 to 16. Reading never creates a plan. Requires only an authenticated user, so any role; every role gets the same body.
+ * @summary List the management plans of every period
+ */
+export const getManagementPlans = async ( options?: Parameters<typeof customFetch>[1]): Promise<getManagementPlansResponse> => {
+
+  return customFetch<getManagementPlansResponse>(getGetManagementPlansUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetManagementPlansQueryKey = () => {
+    return [
+    `/management-plans`
+    ] as const;
+    }
+
+
+export const getGetManagementPlansQueryOptions = <TData = Awaited<ReturnType<typeof getManagementPlans>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetManagementPlansQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getManagementPlans>>> = ({ signal }) => getManagementPlans({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetManagementPlansQueryResult = NonNullable<Awaited<ReturnType<typeof getManagementPlans>>>
+export type GetManagementPlansQueryError = ErrorResponse
+
+
+export function useGetManagementPlans<TData = Awaited<ReturnType<typeof getManagementPlans>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getManagementPlans>>,
+          TError,
+          Awaited<ReturnType<typeof getManagementPlans>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagementPlans<TData = Awaited<ReturnType<typeof getManagementPlans>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getManagementPlans>>,
+          TError,
+          Awaited<ReturnType<typeof getManagementPlans>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetManagementPlans<TData = Awaited<ReturnType<typeof getManagementPlans>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the management plans of every period
+ */
+
+export function useGetManagementPlans<TData = Awaited<ReturnType<typeof getManagementPlans>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getManagementPlans>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetManagementPlansQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse200 = {
+  data: ManagementPlan
+  status: 200
+}
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putManagementPlansPeriodIdCellsRowLevelResponseSuccess = (putManagementPlansPeriodIdCellsRowLevelResponse200) & {
+  headers: Headers;
+};
+export type putManagementPlansPeriodIdCellsRowLevelResponseError = (putManagementPlansPeriodIdCellsRowLevelResponse400 | putManagementPlansPeriodIdCellsRowLevelResponse401 | putManagementPlansPeriodIdCellsRowLevelResponse403 | putManagementPlansPeriodIdCellsRowLevelResponse404) & {
+  headers: Headers;
+};
+
+export type putManagementPlansPeriodIdCellsRowLevelResponse = (putManagementPlansPeriodIdCellsRowLevelResponseSuccess | putManagementPlansPeriodIdCellsRowLevelResponseError)
+
+export const getPutManagementPlansPeriodIdCellsRowLevelUrl = (periodId: string,
+    row: ManagementPlanEvaluatedRow,
+    level: number,) => {
+
+
+
+
+  return `/management-plans/${periodId}/cells/${row}/${level}`
+}
+
+/**
+ * Writes the given state into one evaluated cell of the period's plan and returns the whole plan, with inputs, outputs and score recalculated. The value is absolute, so repeating the same request gives the same plan. The plan's row is created on its first change: a period without one is a blank plan until then. A cell may be green only when every cell on its left in the same row (lower levels) is green; any other state is always accepted, and demoting a cell does not change the greens on its right. There is no route for inputs and outputs, which are derived. Checked in this order: the cell (row and level), the state, the period and, last, the green rule, on the plan as stored when the change is applied. The period is locked in shared mode before the plan, so a change and the period's deletion serialize: either the plan is written and the deletion sees it, or the period is gone and this answers 404. Records who made the change. Requires the user or admin role.
+ * @summary Change the state of a management plan cell
+ */
+export const putManagementPlansPeriodIdCellsRowLevel = async (periodId: string,
+    row: ManagementPlanEvaluatedRow,
+    level: number,
+    managementPlanCellInput: ManagementPlanCellInput, options?: Parameters<typeof customFetch>[1]): Promise<putManagementPlansPeriodIdCellsRowLevelResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putManagementPlansPeriodIdCellsRowLevelResponse>(getPutManagementPlansPeriodIdCellsRowLevelUrl(periodId,row,level),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(managementPlanCellInput)
+  }
+);}
+
+
+
+
+
+export const getPutManagementPlansPeriodIdCellsRowLevelMutationKey = () => ['putManagementPlansPeriodIdCellsRowLevel'] as const;
+
+export const getPutManagementPlansPeriodIdCellsRowLevelMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>, TError,PutManagementPlansPeriodIdCellsRowLevelMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>, TError,PutManagementPlansPeriodIdCellsRowLevelMutationVariables, TContext> => {
+
+const mutationKey = getPutManagementPlansPeriodIdCellsRowLevelMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>, PutManagementPlansPeriodIdCellsRowLevelMutationVariables> = (props) => {
+          const {periodId,row,level,data} = props ?? {};
+
+          return  putManagementPlansPeriodIdCellsRowLevel(periodId,row,level,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutManagementPlansPeriodIdCellsRowLevelMutationResult = NonNullable<Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>>
+    export type PutManagementPlansPeriodIdCellsRowLevelMutationBody = ManagementPlanCellInput
+    export type PutManagementPlansPeriodIdCellsRowLevelMutationError = ErrorResponse
+    export type PutManagementPlansPeriodIdCellsRowLevelMutationVariables = {periodId: string;row: ManagementPlanEvaluatedRow;level: number;data: ManagementPlanCellInput}
+
+    /**
+ * @summary Change the state of a management plan cell
+ */
+export const usePutManagementPlansPeriodIdCellsRowLevel = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>, TError,PutManagementPlansPeriodIdCellsRowLevelMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putManagementPlansPeriodIdCellsRowLevel>>,
+        TError,
+        PutManagementPlansPeriodIdCellsRowLevelMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutManagementPlansPeriodIdCellsRowLevelMutationOptions(options), queryClient);
+    }
+
+export type putManagementPlansPeriodIdGoalResponse200 = {
+  data: ManagementPlan
+  status: 200
+}
+
+export type putManagementPlansPeriodIdGoalResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putManagementPlansPeriodIdGoalResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putManagementPlansPeriodIdGoalResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putManagementPlansPeriodIdGoalResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putManagementPlansPeriodIdGoalResponseSuccess = (putManagementPlansPeriodIdGoalResponse200) & {
+  headers: Headers;
+};
+export type putManagementPlansPeriodIdGoalResponseError = (putManagementPlansPeriodIdGoalResponse400 | putManagementPlansPeriodIdGoalResponse401 | putManagementPlansPeriodIdGoalResponse403 | putManagementPlansPeriodIdGoalResponse404) & {
+  headers: Headers;
+};
+
+export type putManagementPlansPeriodIdGoalResponse = (putManagementPlansPeriodIdGoalResponseSuccess | putManagementPlansPeriodIdGoalResponseError)
+
+export const getPutManagementPlansPeriodIdGoalUrl = (periodId: string,) => {
+
+
+
+
+  return `/management-plans/${periodId}/goal`
+}
+
+/**
+ * Writes the goal of the period's plan, the score planned for the end of the period, and returns the whole plan. The value is absolute, so repeating the same request gives the same plan. The plan's row is created on its first change. goal must be a JSON integer from 0 to 16: a missing goal, null, a string (even "8"), a decimal or a value out of range answers 400. The goal is checked before the period. Same locks as the cell change: the period in shared mode, then the plan. Records who made the change. Requires the user or admin role.
+ * @summary Change the goal of a management plan
+ */
+export const putManagementPlansPeriodIdGoal = async (periodId: string,
+    managementPlanGoalInput: ManagementPlanGoalInput, options?: Parameters<typeof customFetch>[1]): Promise<putManagementPlansPeriodIdGoalResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putManagementPlansPeriodIdGoalResponse>(getPutManagementPlansPeriodIdGoalUrl(periodId),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(managementPlanGoalInput)
+  }
+);}
+
+
+
+
+
+export const getPutManagementPlansPeriodIdGoalMutationKey = () => ['putManagementPlansPeriodIdGoal'] as const;
+
+export const getPutManagementPlansPeriodIdGoalMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>, TError,PutManagementPlansPeriodIdGoalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>, TError,PutManagementPlansPeriodIdGoalMutationVariables, TContext> => {
+
+const mutationKey = getPutManagementPlansPeriodIdGoalMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>, PutManagementPlansPeriodIdGoalMutationVariables> = (props) => {
+          const {periodId,data} = props ?? {};
+
+          return  putManagementPlansPeriodIdGoal(periodId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutManagementPlansPeriodIdGoalMutationResult = NonNullable<Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>>
+    export type PutManagementPlansPeriodIdGoalMutationBody = ManagementPlanGoalInput
+    export type PutManagementPlansPeriodIdGoalMutationError = ErrorResponse
+    export type PutManagementPlansPeriodIdGoalMutationVariables = {periodId: string;data: ManagementPlanGoalInput}
+
+    /**
+ * @summary Change the goal of a management plan
+ */
+export const usePutManagementPlansPeriodIdGoal = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>, TError,PutManagementPlansPeriodIdGoalMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putManagementPlansPeriodIdGoal>>,
+        TError,
+        PutManagementPlansPeriodIdGoalMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutManagementPlansPeriodIdGoalMutationOptions(options), queryClient);
+    }
