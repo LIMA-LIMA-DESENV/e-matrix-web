@@ -49,6 +49,7 @@ src/
 │   │   ├── documentos/   # list, novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── treinamentos/ # list sliced by period (?period=<id>|all), novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── reunioes/     # list sliced by period (?period=<id>|all), detail modal, two attachments and two templates, novo/, [id]/editar/, _form/; every role reads, canEdit writes
+│   │   ├── plano-de-gestao/ # one GET for every period: SVG chart, mini-grids and the full grid of ?period=<id> (default resolved on the page, no "all"); every role reads, canEdit clicks cells and edits the goal (saved at once, not optimistic, grid locked while saving)
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/)
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
