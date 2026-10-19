@@ -695,6 +695,85 @@
       }
     }
   },
+  "managementPlan": {
+    "title": "Management Plan",
+    "subtitle": "over the year",
+    "level": "Level {level}",
+    "rows": {
+      "inputs": "Inputs",
+      "outputs": "Outputs",
+      "educational": "Educational",
+      "clinical": "Clinic",
+      "projects": "Projects",
+      "management": "Management"
+    },
+    "cells": {
+      "inputs": {
+        "1": "Identification of ergonomic concerns arising from interviews or spontaneous employee search, from EHS records and from the health team.",
+        "2": "Visits at work stations to monitor work activities and basic (qualitative) ergonomic analysis to identify ergonomic risk and route solutions.",
+        "3": "Workstation visits to monitor work activities and advanced ergonomic analysis (quantitative) for ergonomic risk classification, prioritization of actions and solution planning.",
+        "4": "Monitoring of the effectiveness of the improvements implemented with reassessment and reclassification of the risks and validation of the employees involved in the tasks."
+      },
+      "outputs": {
+        "1": "Ergonomic awareness of the employees on the site, involvement of the ergonomics team with the other areas and identification of concerns on the site.",
+        "2": "Basic analysis of the work activities and concerns in the site and participation of the Lean, Projects and Maintenance team to implement simple and administrative improvements. Accompaniment of the ergonomics team during the implementations.",
+        "3": "Advanced analysis of work activities with the participation of Lean, Projects and Maintenance team to implement improvements and projects involving investments. Accompaniment of the ergonomics team during the implementations.",
+        "4": "Compliance with pre-determined deadlines according to prioritization of actions with recorded changes and information of activity analyzed, ergonomic risk, action priority, investment involved and effectiveness of the action."
+      },
+      "educational": {
+        "1": "Basic ergonomic training for all to identify ergonomic hazards and postural orientations at work.",
+        "2": "Advanced Ergonomics Training for Ergonomics Committee and Health teams, Moc / Changes, Projects, Lean, Incident / accident investigation.",
+        "3": "Advanced ergonomics training for procedures staff (SOPs or RAs)",
+        "4": "Program of training with recycling and guarantee of the update in the site with the theme ergonomics, including of new employees."
+      },
+      "clinical": {
+        "1": "Ergo leader's involvement in health campaigns with themes related to Dorts prevention.",
+        "2": "Investigation of medical / clinical occurrences with participation of Ergonomics Team member and EHS.",
+        "3": "Health team involved in the selection of people (admission and periodical).",
+        "4": "Postural, admission and periodic evaluation and monitoring program."
+      },
+      "projects": {
+        "1": "Ergo leader participating in the MOC Team / Changes / Projects / Lean.",
+        "2": "Computerized data recording with Management Plan, Program Guidelines, Assessments, Risks and Projects.",
+        "3": "Involvement of the Ergonomics team with Managers, Ehs, Rh, Health, Manufacturing and Employees to prioritize actions and ergonomic improvement projects.",
+        "4": "Moc/Changes Systems and Computerized Procedures and registration of projects implemented in the site."
+      },
+      "management": {
+        "1": "Ergo leader and Ergonomics Committee training.",
+        "2": "Computerized data recording with Management Plan, Program Guidelines, Assessments, Risks and Projects.",
+        "3": "Prioritization of ergonomics actions and monitoring projects and meeting deadlines.",
+        "4": "Evaluation of the goals of Management and the Program of Ergonomics with Map of Risks and Projects of the site."
+      }
+    },
+    "states": {
+      "not_evaluated": "Not evaluated",
+      "green": "Green",
+      "yellow": "Yellow",
+      "red": "Red"
+    },
+    "cellLabel": "{row}, {level}: {state}",
+    "cellWithText": "{label}. {text}",
+    "goalSentence": "Planning Score <strong>{score}</strong>, with the Goal of <goalValue>{goal}</goalValue> until the end of the period",
+    "goalInput": "Goal of the period",
+    "goalInvalid": "The goal must be a whole number from 0 to {max}.",
+    "saving": "Saving…",
+    "chart": {
+      "title": "Score evolution",
+      "score": "Annual Scores",
+      "goal": "Planned",
+      "description": "Line chart of the score and the goal of each period: {summary}.",
+      "periodSummary": "{period}: score {score}, goal {goal}",
+      "pointTitle": "{series} — {period}: {value}"
+    },
+    "miniGridsLabel": "Plan of each period",
+    "selectPeriod": "View the plan of {period}",
+    "loadError": "Could not load the Management Plan.",
+    "empty": {
+      "title": "No period registered.",
+      "description": "The Management Plan is defined for each period. It shows up here as soon as a period is registered.",
+      "action": "Register periods in Parameters"
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -794,6 +873,10 @@
     "meetingFileUnavailable": "The file of this meeting could not be delivered. Try again later.",
     "meetingTemplateNotFound": "Meeting template not found.",
     "meetingTemplateUnavailable": "The meeting template could not be delivered. Try again later.",
+    "managementPlanCellNotFound": "Management Plan cell not found.",
+    "managementPlanCellStateInvalid": "Invalid state for the Management Plan cell.",
+    "managementPlanCellGreenBeforePreviousLevels": "A cell can only turn green when the previous levels of its row are green.",
+    "managementPlanGoalInvalid": "The Management Plan goal must be a whole number from 0 to 16.",
     "status400": "Check the information and try again.",
     "status404": "The requested record was not found.",
     "status409": "There is already a record with this information.",

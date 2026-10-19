@@ -695,6 +695,85 @@
       }
     }
   },
+  "managementPlan": {
+    "title": "Plano de Gestão",
+    "subtitle": "durante os anos",
+    "level": "Nível {level}",
+    "rows": {
+      "inputs": "Entradas (Inputs)",
+      "outputs": "Ações (Outputs)",
+      "educational": "Educacional",
+      "clinical": "Clínica",
+      "projects": "Projetos",
+      "management": "Gestão"
+    },
+    "cells": {
+      "inputs": {
+        "1": "Identificação de preocupações ergonômicas vindas de entrevistas ou procura espontânea dos colaboradores, de registros de Ehs e da equipe de saúde.",
+        "2": "Visitas nas estações de trabalho para acompanhamento das atividades laborais e análise ergonômica básica (qualitativa) para identificação do risco ergonômico e encaminhamento de soluções.",
+        "3": "Visitas nas estações de trabalho para acompanhamento das atividades laborais e análise ergonômica avançada (quantitativa) para classificação do risco ergonômico, priorização de ações e planejamento de soluções.",
+        "4": "Acompanhamento da eficácia das melhorias implementadas com reavaliação e reclassificação dos riscos e validação dos colaboradores envolvidos nas tarefas."
+      },
+      "outputs": {
+        "1": "Conscientização ergonômica dos colaboradores no site, envolvimento da equipe de ergonomia com as demais áreas e identificações de preocupações no site.",
+        "2": "Análise básica das atividades laborais e preocupações no site e participação da equipe de Lean, Projetos e Manutenção para implementação de melhorias simples e administrativas. Acompanhamento da equipe de ergonomia durante as implementações.",
+        "3": "Análise avançada das atividades laborais com participação da equipe de Lean, Projetos e Manutenção para implementação de melhorias e projetos que envolvam investimentos. Acompanhamento da equipe de ergonomia durante as implementações.",
+        "4": "Cumprimento dos prazos pré-determinados conforme priorização das ações com registro de mudanças implementadas e informações da atividade analisada, risco ergonômico, prioridade de ação, investimento envolvido e eficácia da ação."
+      },
+      "educational": {
+        "1": "Treinamento básico de ergonomia para todos para identificação de riscos ergonômicos e orientações posturais no trabalho.",
+        "2": "Treinamento avançado de ergonomia para Comitê de Ergonomia e equipes de Saúde, Moc/Mudanças, Projetos, Lean, Investigação incidente/acidente.",
+        "3": "Treinamento avançado de ergonomia para equipe de procedimentos (SOPs ou RAs)",
+        "4": "Programa de treinamentos com reciclagens e garantia da atualização no site com o tema ergonomia, inclusive de funcionários novos."
+      },
+      "clinical": {
+        "1": "Envolvimento do Ergo leader em Campanhas de saúde com temas relacionados a prevenção de Dorts.",
+        "2": "Investigação de ocorrências médicas/clínicas com participação de membro do Time de Ergonomia e EHS.",
+        "3": "Equipe de saúde envolvida na seleção de pessoas (admissional e periódico).",
+        "4": "Programa de avaliação e acompanhamento postural, admissional e periódico."
+      },
+      "projects": {
+        "1": "Ergo leader participando do Time de Moc/Mudanças/Projetos/Lean.",
+        "2": "Registro dos dados informatizado com Plano de Gestão, Guidelines do Programa, Avaliações, Riscos e Projetos.",
+        "3": "Envolvimento da equipe de Ergonomia com Gestores, Ehs, Rh, Saúde, Manufatura e Colaboradores para priorização de ações e projetos de melhoria ergonômica.",
+        "4": "Sistemas de Moc/Mudanças e Procedimentos informatizados e registro de projetos implementados no site."
+      },
+      "management": {
+        "1": "Ergo leader e formação de Comitê de Ergonomia.",
+        "2": "Registro dos dados informatizado com Plano de Gestão, Guidelines do Programa, Avaliações, Riscos e Projetos.",
+        "3": "Priorização das ações de ergonomia e acompanhamento de projetos e cumprimento de prazos.",
+        "4": "Avaliação das metas de Gestão e do Programa de Ergonomia com Mapa de Riscos e Projetos do site."
+      }
+    },
+    "states": {
+      "not_evaluated": "Não avaliado",
+      "green": "Verde",
+      "yellow": "Amarelo",
+      "red": "Vermelho"
+    },
+    "cellLabel": "{row}, {level}: {state}",
+    "cellWithText": "{label}. {text}",
+    "goalSentence": "Pontuação do planejamento <strong>{score}</strong>, com Meta de <goalValue>{goal}</goalValue> até o final do período",
+    "goalInput": "Meta do período",
+    "goalInvalid": "A meta deve ser um número inteiro de 0 a {max}.",
+    "saving": "Salvando…",
+    "chart": {
+      "title": "Evolução da pontuação",
+      "score": "Pontuações Anuais",
+      "goal": "Planejado",
+      "description": "Gráfico de linhas da pontuação e da meta de cada período: {summary}.",
+      "periodSummary": "{period}: pontuação {score}, meta {goal}",
+      "pointTitle": "{series} — {period}: {value}"
+    },
+    "miniGridsLabel": "Plano de cada período",
+    "selectPeriod": "Ver o plano de {period}",
+    "loadError": "Não foi possível carregar o Plano de Gestão.",
+    "empty": {
+      "title": "Nenhum período cadastrado.",
+      "description": "O Plano de Gestão é definido para cada período. Ele aparece aqui assim que houver um período cadastrado.",
+      "action": "Cadastrar períodos em Parâmetros"
+    }
+  },
   "errors": {
     "invalidCredentials": "E-mail ou senha incorretos.",
     "sessionExpired": "Sua sessão expirou por inatividade. Entre novamente para continuar.",
@@ -794,6 +873,10 @@
     "meetingFileUnavailable": "Não foi possível entregar o arquivo desta reunião. Tente novamente mais tarde.",
     "meetingTemplateNotFound": "Modelo de reunião não encontrado.",
     "meetingTemplateUnavailable": "Não foi possível entregar o modelo de reunião. Tente novamente mais tarde.",
+    "managementPlanCellNotFound": "Célula do Plano de Gestão não encontrada.",
+    "managementPlanCellStateInvalid": "Estado inválido para a célula do Plano de Gestão.",
+    "managementPlanCellGreenBeforePreviousLevels": "A célula só pode ficar verde quando os níveis anteriores da linha estiverem verdes.",
+    "managementPlanGoalInvalid": "A meta do Plano de Gestão deve ser um número inteiro de 0 a 16.",
     "status400": "Verifique os dados informados e tente novamente.",
     "status404": "O registro solicitado não foi encontrado.",
     "status409": "Já existe um registro com os dados informados.",

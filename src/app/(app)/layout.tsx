@@ -46,12 +46,7 @@ interface NavItem {
 // header "Administração" menu.
 const navItems: NavItem[] = [
   { key: 'dashboard', href: '/dashboard', icon: 'dashboard' },
-  {
-    key: 'managementPlan',
-    href: '/plano-de-gestao',
-    icon: 'monitoring',
-    pending: true,
-  },
+  { key: 'managementPlan', href: '/plano-de-gestao', icon: 'monitoring' },
   { key: 'programs', href: '/programa', icon: 'diamond', pending: true },
   { key: 'documents', href: '/documentos', icon: 'description' },
   { key: 'projects', href: '/projetos', icon: 'list_alt', pending: true },

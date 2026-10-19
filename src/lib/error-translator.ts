@@ -113,6 +113,12 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Meeting file is unavailable.': 'meetingFileUnavailable',
   'Meeting template not found.': 'meetingTemplateNotFound',
   'Meeting template is unavailable.': 'meetingTemplateUnavailable',
+  'Management plan cell not found.': 'managementPlanCellNotFound',
+  'Invalid management plan cell state.': 'managementPlanCellStateInvalid',
+  'Management plan cell cannot be green before the previous levels.':
+    'managementPlanCellGreenBeforePreviousLevels',
+  'Management plan goal must be an integer from 0 to 16.':
+    'managementPlanGoalInvalid',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

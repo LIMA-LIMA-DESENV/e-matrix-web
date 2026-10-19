@@ -18,7 +18,7 @@ const modules = [
   { key: 'documents', done: true },
   { key: 'trainings', done: true },
   { key: 'meetings', done: true },
-  { key: 'managementPlan', done: false },
+  { key: 'managementPlan', done: true },
   { key: 'programs', done: false },
   { key: 'projects', done: false },
   { key: 'matrix', done: false },
