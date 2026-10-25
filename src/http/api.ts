@@ -390,6 +390,159 @@ export const MeetingType = {
 } as const;
 
 /**
+ * production is the RGP (Produção tab) and office the RGA (Escritório tab). Chosen on creation and never changed: it picks the numbering and the code prefix.
+ */
+export type ImprovementProjectScope = typeof ImprovementProjectScope[keyof typeof ImprovementProjectScope];
+
+
+export const ImprovementProjectScope = {
+  production: 'production',
+  office: 'office',
+} as const;
+
+/**
+ * One attachment of a project as the contract exposes it. The storage key never leaves the server: the download goes by record id and attachment.
+ */
+export interface ProjectFile {
+  /** Original name sent on the upload, also the name of the downloaded file */
+  name: string;
+  /** Derived from the extension, not from the Content-Type the client sent */
+  mime_type: string;
+}
+
+/**
+ * The activity of the project as it is now: changing the activity's code changes what is shown here, never the link, which is by id.
+ */
+export interface ImprovementProjectActivity {
+  id: string;
+  code: string;
+  name: string;
+}
+
+export interface ImprovementProject {
+  id: string;
+  scope: ImprovementProjectScope;
+  /**
+     * Sequential number of the scope, assigned on creation, never changed nor reused
+     * @minimum 1
+     */
+  number: number;
+  /** RGP-<number> or RGA-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  date: string;
+  concern: string;
+  improvement_recommendation: string;
+  /** Free text */
+  priority: string;
+  /** The photo before the improvement, or null when the project has none */
+  before_photo: ProjectFile | null;
+  /** The photo after the improvement, or null when the project has none */
+  after_photo: ProjectFile | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ImprovementProjectInput {
+  scope: ImprovementProjectScope;
+  /** An existing activity */
+  activity_id: string;
+  /** Calendar day, without time. It must fall inside a registered period, limits included; with no period registered every date is refused. */
+  date: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  concern: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  improvement_recommendation: string;
+  /**
+     * Free text, trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  priority: string;
+  /** Optional photo before the improvement. jpg, jpeg or png, up to 10485760 bytes (10 MB), any dimensions. At most one file in this part; leaving it out, or sending it with an empty filename, means no photo. */
+  before_photo?: Blob | File;
+  /** Optional photo after the improvement, with the same rules as before_photo. */
+  after_photo?: Blob | File;
+}
+
+export interface ImprovementProjectUpdateInput {
+  /** An existing activity */
+  activity_id: string;
+  /** Calendar day, without time. It must fall inside a registered period, limits included; with no period registered every date is refused. */
+  date: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  concern: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  improvement_recommendation: string;
+  /**
+     * Free text, trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  priority: string;
+  /** Optional replacement of the photo before the improvement. jpg, jpeg or png, up to 10485760 bytes (10 MB), any dimensions. At most one file in this part; leaving it out, or sending it with an empty filename, keeps the current photo. */
+  before_photo?: Blob | File;
+  /** Optional replacement of the photo after the improvement, with the same rules as before_photo. */
+  after_photo?: Blob | File;
+}
+
+/**
+ * A material receipt (RA). It has no activity. The storage key and the authorship never leave the server.
+ */
+export interface MaterialReceipt {
+  id: string;
+  /**
+     * Sequential number of the RA, independent of RGP and RGA, never reused
+     * @minimum 1
+     */
+  number: number;
+  /** RA-<number>, derived and never stored */
+  code: string;
+  employee: string;
+  employee_registry: string;
+  date: string;
+  /** The receipt form, or null when there is none */
+  file: ProjectFile | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MaterialReceiptInput {
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  employee: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  employee_registry: string;
+  /** Calendar day, without time. It must fall inside a registered period, limits included; with no period registered every date is refused. */
+  date: string;
+  /** Optional receipt form. doc, docx, ppt, pptx or pdf, up to 26214400 bytes (25 MB). At most one file, in this part only; leaving it out, or sending it with an empty filename, means no form. */
+  file?: Blob | File;
+}
+
+/**
  * One attachment of a meeting as the contract exposes it. The storage key never leaves the server: the download goes by meeting id and attachment.
  */
 export interface MeetingFile {
@@ -544,6 +697,326 @@ export interface ManagementPlan {
   goal: number;
 }
 
+/**
+ * The five fixed fronts of the program, in the order of the legacy E-Matrix, which is also the order of the listing: ergonomics-team-and-trainings (Equipe de Ergonomia e Treinamentos), procedures-and-materials (Procedimento e Materiais), priority-list (Lista de Prioridades), ergonomic-projects (Projetos Ergonomicos) and improvement-review-and-control (Revisao e Controle de Melhorias). Several items may share a type.
+ */
+export type ProgramType = typeof ProgramType[keyof typeof ProgramType];
+
+
+export const ProgramType = {
+  'ergonomics-team-and-trainings': 'ergonomics-team-and-trainings',
+  'procedures-and-materials': 'procedures-and-materials',
+  'priority-list': 'priority-list',
+  'ergonomic-projects': 'ergonomic-projects',
+  'improvement-review-and-control': 'improvement-review-and-control',
+} as const;
+
+/**
+ * The key of a fixed material, downloaded from GET /programs/materials/{material}: material-specifications (especificacoes-materiais.docx) and ergonomics-procedure (procedimento-ergonomia.docx).
+ */
+export type ProgramMaterial = typeof ProgramMaterial[keyof typeof ProgramMaterial];
+
+
+export const ProgramMaterial = {
+  'material-specifications': 'material-specifications',
+  'ergonomics-procedure': 'ergonomics-procedure',
+} as const;
+
+/**
+ * The attached file as the contract exposes it. The storage key never leaves the server: the download goes by item id.
+ */
+export interface ProgramFile {
+  /** Original name sent on the upload, also the name of the downloaded file */
+  name: string;
+  /** Derived from the extension, not from the Content-Type the client sent */
+  mime_type: string;
+}
+
+export interface Program {
+  id: string;
+  type: ProgramType;
+  question: string;
+  /** Plain text; line breaks are \n and markup is literal, never HTML */
+  description: string;
+  /** Plain text; line breaks are \n and markup is literal, never HTML */
+  actions: string;
+  responsible: string;
+  target_date: string;
+  /**
+     * @minimum 0
+     * @maximum 100
+     */
+  completed_percentage: number;
+  /** The attached file, or null when the item has none */
+  file: ProgramFile | null;
+  /** The keys of the fixed materials of the item's type, in this order: both for procedures-and-materials, whatever the question says, and an empty list for every other type */
+  materials: ProgramMaterial[];
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The current score of the program, derived on every read and never stored. Not rounded.
+ */
+export interface ProgramScore {
+  /**
+     * Sum of the completed percentages x 5 / (number of items x 100); 0 without items
+     * @minimum 0
+     * @maximum 5
+     */
+  value: number;
+  /** Always 5 */
+  max: number;
+  /**
+     * value / max x 100, the width of the progress bar
+     * @minimum 0
+     * @maximum 100
+     */
+  percentage: number;
+  /** True only when there are items and value is max */
+  complete: boolean;
+}
+
+/**
+ * The answer of GET /programs: every item and the score. Not an array, unlike the other listings.
+ */
+export interface ProgramList {
+  /** Ordered by the position of the type in ProgramType, then created_at ascending, then id */
+  items: Program[];
+  score: ProgramScore;
+}
+
+export interface ProgramInput {
+  type: ProgramType;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  question: string;
+  /**
+     * Plain text. \r\n is normalized to \n and the text is trimmed before validation; the limit counts code points
+     * @minLength 1
+     * @maxLength 5000
+     */
+  description: string;
+  /**
+     * Plain text. \r\n is normalized to \n and the text is trimmed before validation; the limit counts code points
+     * @minLength 1
+     * @maxLength 5000
+     */
+  actions: string;
+  /**
+     * Trimmed before validation
+     * @minLength 1
+     * @maxLength 255
+     */
+  responsible: string;
+  /** Calendar day, without time; past dates are accepted */
+  target_date: string;
+  /**
+     * Integer from 0 to 100 sent as multipart text: only decimal digits, so 50.5, -1 and 1e2 are refused
+     * @pattern ^\s*\d+\s*$
+     */
+  completed_percentage: string;
+  /** Optional. doc, docx, ppt, pptx, pdf or zip, up to 26214400 bytes (25 MB). Leaving the part out creates the item without a file. */
+  file?: Blob | File;
+}
+
+/**
+ * Risk level of risk_score and post_project_risk; the web shows Alto, Médio and Baixo in the user's language
+ */
+export type MatrixRiskLevel = typeof MatrixRiskLevel[keyof typeof MatrixRiskLevel];
+
+
+export const MatrixRiskLevel = {
+  high: 'high',
+  medium: 'medium',
+  low: 'low',
+} as const;
+
+/**
+ * Status of the project of a matrix item; the web shows Aberto and Fechado in the user's language
+ */
+export type MatrixProjectStatus = typeof MatrixProjectStatus[keyof typeof MatrixProjectStatus];
+
+
+export const MatrixProjectStatus = {
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+/**
+ * The 21 fields of a matrix item, always with every key, in this order. A value is null when the field is empty or when the activity has no item in the period. An item is filled when any of them is not null.
+ */
+export interface MatrixValues {
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  hazard_type: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  hazardous_event: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  injuries: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  causes: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  exposure: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  body_segment: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  probability: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  severity: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  pure_risk_level: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  pure_risk_classification: string | null;
+  risk_score: MatrixRiskLevel | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  elimination_substitution: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  engineering_controls: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  administrative_controls: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  ppe: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  control_level: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  residual_risk_level: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  residual_risk_classification: string | null;
+  /**
+     * Free text, trimmed and never empty; null when empty
+     * @maxLength 5000
+     * @nullable
+     */
+  required_actions: string | null;
+  project_status: MatrixProjectStatus | null;
+  post_project_risk: MatrixRiskLevel | null;
+}
+
+/**
+ * The activity of the row, as it is now
+ */
+export type MatrixRowActivity = {
+  id: string;
+  code: string;
+  name: string;
+  fabric: string;
+  line: string;
+  area: string;
+  function: string;
+};
+
+export interface MatrixRow {
+  /** The activity of the row, as it is now */
+  activity: MatrixRowActivity;
+  values: MatrixValues;
+}
+
+/**
+ * The period a matrix not initialized would be copied from: among the periods whose matrix is initialized, the one with the latest start_date before the period's
+ */
+export interface MatrixCopySource {
+  id: string;
+  description: string;
+}
+
+export interface Matrix {
+  period: Period;
+  /** Whether the matrix of the period was initialized (POST /matrices/{period_id}); it happens once and has no way back */
+  initialized: boolean;
+  /** While the period is not initialized, the period a copy would come from, or null when there is none (the matrix can then only start blank). Always null once initialized. */
+  copy_source: MatrixCopySource | null;
+  /** Empty while the period is not initialized. Once initialized, one row per existing activity, ordered by code ignoring case, including the activities created after the initialization, which come with every value null. */
+  rows: MatrixRow[];
+}
+
+export interface MatrixInitializationInput {
+  /**
+     * null starts the matrix blank; the id of the period's current copy_source copies its filled items. The key is required.
+     * @nullable
+     */
+  copy_from_period_id: string | null;
+}
+
+export interface MatrixFieldInput {
+  /**
+     * The new value of the field. A text in the 18 text fields; high, medium or low in risk_score and post_project_risk; open or closed in project_status. null empties any field. The key is required.
+     * @maxLength 5000
+     * @nullable
+     */
+  value: string | null;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -594,6 +1067,24 @@ token: string;
 export type GetTrainingsParams = {
 /**
  * Period whose date range slices the listing. Omit it to list every training.
+ */
+period_id?: string;
+};
+
+export type GetImprovementProjectsParams = {
+/**
+ * production (RGP) or office (RGA). Omit it to list both.
+ */
+scope?: ImprovementProjectScope;
+/**
+ * Period whose date range slices the listing. Omit it to list every project.
+ */
+period_id?: string;
+};
+
+export type GetMaterialReceiptsParams = {
+/**
+ * Period whose date range slices the listing. Omit it to list every receipt.
  */
 period_id?: string;
 };
@@ -2179,7 +2670,7 @@ export const getGetPeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and its management plan, counted as 1 only when it is filled (an evaluated cell other than not_evaluated, or a goal above 0), and nothing else until the remaining modules exist. Any authenticated role.
+ * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and its management plan, counted as 1 only when it is filled (an evaluated cell other than not_evaluated, or a goal above 0), and its filled matrix items, one each under matrix (blank matrix items are not counted), and nothing else until the remaining modules exist. Any authenticated role.
  * @summary Get period
  */
 export const getPeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsIdResponse> => {
@@ -2444,7 +2935,7 @@ export const getDeletePeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. Since the trainings, meetings and management plans modules exist, this 409 does happen in practice: a period with trainings or meetings dated inside it, or with a filled management plan (an evaluated cell other than not_evaluated, or a goal above 0), is not deleted, and the legacy system deleted those records along with the period. A blank management plan is not a linked record: it is removed together with the period, without notice. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
+ * Deletes a period permanently, only when it has no linked records (see GET /periods/{id}); there is no cascade and no soft delete. Since the trainings, meetings and management plans modules exist, this 409 does happen in practice: a period with trainings or meetings dated inside it, or with a filled management plan (an evaluated cell other than not_evaluated, or a goal above 0), is not deleted, and the legacy system deleted those records along with the period. A blank management plan is not a linked record: it is removed together with the period, without notice. Likewise, a period with filled matrix items (any of the 21 fields not null) is not deleted, while its blank matrix items and the mark of its initialized matrix are removed together with the period, without notice. The period is locked while its linked records are counted and removed in the same transaction. Deleting the same period again responds 404. The request has no body. Requires admin role.
  * @summary Delete period
  */
 export const deletePeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deletePeriodsIdResponse> => {
@@ -2797,7 +3288,7 @@ export const getGetActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its evaluations, its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. Requires admin role.
+ * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its evaluations, its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. Requires admin role.
  * @summary Get activity
  */
 export const getActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesIdResponse> => {
@@ -3062,7 +3553,7 @@ export const getDeleteActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction. Deleting the same activity again responds 404. The request has no body. Requires admin role.
+ * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction: an activity with a filled matrix item in any period is not deleted, and its blank matrix items are removed together with it. Deleting the same activity again responds 404. The request has no body. Requires admin role.
  * @summary Delete activity
  */
 export const deleteActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteActivitiesIdResponse> => {
@@ -5058,6 +5549,2092 @@ export function useGetTrainingsTemplatesTemplate<TData = Awaited<ReturnType<type
 
 
 
+export type getImprovementProjectsResponse200 = {
+  data: ImprovementProject[]
+  status: 200
+}
+
+export type getImprovementProjectsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type getImprovementProjectsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getImprovementProjectsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getImprovementProjectsResponseSuccess = (getImprovementProjectsResponse200) & {
+  headers: Headers;
+};
+export type getImprovementProjectsResponseError = (getImprovementProjectsResponse400 | getImprovementProjectsResponse401 | getImprovementProjectsResponse404) & {
+  headers: Headers;
+};
+
+export type getImprovementProjectsResponse = (getImprovementProjectsResponseSuccess | getImprovementProjectsResponseError)
+
+export const getGetImprovementProjectsUrl = (params?: GetImprovementProjectsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/improvement-projects?${stringifiedParams}` : `/improvement-projects`
+}
+
+/**
+ * Lists the project registers - RGP (scope production) and RGA (scope office) - newest date first, then the largest number first. The optional scope keeps one type only; any other value answers 400. The optional period_id narrows the listing to the projects whose date falls inside that period's closed range, both limits included; without it every project is returned, including any whose date falls outside every period. A period_id that is not a UUID, that names no period, or that is empty answers 404 instead of widening the listing. Each item carries its activity as it is now (id, code and name), read through the Activities port. There is no pagination on the server; searching, sorting and paging are done by the client. Requires only an authenticated user, so any role.
+ * @summary List improvement projects
+ */
+export const getImprovementProjects = async (params?: GetImprovementProjectsParams, options?: Parameters<typeof customFetch>[1]): Promise<getImprovementProjectsResponse> => {
+
+  return customFetch<getImprovementProjectsResponse>(getGetImprovementProjectsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImprovementProjectsQueryKey = (params?: GetImprovementProjectsParams,) => {
+    return [
+    `/improvement-projects`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetImprovementProjectsQueryOptions = <TData = Awaited<ReturnType<typeof getImprovementProjects>>, TError = ErrorResponse>(params?: GetImprovementProjectsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImprovementProjectsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImprovementProjects>>> = ({ signal }) => getImprovementProjects(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetImprovementProjectsQueryResult = NonNullable<Awaited<ReturnType<typeof getImprovementProjects>>>
+export type GetImprovementProjectsQueryError = ErrorResponse
+
+
+export function useGetImprovementProjects<TData = Awaited<ReturnType<typeof getImprovementProjects>>, TError = ErrorResponse>(
+ params: undefined |  GetImprovementProjectsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjects>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjects>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjects<TData = Awaited<ReturnType<typeof getImprovementProjects>>, TError = ErrorResponse>(
+ params?: GetImprovementProjectsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjects>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjects>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjects<TData = Awaited<ReturnType<typeof getImprovementProjects>>, TError = ErrorResponse>(
+ params?: GetImprovementProjectsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List improvement projects
+ */
+
+export function useGetImprovementProjects<TData = Awaited<ReturnType<typeof getImprovementProjects>>, TError = ErrorResponse>(
+ params?: GetImprovementProjectsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjects>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetImprovementProjectsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postImprovementProjectsResponse201 = {
+  data: ImprovementProject
+  status: 201
+}
+
+export type postImprovementProjectsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postImprovementProjectsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postImprovementProjectsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postImprovementProjectsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postImprovementProjectsResponseSuccess = (postImprovementProjectsResponse201) & {
+  headers: Headers;
+};
+export type postImprovementProjectsResponseError = (postImprovementProjectsResponse400 | postImprovementProjectsResponse401 | postImprovementProjectsResponse403 | postImprovementProjectsResponse413) & {
+  headers: Headers;
+};
+
+export type postImprovementProjectsResponse = (postImprovementProjectsResponseSuccess | postImprovementProjectsResponseError)
+
+export const getPostImprovementProjectsUrl = () => {
+
+
+
+
+  return `/improvement-projects`
+}
+
+/**
+ * Creates a project register, RGP or RGA, with optional before and after photos. The body is multipart/form-data: scope, activity_id, date, concern, improvement_recommendation and priority are required; the three texts are trimmed and limited to 255 characters. The number is taken from the scope's own sequence inside the INSERT, so RGP and RGA are numbered independently and a number is never handed out again, not even after the largest one is deleted; the code is RGP-<number> or RGA-<number>. The date is a calendar day and must fall inside a registered period, limits included, and the activity must exist: inside the same transaction that writes the row, the period's row and then the activity's row are read under shared locks, so a project is never created in a period or for an activity that is being deleted. Validation order: scope, activity_id (required), date, concern, improvement_recommendation, priority, before_photo, after_photo, the period of the date, the existence of the activity. The photos are jpg, jpeg or png by extension, up to 10 MB each with no limit of pixels; a part whose filename is empty counts as no photo. Both photos are validated before either is stored, and every object stored by a request that ends up refused is removed. The original names are preserved and are the names of the downloaded files; the keys are never exposed. Records who created the project in created_by. Requires the user or admin role, checked before the body is read.
+ * @summary Create improvement project
+ */
+export const postImprovementProjects = async (improvementProjectInput: ImprovementProjectInput, options?: Parameters<typeof customFetch>[1]): Promise<postImprovementProjectsResponse> => {
+    const formData = new FormData();
+formData.append(`scope`, improvementProjectInput.scope);
+formData.append(`activity_id`, improvementProjectInput.activity_id);
+formData.append(`date`, improvementProjectInput.date);
+formData.append(`concern`, improvementProjectInput.concern);
+formData.append(`improvement_recommendation`, improvementProjectInput.improvement_recommendation);
+formData.append(`priority`, improvementProjectInput.priority);
+if(improvementProjectInput.before_photo !== undefined) {
+ formData.append(`before_photo`, improvementProjectInput.before_photo);
+ }
+if(improvementProjectInput.after_photo !== undefined) {
+ formData.append(`after_photo`, improvementProjectInput.after_photo);
+ }
+
+  return customFetch<postImprovementProjectsResponse>(getPostImprovementProjectsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostImprovementProjectsMutationKey = () => ['postImprovementProjects'] as const;
+
+export const getPostImprovementProjectsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postImprovementProjects>>, TError,PostImprovementProjectsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postImprovementProjects>>, TError,PostImprovementProjectsMutationVariables, TContext> => {
+
+const mutationKey = getPostImprovementProjectsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postImprovementProjects>>, PostImprovementProjectsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postImprovementProjects(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostImprovementProjectsMutationResult = NonNullable<Awaited<ReturnType<typeof postImprovementProjects>>>
+    export type PostImprovementProjectsMutationBody = ImprovementProjectInput
+    export type PostImprovementProjectsMutationError = ErrorResponse
+    export type PostImprovementProjectsMutationVariables = {data: ImprovementProjectInput}
+
+    /**
+ * @summary Create improvement project
+ */
+export const usePostImprovementProjects = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postImprovementProjects>>, TError,PostImprovementProjectsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postImprovementProjects>>,
+        TError,
+        PostImprovementProjectsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostImprovementProjectsMutationOptions(options), queryClient);
+    }
+
+export type getImprovementProjectsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getImprovementProjectsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getImprovementProjectsActivitiesResponseSuccess = (getImprovementProjectsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getImprovementProjectsActivitiesResponseError = (getImprovementProjectsActivitiesResponse401) & {
+  headers: Headers;
+};
+
+export type getImprovementProjectsActivitiesResponse = (getImprovementProjectsActivitiesResponseSuccess | getImprovementProjectsActivitiesResponseError)
+
+export const getGetImprovementProjectsActivitiesUrl = () => {
+
+
+
+
+  return `/improvement-projects/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the project form. Nothing else of an activity (fabric, line, area, function, authorship) is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role.
+ * @summary List the activities a project can belong to
+ */
+export const getImprovementProjectsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getImprovementProjectsActivitiesResponse> => {
+
+  return customFetch<getImprovementProjectsActivitiesResponse>(getGetImprovementProjectsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImprovementProjectsActivitiesQueryKey = () => {
+    return [
+    `/improvement-projects/activities`
+    ] as const;
+    }
+
+
+export const getGetImprovementProjectsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImprovementProjectsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImprovementProjectsActivities>>> = ({ signal }) => getImprovementProjectsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetImprovementProjectsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getImprovementProjectsActivities>>>
+export type GetImprovementProjectsActivitiesQueryError = ErrorResponse
+
+
+export function useGetImprovementProjectsActivities<TData = Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsActivities<TData = Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsActivities<TData = Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a project can belong to
+ */
+
+export function useGetImprovementProjectsActivities<TData = Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetImprovementProjectsActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getImprovementProjectsTemplatesTemplateResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getImprovementProjectsTemplatesTemplateResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getImprovementProjectsTemplatesTemplateResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getImprovementProjectsTemplatesTemplateResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getImprovementProjectsTemplatesTemplateResponseSuccess = (getImprovementProjectsTemplatesTemplateResponse200) & {
+  headers: Headers;
+};
+export type getImprovementProjectsTemplatesTemplateResponseError = (getImprovementProjectsTemplatesTemplateResponse401 | getImprovementProjectsTemplatesTemplateResponse404 | getImprovementProjectsTemplatesTemplateResponse500) & {
+  headers: Headers;
+};
+
+export type getImprovementProjectsTemplatesTemplateResponse = (getImprovementProjectsTemplatesTemplateResponseSuccess | getImprovementProjectsTemplatesTemplateResponseError)
+
+export const getGetImprovementProjectsTemplatesTemplateUrl = (template: 'effectiveness-verification',) => {
+
+
+
+
+  return `/improvement-projects/templates/${template}`
+}
+
+/**
+ * Streams the versioned blank effectiveness verification form of the Production tab (effectiveness-verification) to an authenticated user, delivered under its stable name verificacao-de-eficacia.pdf as an attachment with X-Content-Type-Options: nosniff, by the same rules as a project's own photos. The file is versioned in the server repository, copied byte for byte from the legacy system, and is not editable by the application; it is never served as a public asset. Requires only an authenticated user, so any role.
+ * @summary Download an improvement project template
+ */
+export const getImprovementProjectsTemplatesTemplate = async (template: 'effectiveness-verification', options?: Parameters<typeof customFetch>[1]): Promise<getImprovementProjectsTemplatesTemplateResponse> => {
+
+  return customFetch<getImprovementProjectsTemplatesTemplateResponse>(getGetImprovementProjectsTemplatesTemplateUrl(template),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImprovementProjectsTemplatesTemplateQueryKey = (template: 'effectiveness-verification',) => {
+    return [
+    `/improvement-projects/templates/${template}`
+    ] as const;
+    }
+
+
+export const getGetImprovementProjectsTemplatesTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError = ErrorResponse>(template: 'effectiveness-verification', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImprovementProjectsTemplatesTemplateQueryKey(template);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>> = ({ signal }) => getImprovementProjectsTemplatesTemplate(template, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: template !== null && template !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetImprovementProjectsTemplatesTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>>
+export type GetImprovementProjectsTemplatesTemplateQueryError = ErrorResponse
+
+
+export function useGetImprovementProjectsTemplatesTemplate<TData = Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'effectiveness-verification', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsTemplatesTemplate<TData = Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'effectiveness-verification', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsTemplatesTemplate<TData = Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'effectiveness-verification', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download an improvement project template
+ */
+
+export function useGetImprovementProjectsTemplatesTemplate<TData = Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'effectiveness-verification', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetImprovementProjectsTemplatesTemplateQueryOptions(template,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getImprovementProjectsIdResponse200 = {
+  data: ImprovementProject
+  status: 200
+}
+
+export type getImprovementProjectsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getImprovementProjectsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getImprovementProjectsIdResponseSuccess = (getImprovementProjectsIdResponse200) & {
+  headers: Headers;
+};
+export type getImprovementProjectsIdResponseError = (getImprovementProjectsIdResponse401 | getImprovementProjectsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getImprovementProjectsIdResponse = (getImprovementProjectsIdResponseSuccess | getImprovementProjectsIdResponseError)
+
+export const getGetImprovementProjectsIdUrl = (id: string,) => {
+
+
+
+
+  return `/improvement-projects/${id}`
+}
+
+/**
+ * Returns one project register, in the same format as an item of the listing. Requires only an authenticated user, so any role.
+ * @summary Get improvement project
+ */
+export const getImprovementProjectsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getImprovementProjectsIdResponse> => {
+
+  return customFetch<getImprovementProjectsIdResponse>(getGetImprovementProjectsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImprovementProjectsIdQueryKey = (id: string,) => {
+    return [
+    `/improvement-projects/${id}`
+    ] as const;
+    }
+
+
+export const getGetImprovementProjectsIdQueryOptions = <TData = Awaited<ReturnType<typeof getImprovementProjectsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImprovementProjectsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImprovementProjectsId>>> = ({ signal }) => getImprovementProjectsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetImprovementProjectsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getImprovementProjectsId>>>
+export type GetImprovementProjectsIdQueryError = ErrorResponse
+
+
+export function useGetImprovementProjectsId<TData = Awaited<ReturnType<typeof getImprovementProjectsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsId>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsId<TData = Awaited<ReturnType<typeof getImprovementProjectsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsId>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsId<TData = Awaited<ReturnType<typeof getImprovementProjectsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get improvement project
+ */
+
+export function useGetImprovementProjectsId<TData = Awaited<ReturnType<typeof getImprovementProjectsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetImprovementProjectsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putImprovementProjectsIdResponse200 = {
+  data: ImprovementProject
+  status: 200
+}
+
+export type putImprovementProjectsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putImprovementProjectsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putImprovementProjectsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putImprovementProjectsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putImprovementProjectsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putImprovementProjectsIdResponseSuccess = (putImprovementProjectsIdResponse200) & {
+  headers: Headers;
+};
+export type putImprovementProjectsIdResponseError = (putImprovementProjectsIdResponse400 | putImprovementProjectsIdResponse401 | putImprovementProjectsIdResponse403 | putImprovementProjectsIdResponse404 | putImprovementProjectsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putImprovementProjectsIdResponse = (putImprovementProjectsIdResponseSuccess | putImprovementProjectsIdResponseError)
+
+export const getPutImprovementProjectsIdUrl = (id: string,) => {
+
+
+
+
+  return `/improvement-projects/${id}`
+}
+
+/**
+ * Updates a project register, RGP or RGA. The body is multipart/form-data: activity_id, date, concern, improvement_recommendation and priority are all required; there is no partial update. The scope and the number never change: a scope part is ignored like any other extra field (number, code, the audit fields, the photo columns), so the code stays the same. The activity may change, moving the project to another activity; the link is the activity's id. Each photo is decided by its own file part alone: leaving the before_photo or after_photo part out keeps that photo intact, and sending a valid one replaces only that photo, its previous object being deleted from the storage so it stops being served, while the other photo does not change. A file part whose filename is empty also counts as keeping that photo. Removing a photo without replacing it is a separate operation: DELETE /improvement-projects/{id}/files/{attachment}. The new date must fall within a registered period and the activity must exist, exactly as on creation: inside the transaction, the period's row and then the activity's row are read under shared locks, and only then the project's row is locked, the order every writer of a project takes, so an update and a deletion of the period or of the activity serialize. Moving a project away from an activity does not lock that activity: its deletion answers 409 while the move has not committed. A refused request changes nothing and leaves no new object behind. Validation order: activity_id (required), date, concern, improvement_recommendation, priority, before_photo, after_photo, the period of the date, the existence of the activity, the existence of the project. Records who made the change in updated_by. Requires the user or admin role, checked before the body is read.
+ * @summary Update improvement project
+ */
+export const putImprovementProjectsId = async (id: string,
+    improvementProjectUpdateInput: ImprovementProjectUpdateInput, options?: Parameters<typeof customFetch>[1]): Promise<putImprovementProjectsIdResponse> => {
+    const formData = new FormData();
+formData.append(`activity_id`, improvementProjectUpdateInput.activity_id);
+formData.append(`date`, improvementProjectUpdateInput.date);
+formData.append(`concern`, improvementProjectUpdateInput.concern);
+formData.append(`improvement_recommendation`, improvementProjectUpdateInput.improvement_recommendation);
+formData.append(`priority`, improvementProjectUpdateInput.priority);
+if(improvementProjectUpdateInput.before_photo !== undefined) {
+ formData.append(`before_photo`, improvementProjectUpdateInput.before_photo);
+ }
+if(improvementProjectUpdateInput.after_photo !== undefined) {
+ formData.append(`after_photo`, improvementProjectUpdateInput.after_photo);
+ }
+
+  return customFetch<putImprovementProjectsIdResponse>(getPutImprovementProjectsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutImprovementProjectsIdMutationKey = () => ['putImprovementProjectsId'] as const;
+
+export const getPutImprovementProjectsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putImprovementProjectsId>>, TError,PutImprovementProjectsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putImprovementProjectsId>>, TError,PutImprovementProjectsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutImprovementProjectsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putImprovementProjectsId>>, PutImprovementProjectsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putImprovementProjectsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutImprovementProjectsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putImprovementProjectsId>>>
+    export type PutImprovementProjectsIdMutationBody = ImprovementProjectUpdateInput
+    export type PutImprovementProjectsIdMutationError = ErrorResponse
+    export type PutImprovementProjectsIdMutationVariables = {id: string;data: ImprovementProjectUpdateInput}
+
+    /**
+ * @summary Update improvement project
+ */
+export const usePutImprovementProjectsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putImprovementProjectsId>>, TError,PutImprovementProjectsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putImprovementProjectsId>>,
+        TError,
+        PutImprovementProjectsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutImprovementProjectsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteImprovementProjectsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteImprovementProjectsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteImprovementProjectsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteImprovementProjectsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteImprovementProjectsIdResponseSuccess = (deleteImprovementProjectsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteImprovementProjectsIdResponseError = (deleteImprovementProjectsIdResponse401 | deleteImprovementProjectsIdResponse403 | deleteImprovementProjectsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteImprovementProjectsIdResponse = (deleteImprovementProjectsIdResponseSuccess | deleteImprovementProjectsIdResponseError)
+
+export const getDeleteImprovementProjectsIdUrl = (id: string,) => {
+
+
+
+
+  return `/improvement-projects/${id}`
+}
+
+/**
+ * Deletes a project register permanently and deletes the objects of its photos, none, one or both, which stop being served. The deletion is never blocked: no module points at projects, so there is no 409. Its number is never handed out again: the next project of the same scope takes the following number of the sequence, even when the deleted one was the largest. Deleting a project is what frees the period it was dated in and the activity it pointed at, whose deletions answer 409 while they have projects. Deleting the same project again responds 404. The row is locked while its storage keys are read and the objects are deleted only after the transaction committed. The request has no body. The confirmation R-29 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete improvement project
+ */
+export const deleteImprovementProjectsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteImprovementProjectsIdResponse> => {
+
+  return customFetch<deleteImprovementProjectsIdResponse>(getDeleteImprovementProjectsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteImprovementProjectsIdMutationKey = () => ['deleteImprovementProjectsId'] as const;
+
+export const getDeleteImprovementProjectsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsId>>, TError,DeleteImprovementProjectsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsId>>, TError,DeleteImprovementProjectsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteImprovementProjectsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteImprovementProjectsId>>, DeleteImprovementProjectsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteImprovementProjectsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteImprovementProjectsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteImprovementProjectsId>>>
+
+    export type DeleteImprovementProjectsIdMutationError = ErrorResponse
+    export type DeleteImprovementProjectsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete improvement project
+ */
+export const useDeleteImprovementProjectsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsId>>, TError,DeleteImprovementProjectsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteImprovementProjectsId>>,
+        TError,
+        DeleteImprovementProjectsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteImprovementProjectsIdMutationOptions(options), queryClient);
+    }
+
+export type getImprovementProjectsIdFilesAttachmentResponse200ImageJpeg = {
+  data: Blob
+  status: 200
+}
+
+export type getImprovementProjectsIdFilesAttachmentResponse200ImagePng = {
+  data: Blob
+  status: 200
+}
+
+export type getImprovementProjectsIdFilesAttachmentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getImprovementProjectsIdFilesAttachmentResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getImprovementProjectsIdFilesAttachmentResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getImprovementProjectsIdFilesAttachmentResponseSuccess = (getImprovementProjectsIdFilesAttachmentResponse200ImageJpeg | getImprovementProjectsIdFilesAttachmentResponse200ImagePng) & {
+  headers: Headers;
+};
+export type getImprovementProjectsIdFilesAttachmentResponseError = (getImprovementProjectsIdFilesAttachmentResponse401 | getImprovementProjectsIdFilesAttachmentResponse404 | getImprovementProjectsIdFilesAttachmentResponse500) & {
+  headers: Headers;
+};
+
+export type getImprovementProjectsIdFilesAttachmentResponse = (getImprovementProjectsIdFilesAttachmentResponseSuccess | getImprovementProjectsIdFilesAttachmentResponseError)
+
+export const getGetImprovementProjectsIdFilesAttachmentUrl = (id: string,
+    attachment: 'before-photo' | 'after-photo',) => {
+
+
+
+
+  return `/improvement-projects/${id}/files/${attachment}`
+}
+
+/**
+ * Streams one photo of a project register - before-photo or after-photo - to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. There is no other way to reach the photos: no static route, no signed URL and no public object. The attachment segment is resolved by a fixed map; any other value answers 404, the same as an empty photo. Requires only an authenticated user, so any role.
+ * @summary Download an improvement project photo
+ */
+export const getImprovementProjectsIdFilesAttachment = async (id: string,
+    attachment: 'before-photo' | 'after-photo', options?: Parameters<typeof customFetch>[1]): Promise<getImprovementProjectsIdFilesAttachmentResponse> => {
+
+  return customFetch<getImprovementProjectsIdFilesAttachmentResponse>(getGetImprovementProjectsIdFilesAttachmentUrl(id,attachment),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetImprovementProjectsIdFilesAttachmentQueryKey = (id: string,
+    attachment: 'before-photo' | 'after-photo',) => {
+    return [
+    `/improvement-projects/${id}/files/${attachment}`
+    ] as const;
+    }
+
+
+export const getGetImprovementProjectsIdFilesAttachmentQueryOptions = <TData = Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError = ErrorResponse>(id: string,
+    attachment: 'before-photo' | 'after-photo', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetImprovementProjectsIdFilesAttachmentQueryKey(id,attachment);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>> = ({ signal }) => getImprovementProjectsIdFilesAttachment(id,attachment, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && attachment !== null && attachment !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetImprovementProjectsIdFilesAttachmentQueryResult = NonNullable<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>>
+export type GetImprovementProjectsIdFilesAttachmentQueryError = ErrorResponse
+
+
+export function useGetImprovementProjectsIdFilesAttachment<TData = Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'before-photo' | 'after-photo', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsIdFilesAttachment<TData = Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'before-photo' | 'after-photo', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>,
+          TError,
+          Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetImprovementProjectsIdFilesAttachment<TData = Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'before-photo' | 'after-photo', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download an improvement project photo
+ */
+
+export function useGetImprovementProjectsIdFilesAttachment<TData = Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError = ErrorResponse>(
+ id: string,
+    attachment: 'before-photo' | 'after-photo', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getImprovementProjectsIdFilesAttachment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetImprovementProjectsIdFilesAttachmentQueryOptions(id,attachment,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteImprovementProjectsIdFilesAttachmentResponse200 = {
+  data: ImprovementProject
+  status: 200
+}
+
+export type deleteImprovementProjectsIdFilesAttachmentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteImprovementProjectsIdFilesAttachmentResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteImprovementProjectsIdFilesAttachmentResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteImprovementProjectsIdFilesAttachmentResponseSuccess = (deleteImprovementProjectsIdFilesAttachmentResponse200) & {
+  headers: Headers;
+};
+export type deleteImprovementProjectsIdFilesAttachmentResponseError = (deleteImprovementProjectsIdFilesAttachmentResponse401 | deleteImprovementProjectsIdFilesAttachmentResponse403 | deleteImprovementProjectsIdFilesAttachmentResponse404) & {
+  headers: Headers;
+};
+
+export type deleteImprovementProjectsIdFilesAttachmentResponse = (deleteImprovementProjectsIdFilesAttachmentResponseSuccess | deleteImprovementProjectsIdFilesAttachmentResponseError)
+
+export const getDeleteImprovementProjectsIdFilesAttachmentUrl = (id: string,
+    attachment: 'before-photo' | 'after-photo',) => {
+
+
+
+
+  return `/improvement-projects/${id}/files/${attachment}`
+}
+
+/**
+ * Removes one photo of a project register - before-photo or after-photo - and keeps the project and the other photo; the project starts answering null for that photo and stops offering its download. It is a route of its own rather than a flag on the PUT, where an absent file part always means 'keep'. Answers 200 with the updated project, and not 204, because the resource still exists and changed. An empty photo answers 404 'Improvement project photo not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent; an attachment segment other than before-photo and after-photo answers the same 404. Neither the period nor the activity is checked, since neither changes. Only the three columns of that photo are cleared, never the other's, and its object is deleted only afterwards. Records who made the change in updated_by. The confirmation R-19 requires is the interface's responsibility. Requires the user or admin role.
+ * @summary Remove an improvement project photo
+ */
+export const deleteImprovementProjectsIdFilesAttachment = async (id: string,
+    attachment: 'before-photo' | 'after-photo', options?: Parameters<typeof customFetch>[1]): Promise<deleteImprovementProjectsIdFilesAttachmentResponse> => {
+
+  return customFetch<deleteImprovementProjectsIdFilesAttachmentResponse>(getDeleteImprovementProjectsIdFilesAttachmentUrl(id,attachment),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteImprovementProjectsIdFilesAttachmentMutationKey = () => ['deleteImprovementProjectsIdFilesAttachment'] as const;
+
+export const getDeleteImprovementProjectsIdFilesAttachmentMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>, TError,DeleteImprovementProjectsIdFilesAttachmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>, TError,DeleteImprovementProjectsIdFilesAttachmentMutationVariables, TContext> => {
+
+const mutationKey = getDeleteImprovementProjectsIdFilesAttachmentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>, DeleteImprovementProjectsIdFilesAttachmentMutationVariables> = (props) => {
+          const {id,attachment} = props ?? {};
+
+          return  deleteImprovementProjectsIdFilesAttachment(id,attachment,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteImprovementProjectsIdFilesAttachmentMutationResult = NonNullable<Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>>
+
+    export type DeleteImprovementProjectsIdFilesAttachmentMutationError = ErrorResponse
+    export type DeleteImprovementProjectsIdFilesAttachmentMutationVariables = {id: string;attachment: 'before-photo' | 'after-photo'}
+
+    /**
+ * @summary Remove an improvement project photo
+ */
+export const useDeleteImprovementProjectsIdFilesAttachment = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>, TError,DeleteImprovementProjectsIdFilesAttachmentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteImprovementProjectsIdFilesAttachment>>,
+        TError,
+        DeleteImprovementProjectsIdFilesAttachmentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteImprovementProjectsIdFilesAttachmentMutationOptions(options), queryClient);
+    }
+
+export type getMaterialReceiptsResponse200 = {
+  data: MaterialReceipt[]
+  status: 200
+}
+
+export type getMaterialReceiptsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMaterialReceiptsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMaterialReceiptsResponseSuccess = (getMaterialReceiptsResponse200) & {
+  headers: Headers;
+};
+export type getMaterialReceiptsResponseError = (getMaterialReceiptsResponse401 | getMaterialReceiptsResponse404) & {
+  headers: Headers;
+};
+
+export type getMaterialReceiptsResponse = (getMaterialReceiptsResponseSuccess | getMaterialReceiptsResponseError)
+
+export const getGetMaterialReceiptsUrl = (params?: GetMaterialReceiptsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/material-receipts?${stringifiedParams}` : `/material-receipts`
+}
+
+/**
+ * Lists the material receipts (RA) newest date first, then the largest number first. The optional period_id narrows the listing to the receipts whose date falls inside that period's closed range, both limits included; without it every receipt is returned, including any whose date falls outside every period. A period_id that is not a UUID, that names no period, or that is empty answers 404 instead of widening the listing. There is no pagination on the server; searching, sorting and paging are done by the client. Requires only an authenticated user, so any role.
+ * @summary List material receipts
+ */
+export const getMaterialReceipts = async (params?: GetMaterialReceiptsParams, options?: Parameters<typeof customFetch>[1]): Promise<getMaterialReceiptsResponse> => {
+
+  return customFetch<getMaterialReceiptsResponse>(getGetMaterialReceiptsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMaterialReceiptsQueryKey = (params?: GetMaterialReceiptsParams,) => {
+    return [
+    `/material-receipts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetMaterialReceiptsQueryOptions = <TData = Awaited<ReturnType<typeof getMaterialReceipts>>, TError = ErrorResponse>(params?: GetMaterialReceiptsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMaterialReceiptsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaterialReceipts>>> = ({ signal }) => getMaterialReceipts(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMaterialReceiptsQueryResult = NonNullable<Awaited<ReturnType<typeof getMaterialReceipts>>>
+export type GetMaterialReceiptsQueryError = ErrorResponse
+
+
+export function useGetMaterialReceipts<TData = Awaited<ReturnType<typeof getMaterialReceipts>>, TError = ErrorResponse>(
+ params: undefined |  GetMaterialReceiptsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceipts>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceipts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceipts<TData = Awaited<ReturnType<typeof getMaterialReceipts>>, TError = ErrorResponse>(
+ params?: GetMaterialReceiptsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceipts>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceipts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceipts<TData = Awaited<ReturnType<typeof getMaterialReceipts>>, TError = ErrorResponse>(
+ params?: GetMaterialReceiptsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List material receipts
+ */
+
+export function useGetMaterialReceipts<TData = Awaited<ReturnType<typeof getMaterialReceipts>>, TError = ErrorResponse>(
+ params?: GetMaterialReceiptsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceipts>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMaterialReceiptsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postMaterialReceiptsResponse201 = {
+  data: MaterialReceipt
+  status: 201
+}
+
+export type postMaterialReceiptsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postMaterialReceiptsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postMaterialReceiptsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postMaterialReceiptsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postMaterialReceiptsResponseSuccess = (postMaterialReceiptsResponse201) & {
+  headers: Headers;
+};
+export type postMaterialReceiptsResponseError = (postMaterialReceiptsResponse400 | postMaterialReceiptsResponse401 | postMaterialReceiptsResponse403 | postMaterialReceiptsResponse413) & {
+  headers: Headers;
+};
+
+export type postMaterialReceiptsResponse = (postMaterialReceiptsResponseSuccess | postMaterialReceiptsResponseError)
+
+export const getPostMaterialReceiptsUrl = () => {
+
+
+
+
+  return `/material-receipts`
+}
+
+/**
+ * Creates a material receipt (RA) with an optional receipt form. The body is multipart/form-data: employee, employee_registry and date are required; the two texts are trimmed and limited to 255 characters. The number is taken from the RA's own sequence inside the INSERT, independent of the RGP and RGA numbering, and is never handed out again, not even after the largest one is deleted; the code is RA-<number>. A receipt has no activity. The date is a calendar day and must fall inside a registered period, limits included: inside the same transaction that writes the row, the period's row is read under a shared lock, so a receipt is never created in a period that is being deleted. Validation order: employee, employee_registry, date, file, the period of the date. The form is doc, docx, ppt, pptx or pdf by extension, up to 25 MB; a part whose filename is empty counts as no form. An object stored by a request that ends up refused is removed. The original name is preserved and is the name of the downloaded file; the key is never exposed. Records who created the receipt in created_by. Requires the user or admin role, checked before the body is read.
+ * @summary Create material receipt
+ */
+export const postMaterialReceipts = async (materialReceiptInput: MaterialReceiptInput, options?: Parameters<typeof customFetch>[1]): Promise<postMaterialReceiptsResponse> => {
+    const formData = new FormData();
+formData.append(`employee`, materialReceiptInput.employee);
+formData.append(`employee_registry`, materialReceiptInput.employee_registry);
+formData.append(`date`, materialReceiptInput.date);
+if(materialReceiptInput.file !== undefined) {
+ formData.append(`file`, materialReceiptInput.file);
+ }
+
+  return customFetch<postMaterialReceiptsResponse>(getPostMaterialReceiptsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostMaterialReceiptsMutationKey = () => ['postMaterialReceipts'] as const;
+
+export const getPostMaterialReceiptsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMaterialReceipts>>, TError,PostMaterialReceiptsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postMaterialReceipts>>, TError,PostMaterialReceiptsMutationVariables, TContext> => {
+
+const mutationKey = getPostMaterialReceiptsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMaterialReceipts>>, PostMaterialReceiptsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postMaterialReceipts(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostMaterialReceiptsMutationResult = NonNullable<Awaited<ReturnType<typeof postMaterialReceipts>>>
+    export type PostMaterialReceiptsMutationBody = MaterialReceiptInput
+    export type PostMaterialReceiptsMutationError = ErrorResponse
+    export type PostMaterialReceiptsMutationVariables = {data: MaterialReceiptInput}
+
+    /**
+ * @summary Create material receipt
+ */
+export const usePostMaterialReceipts = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMaterialReceipts>>, TError,PostMaterialReceiptsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postMaterialReceipts>>,
+        TError,
+        PostMaterialReceiptsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostMaterialReceiptsMutationOptions(options), queryClient);
+    }
+
+export type getMaterialReceiptsTemplatesTemplateResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getMaterialReceiptsTemplatesTemplateResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMaterialReceiptsTemplatesTemplateResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMaterialReceiptsTemplatesTemplateResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getMaterialReceiptsTemplatesTemplateResponseSuccess = (getMaterialReceiptsTemplatesTemplateResponse200) & {
+  headers: Headers;
+};
+export type getMaterialReceiptsTemplatesTemplateResponseError = (getMaterialReceiptsTemplatesTemplateResponse401 | getMaterialReceiptsTemplatesTemplateResponse404 | getMaterialReceiptsTemplatesTemplateResponse500) & {
+  headers: Headers;
+};
+
+export type getMaterialReceiptsTemplatesTemplateResponse = (getMaterialReceiptsTemplatesTemplateResponseSuccess | getMaterialReceiptsTemplatesTemplateResponseError)
+
+export const getGetMaterialReceiptsTemplatesTemplateUrl = (template: 'receiving-materials',) => {
+
+
+
+
+  return `/material-receipts/templates/${template}`
+}
+
+/**
+ * Streams the versioned blank receipt form of the material receipts card (receiving-materials) to an authenticated user, delivered under its stable name recebimento-de-materiais.pdf as an attachment with X-Content-Type-Options: nosniff, by the same rules as a receipt's own form. The file is versioned in the server repository, copied byte for byte from the legacy system, and is not editable by the application; it is never served as a public asset. Requires only an authenticated user, so any role.
+ * @summary Download a material receipt template
+ */
+export const getMaterialReceiptsTemplatesTemplate = async (template: 'receiving-materials', options?: Parameters<typeof customFetch>[1]): Promise<getMaterialReceiptsTemplatesTemplateResponse> => {
+
+  return customFetch<getMaterialReceiptsTemplatesTemplateResponse>(getGetMaterialReceiptsTemplatesTemplateUrl(template),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMaterialReceiptsTemplatesTemplateQueryKey = (template: 'receiving-materials',) => {
+    return [
+    `/material-receipts/templates/${template}`
+    ] as const;
+    }
+
+
+export const getGetMaterialReceiptsTemplatesTemplateQueryOptions = <TData = Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError = ErrorResponse>(template: 'receiving-materials', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMaterialReceiptsTemplatesTemplateQueryKey(template);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>> = ({ signal }) => getMaterialReceiptsTemplatesTemplate(template, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: template !== null && template !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMaterialReceiptsTemplatesTemplateQueryResult = NonNullable<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>>
+export type GetMaterialReceiptsTemplatesTemplateQueryError = ErrorResponse
+
+
+export function useGetMaterialReceiptsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'receiving-materials', options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'receiving-materials', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'receiving-materials', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a material receipt template
+ */
+
+export function useGetMaterialReceiptsTemplatesTemplate<TData = Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError = ErrorResponse>(
+ template: 'receiving-materials', options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsTemplatesTemplate>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMaterialReceiptsTemplatesTemplateQueryOptions(template,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getMaterialReceiptsIdResponse200 = {
+  data: MaterialReceipt
+  status: 200
+}
+
+export type getMaterialReceiptsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMaterialReceiptsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMaterialReceiptsIdResponseSuccess = (getMaterialReceiptsIdResponse200) & {
+  headers: Headers;
+};
+export type getMaterialReceiptsIdResponseError = (getMaterialReceiptsIdResponse401 | getMaterialReceiptsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getMaterialReceiptsIdResponse = (getMaterialReceiptsIdResponseSuccess | getMaterialReceiptsIdResponseError)
+
+export const getGetMaterialReceiptsIdUrl = (id: string,) => {
+
+
+
+
+  return `/material-receipts/${id}`
+}
+
+/**
+ * Returns one material receipt with its code. Requires only an authenticated user, so any role.
+ * @summary Get material receipt
+ */
+export const getMaterialReceiptsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getMaterialReceiptsIdResponse> => {
+
+  return customFetch<getMaterialReceiptsIdResponse>(getGetMaterialReceiptsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMaterialReceiptsIdQueryKey = (id: string,) => {
+    return [
+    `/material-receipts/${id}`
+    ] as const;
+    }
+
+
+export const getGetMaterialReceiptsIdQueryOptions = <TData = Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMaterialReceiptsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaterialReceiptsId>>> = ({ signal }) => getMaterialReceiptsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMaterialReceiptsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMaterialReceiptsId>>>
+export type GetMaterialReceiptsIdQueryError = ErrorResponse
+
+
+export function useGetMaterialReceiptsId<TData = Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsId<TData = Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsId>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsId<TData = Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get material receipt
+ */
+
+export function useGetMaterialReceiptsId<TData = Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMaterialReceiptsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putMaterialReceiptsIdResponse200 = {
+  data: MaterialReceipt
+  status: 200
+}
+
+export type putMaterialReceiptsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putMaterialReceiptsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putMaterialReceiptsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putMaterialReceiptsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putMaterialReceiptsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putMaterialReceiptsIdResponseSuccess = (putMaterialReceiptsIdResponse200) & {
+  headers: Headers;
+};
+export type putMaterialReceiptsIdResponseError = (putMaterialReceiptsIdResponse400 | putMaterialReceiptsIdResponse401 | putMaterialReceiptsIdResponse403 | putMaterialReceiptsIdResponse404 | putMaterialReceiptsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putMaterialReceiptsIdResponse = (putMaterialReceiptsIdResponseSuccess | putMaterialReceiptsIdResponseError)
+
+export const getPutMaterialReceiptsIdUrl = (id: string,) => {
+
+
+
+
+  return `/material-receipts/${id}`
+}
+
+/**
+ * Updates a material receipt (RA). The body is multipart/form-data, the same parts as the creation: employee, employee_registry and date are all required; there is no partial update. The number never changes: a number part is ignored like any other extra field (code, the audit fields, the file columns), so the code stays the same. The form is decided by the file part alone: leaving it out keeps the current form intact, and sending a valid one replaces it, the previous object being deleted from the storage so it stops being served. A file part whose filename is empty also counts as keeping the form. Removing the form without replacing it is a separate operation: DELETE /material-receipts/{id}/file. The new date must fall within a registered period, exactly as on creation: inside the transaction, the period's row is read under a shared lock and only then the receipt's row is locked, the order every writer of a dated record takes, so an update and a deletion of the period serialize. A receipt has no activity, so no activity is checked or locked. A refused request changes nothing and leaves no new object behind. Validation order: employee, employee_registry, date, file, the period of the date, the existence of the receipt. Records who made the change in updated_by. Requires the user or admin role, checked before the body is read.
+ * @summary Update material receipt
+ */
+export const putMaterialReceiptsId = async (id: string,
+    materialReceiptInput: MaterialReceiptInput, options?: Parameters<typeof customFetch>[1]): Promise<putMaterialReceiptsIdResponse> => {
+    const formData = new FormData();
+formData.append(`employee`, materialReceiptInput.employee);
+formData.append(`employee_registry`, materialReceiptInput.employee_registry);
+formData.append(`date`, materialReceiptInput.date);
+if(materialReceiptInput.file !== undefined) {
+ formData.append(`file`, materialReceiptInput.file);
+ }
+
+  return customFetch<putMaterialReceiptsIdResponse>(getPutMaterialReceiptsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutMaterialReceiptsIdMutationKey = () => ['putMaterialReceiptsId'] as const;
+
+export const getPutMaterialReceiptsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMaterialReceiptsId>>, TError,PutMaterialReceiptsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putMaterialReceiptsId>>, TError,PutMaterialReceiptsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutMaterialReceiptsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putMaterialReceiptsId>>, PutMaterialReceiptsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putMaterialReceiptsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutMaterialReceiptsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putMaterialReceiptsId>>>
+    export type PutMaterialReceiptsIdMutationBody = MaterialReceiptInput
+    export type PutMaterialReceiptsIdMutationError = ErrorResponse
+    export type PutMaterialReceiptsIdMutationVariables = {id: string;data: MaterialReceiptInput}
+
+    /**
+ * @summary Update material receipt
+ */
+export const usePutMaterialReceiptsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMaterialReceiptsId>>, TError,PutMaterialReceiptsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putMaterialReceiptsId>>,
+        TError,
+        PutMaterialReceiptsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutMaterialReceiptsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteMaterialReceiptsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteMaterialReceiptsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteMaterialReceiptsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteMaterialReceiptsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteMaterialReceiptsIdResponseSuccess = (deleteMaterialReceiptsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteMaterialReceiptsIdResponseError = (deleteMaterialReceiptsIdResponse401 | deleteMaterialReceiptsIdResponse403 | deleteMaterialReceiptsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteMaterialReceiptsIdResponse = (deleteMaterialReceiptsIdResponseSuccess | deleteMaterialReceiptsIdResponseError)
+
+export const getDeleteMaterialReceiptsIdUrl = (id: string,) => {
+
+
+
+
+  return `/material-receipts/${id}`
+}
+
+/**
+ * Deletes a material receipt permanently and deletes the object of its form, when it has one, which stops being served. The deletion is never blocked: no module points at receipts, so there is no 409. Its number is never handed out again: the next receipt takes the following number of the RA sequence, even when the deleted one was the largest. Deleting a receipt is what frees the period it was dated in, whose deletion answers 409 while it has projects. Deleting the same receipt again responds 404. The row is locked while its storage key is read and the object is deleted only after the transaction committed. The request has no body. The confirmation R-29 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete material receipt
+ */
+export const deleteMaterialReceiptsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteMaterialReceiptsIdResponse> => {
+
+  return customFetch<deleteMaterialReceiptsIdResponse>(getDeleteMaterialReceiptsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteMaterialReceiptsIdMutationKey = () => ['deleteMaterialReceiptsId'] as const;
+
+export const getDeleteMaterialReceiptsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsId>>, TError,DeleteMaterialReceiptsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsId>>, TError,DeleteMaterialReceiptsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteMaterialReceiptsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMaterialReceiptsId>>, DeleteMaterialReceiptsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteMaterialReceiptsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMaterialReceiptsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMaterialReceiptsId>>>
+
+    export type DeleteMaterialReceiptsIdMutationError = ErrorResponse
+    export type DeleteMaterialReceiptsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete material receipt
+ */
+export const useDeleteMaterialReceiptsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsId>>, TError,DeleteMaterialReceiptsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMaterialReceiptsId>>,
+        TError,
+        DeleteMaterialReceiptsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteMaterialReceiptsIdMutationOptions(options), queryClient);
+    }
+
+export type getMaterialReceiptsIdFileResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getMaterialReceiptsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMaterialReceiptsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMaterialReceiptsIdFileResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getMaterialReceiptsIdFileResponseSuccess = (getMaterialReceiptsIdFileResponse200) & {
+  headers: Headers;
+};
+export type getMaterialReceiptsIdFileResponseError = (getMaterialReceiptsIdFileResponse401 | getMaterialReceiptsIdFileResponse404 | getMaterialReceiptsIdFileResponse500) & {
+  headers: Headers;
+};
+
+export type getMaterialReceiptsIdFileResponse = (getMaterialReceiptsIdFileResponseSuccess | getMaterialReceiptsIdFileResponseError)
+
+export const getGetMaterialReceiptsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/material-receipts/${id}/file`
+}
+
+/**
+ * Streams the receipt form of a material receipt to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. The form carries an employee's name, registry and signature, and there is no other way to reach it: no static route, no signed URL and no public object. Requires only an authenticated user, so any role.
+ * @summary Download material receipt form
+ */
+export const getMaterialReceiptsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getMaterialReceiptsIdFileResponse> => {
+
+  return customFetch<getMaterialReceiptsIdFileResponse>(getGetMaterialReceiptsIdFileUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMaterialReceiptsIdFileQueryKey = (id: string,) => {
+    return [
+    `/material-receipts/${id}/file`
+    ] as const;
+    }
+
+
+export const getGetMaterialReceiptsIdFileQueryOptions = <TData = Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMaterialReceiptsIdFileQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>> = ({ signal }) => getMaterialReceiptsIdFile(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMaterialReceiptsIdFileQueryResult = NonNullable<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>>
+export type GetMaterialReceiptsIdFileQueryError = ErrorResponse
+
+
+export function useGetMaterialReceiptsIdFile<TData = Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsIdFile<TData = Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMaterialReceiptsIdFile<TData = Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download material receipt form
+ */
+
+export function useGetMaterialReceiptsIdFile<TData = Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMaterialReceiptsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMaterialReceiptsIdFileQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteMaterialReceiptsIdFileResponse200 = {
+  data: MaterialReceipt
+  status: 200
+}
+
+export type deleteMaterialReceiptsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteMaterialReceiptsIdFileResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteMaterialReceiptsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteMaterialReceiptsIdFileResponseSuccess = (deleteMaterialReceiptsIdFileResponse200) & {
+  headers: Headers;
+};
+export type deleteMaterialReceiptsIdFileResponseError = (deleteMaterialReceiptsIdFileResponse401 | deleteMaterialReceiptsIdFileResponse403 | deleteMaterialReceiptsIdFileResponse404) & {
+  headers: Headers;
+};
+
+export type deleteMaterialReceiptsIdFileResponse = (deleteMaterialReceiptsIdFileResponseSuccess | deleteMaterialReceiptsIdFileResponseError)
+
+export const getDeleteMaterialReceiptsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/material-receipts/${id}/file`
+}
+
+/**
+ * Removes the receipt form of a material receipt and keeps the receipt, which starts answering file: null and stops offering the download. It is a route of its own rather than a flag on the PUT, where an absent file part always means 'keep'. Answers 200 with the updated receipt, and not 204, because the resource still exists and changed. A receipt that has no form answers 404 'Material receipt file not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent. The date does not change, so no period is checked. The three file columns are cleared together and the object is deleted only afterwards. Records who made the change in updated_by. The confirmation R-19 requires is the interface's responsibility. Requires the user or admin role.
+ * @summary Remove material receipt form
+ */
+export const deleteMaterialReceiptsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteMaterialReceiptsIdFileResponse> => {
+
+  return customFetch<deleteMaterialReceiptsIdFileResponse>(getDeleteMaterialReceiptsIdFileUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteMaterialReceiptsIdFileMutationKey = () => ['deleteMaterialReceiptsIdFile'] as const;
+
+export const getDeleteMaterialReceiptsIdFileMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>, TError,DeleteMaterialReceiptsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>, TError,DeleteMaterialReceiptsIdFileMutationVariables, TContext> => {
+
+const mutationKey = getDeleteMaterialReceiptsIdFileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>, DeleteMaterialReceiptsIdFileMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteMaterialReceiptsIdFile(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteMaterialReceiptsIdFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>>
+
+    export type DeleteMaterialReceiptsIdFileMutationError = ErrorResponse
+    export type DeleteMaterialReceiptsIdFileMutationVariables = {id: string}
+
+    /**
+ * @summary Remove material receipt form
+ */
+export const useDeleteMaterialReceiptsIdFile = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>, TError,DeleteMaterialReceiptsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteMaterialReceiptsIdFile>>,
+        TError,
+        DeleteMaterialReceiptsIdFileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteMaterialReceiptsIdFileMutationOptions(options), queryClient);
+    }
+
 export type getMeetingsResponse200 = {
   data: Meeting[]
   status: 200
@@ -6418,4 +8995,1454 @@ export const usePutManagementPlansPeriodIdGoal = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPutManagementPlansPeriodIdGoalMutationOptions(options), queryClient);
+    }
+
+export type getProgramsResponse200 = {
+  data: ProgramList
+  status: 200
+}
+
+export type getProgramsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getProgramsResponseSuccess = (getProgramsResponse200) & {
+  headers: Headers;
+};
+export type getProgramsResponseError = (getProgramsResponse401) & {
+  headers: Headers;
+};
+
+export type getProgramsResponse = (getProgramsResponseSuccess | getProgramsResponseError)
+
+export const getGetProgramsUrl = () => {
+
+
+
+
+  return `/programs`
+}
+
+/**
+ * Lists every item of the ergonomics program together with the current score, in one answer. The items come ordered by the position of their type in the fixed list of fronts (the order of ProgramType), then by created_at ascending and then by id, so the order is stable between calls. The score is derived on every read and never stored: value = sum of the completed percentages x 5 / (number of items x 100), from 0 to 5; percentage is value against max (the average percentage), which is what the progress bar shows; complete is true only when there are items and value is 5. Without items the score is 0. Nothing is rounded. The list is global: it accepts no query parameter, is not sliced by period and is not paginated. Requires only an authenticated user, so any role.
+ * @summary List program items and the current score
+ */
+export const getPrograms = async ( options?: Parameters<typeof customFetch>[1]): Promise<getProgramsResponse> => {
+
+  return customFetch<getProgramsResponse>(getGetProgramsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProgramsQueryKey = () => {
+    return [
+    `/programs`
+    ] as const;
+    }
+
+
+export const getGetProgramsQueryOptions = <TData = Awaited<ReturnType<typeof getPrograms>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProgramsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPrograms>>> = ({ signal }) => getPrograms({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetProgramsQueryResult = NonNullable<Awaited<ReturnType<typeof getPrograms>>>
+export type GetProgramsQueryError = ErrorResponse
+
+
+export function useGetPrograms<TData = Awaited<ReturnType<typeof getPrograms>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPrograms>>,
+          TError,
+          Awaited<ReturnType<typeof getPrograms>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPrograms<TData = Awaited<ReturnType<typeof getPrograms>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPrograms>>,
+          TError,
+          Awaited<ReturnType<typeof getPrograms>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPrograms<TData = Awaited<ReturnType<typeof getPrograms>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List program items and the current score
+ */
+
+export function useGetPrograms<TData = Awaited<ReturnType<typeof getPrograms>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPrograms>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetProgramsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postProgramsResponse201 = {
+  data: Program
+  status: 201
+}
+
+export type postProgramsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postProgramsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postProgramsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postProgramsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postProgramsResponseSuccess = (postProgramsResponse201) & {
+  headers: Headers;
+};
+export type postProgramsResponseError = (postProgramsResponse400 | postProgramsResponse401 | postProgramsResponse403 | postProgramsResponse413) & {
+  headers: Headers;
+};
+
+export type postProgramsResponse = (postProgramsResponseSuccess | postProgramsResponseError)
+
+export const getPostProgramsUrl = () => {
+
+
+
+
+  return `/programs`
+}
+
+/**
+ * Creates an item of the program, with an optional file. The body is multipart/form-data: type, question, description, actions, responsible, target_date and completed_percentage are required. Line breaks \r\n are normalized to \n and every text is trimmed before it is validated; question and responsible are limited to 255 characters and description and actions to 5000, counted in code points. description and actions are plain text: line breaks are kept and any markup is stored and given back literally. target_date is a calendar day and may be in the past. completed_percentage is accepted only when, after the trim, it is a run of decimal digits worth 0 to 100. The file part is optional; a part whose filename is empty, which is what browsers send for a blank file field, counts as no file. The original file name is preserved and is the name of the downloaded file, while the stored object is named by the server and its key is never exposed. Records who created the item in created_by. Requires the user or admin role.
+ * @summary Create program item
+ */
+export const postPrograms = async (programInput: ProgramInput, options?: Parameters<typeof customFetch>[1]): Promise<postProgramsResponse> => {
+    const formData = new FormData();
+formData.append(`type`, programInput.type);
+formData.append(`question`, programInput.question);
+formData.append(`description`, programInput.description);
+formData.append(`actions`, programInput.actions);
+formData.append(`responsible`, programInput.responsible);
+formData.append(`target_date`, programInput.target_date);
+formData.append(`completed_percentage`, programInput.completed_percentage);
+if(programInput.file !== undefined) {
+ formData.append(`file`, programInput.file);
+ }
+
+  return customFetch<postProgramsResponse>(getPostProgramsUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPostProgramsMutationKey = () => ['postPrograms'] as const;
+
+export const getPostProgramsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPrograms>>, TError,PostProgramsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postPrograms>>, TError,PostProgramsMutationVariables, TContext> => {
+
+const mutationKey = getPostProgramsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postPrograms>>, PostProgramsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postPrograms(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostProgramsMutationResult = NonNullable<Awaited<ReturnType<typeof postPrograms>>>
+    export type PostProgramsMutationBody = ProgramInput
+    export type PostProgramsMutationError = ErrorResponse
+    export type PostProgramsMutationVariables = {data: ProgramInput}
+
+    /**
+ * @summary Create program item
+ */
+export const usePostPrograms = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postPrograms>>, TError,PostProgramsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postPrograms>>,
+        TError,
+        PostProgramsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostProgramsMutationOptions(options), queryClient);
+    }
+
+export type postProgramsResetResponse200 = {
+  data: ProgramList
+  status: 200
+}
+
+export type postProgramsResetResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postProgramsResetResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postProgramsResetResponseSuccess = (postProgramsResetResponse200) & {
+  headers: Headers;
+};
+export type postProgramsResetResponseError = (postProgramsResetResponse401 | postProgramsResetResponse403) & {
+  headers: Headers;
+};
+
+export type postProgramsResetResponse = (postProgramsResetResponseSuccess | postProgramsResetResponseError)
+
+export const getPostProgramsResetUrl = () => {
+
+
+
+
+  return `/programs/reset`
+}
+
+/**
+ * Deletes every item of the program and recreates the five default items of the legacy system, one per type and in the order of ProgramType, each with responsible 'Ergonomista', completed_percentage 0, target_date 2016-12-31, no file and created_by set to the administrator. Description and actions are plain text. It is atomic: deleting and creating run in one transaction, and if any step fails nothing changes. The objects of the deleted items' files are removed from the storage only after the commit; a failure to remove one is logged and does not change the answer. An item created by another request committed after the deletion survives the reset. Calling it again gives back the same result. Takes no body and answers the same shape as GET /programs. Requires the admin role.
+ * @summary Reset program items to the defaults
+ */
+export const postProgramsReset = async ( options?: Parameters<typeof customFetch>[1]): Promise<postProgramsResetResponse> => {
+
+  return customFetch<postProgramsResetResponse>(getPostProgramsResetUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getPostProgramsResetMutationKey = () => ['postProgramsReset'] as const;
+
+export const getPostProgramsResetMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postProgramsReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postProgramsReset>>, TError,void, TContext> => {
+
+const mutationKey = getPostProgramsResetMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postProgramsReset>>, void> = () => {
+
+
+          return  postProgramsReset(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostProgramsResetMutationResult = NonNullable<Awaited<ReturnType<typeof postProgramsReset>>>
+
+    export type PostProgramsResetMutationError = ErrorResponse
+
+
+    /**
+ * @summary Reset program items to the defaults
+ */
+export const usePostProgramsReset = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postProgramsReset>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postProgramsReset>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPostProgramsResetMutationOptions(options), queryClient);
+    }
+
+export type getProgramsMaterialsMaterialResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getProgramsMaterialsMaterialResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getProgramsMaterialsMaterialResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getProgramsMaterialsMaterialResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getProgramsMaterialsMaterialResponseSuccess = (getProgramsMaterialsMaterialResponse200) & {
+  headers: Headers;
+};
+export type getProgramsMaterialsMaterialResponseError = (getProgramsMaterialsMaterialResponse401 | getProgramsMaterialsMaterialResponse404 | getProgramsMaterialsMaterialResponse500) & {
+  headers: Headers;
+};
+
+export type getProgramsMaterialsMaterialResponse = (getProgramsMaterialsMaterialResponseSuccess | getProgramsMaterialsMaterialResponseError)
+
+export const getGetProgramsMaterialsMaterialUrl = (material: ProgramMaterial,) => {
+
+
+
+
+  return `/programs/materials/${material}`
+}
+
+/**
+ * Streams one of the two fixed materials offered by every item of the procedures-and-materials type, whatever its question says: the material specifications (material-specifications) and the ergonomics procedure (ergonomics-procedure). Each one is delivered under its stable name — especificacoes-materiais.docx and procedimento-ergonomia.docx — as an attachment with X-Content-Type-Options: nosniff, by the same rules as an item's own file. The files are versioned in the server repository and are not editable by the application; they are never served as public assets. The keys an item offers come in its materials field. Requires only an authenticated user, so any role.
+ * @summary Download a fixed program material
+ */
+export const getProgramsMaterialsMaterial = async (material: ProgramMaterial, options?: Parameters<typeof customFetch>[1]): Promise<getProgramsMaterialsMaterialResponse> => {
+
+  return customFetch<getProgramsMaterialsMaterialResponse>(getGetProgramsMaterialsMaterialUrl(material),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProgramsMaterialsMaterialQueryKey = (material: ProgramMaterial,) => {
+    return [
+    `/programs/materials/${material}`
+    ] as const;
+    }
+
+
+export const getGetProgramsMaterialsMaterialQueryOptions = <TData = Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError = ErrorResponse>(material: ProgramMaterial, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProgramsMaterialsMaterialQueryKey(material);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>> = ({ signal }) => getProgramsMaterialsMaterial(material, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: material !== null && material !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetProgramsMaterialsMaterialQueryResult = NonNullable<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>>
+export type GetProgramsMaterialsMaterialQueryError = ErrorResponse
+
+
+export function useGetProgramsMaterialsMaterial<TData = Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError = ErrorResponse>(
+ material: ProgramMaterial, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsMaterialsMaterial<TData = Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError = ErrorResponse>(
+ material: ProgramMaterial, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsMaterialsMaterial<TData = Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError = ErrorResponse>(
+ material: ProgramMaterial, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download a fixed program material
+ */
+
+export function useGetProgramsMaterialsMaterial<TData = Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError = ErrorResponse>(
+ material: ProgramMaterial, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsMaterialsMaterial>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetProgramsMaterialsMaterialQueryOptions(material,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getProgramsIdResponse200 = {
+  data: Program
+  status: 200
+}
+
+export type getProgramsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getProgramsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getProgramsIdResponseSuccess = (getProgramsIdResponse200) & {
+  headers: Headers;
+};
+export type getProgramsIdResponseError = (getProgramsIdResponse401 | getProgramsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getProgramsIdResponse = (getProgramsIdResponseSuccess | getProgramsIdResponseError)
+
+export const getGetProgramsIdUrl = (id: string,) => {
+
+
+
+
+  return `/programs/${id}`
+}
+
+/**
+ * Returns one item of the program, in the same format as an item of the listing. Requires only an authenticated user, so any role.
+ * @summary Get program item
+ */
+export const getProgramsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getProgramsIdResponse> => {
+
+  return customFetch<getProgramsIdResponse>(getGetProgramsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProgramsIdQueryKey = (id: string,) => {
+    return [
+    `/programs/${id}`
+    ] as const;
+    }
+
+
+export const getGetProgramsIdQueryOptions = <TData = Awaited<ReturnType<typeof getProgramsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProgramsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgramsId>>> = ({ signal }) => getProgramsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetProgramsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getProgramsId>>>
+export type GetProgramsIdQueryError = ErrorResponse
+
+
+export function useGetProgramsId<TData = Awaited<ReturnType<typeof getProgramsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsId>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsId<TData = Awaited<ReturnType<typeof getProgramsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsId>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsId<TData = Awaited<ReturnType<typeof getProgramsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get program item
+ */
+
+export function useGetProgramsId<TData = Awaited<ReturnType<typeof getProgramsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetProgramsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putProgramsIdResponse200 = {
+  data: Program
+  status: 200
+}
+
+export type putProgramsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putProgramsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putProgramsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putProgramsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putProgramsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putProgramsIdResponseSuccess = (putProgramsIdResponse200) & {
+  headers: Headers;
+};
+export type putProgramsIdResponseError = (putProgramsIdResponse400 | putProgramsIdResponse401 | putProgramsIdResponse403 | putProgramsIdResponse404 | putProgramsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putProgramsIdResponse = (putProgramsIdResponseSuccess | putProgramsIdResponseError)
+
+export const getPutProgramsIdUrl = (id: string,) => {
+
+
+
+
+  return `/programs/${id}`
+}
+
+/**
+ * Updates an item of the program. The body is multipart/form-data and all seven fields are required, with the same normalization and validation as the creation; there is no partial update. Leaving the file part out keeps the current file intact, and sending a valid one replaces it, the previous object being deleted from the storage so it stops being served. A file part whose filename is empty, which is what browsers send for a blank file field, also counts as keeping the current file. Removing the file without replacing it is a separate operation: DELETE /programs/{id}/file. Extra fields in the body (id, the audit fields, the file columns) are ignored. The row is locked while its previous storage key is read, the file columns are written only when a file is sent, and the previous object is deleted only after the row already points at the new one, so two concurrent updates leave exactly one object alive. A rejected file changes nothing and stores nothing; when the item does not exist, the object just stored is removed. Records who made the change in updated_by. Requires the user or admin role.
+ * @summary Update program item
+ */
+export const putProgramsId = async (id: string,
+    programInput: ProgramInput, options?: Parameters<typeof customFetch>[1]): Promise<putProgramsIdResponse> => {
+    const formData = new FormData();
+formData.append(`type`, programInput.type);
+formData.append(`question`, programInput.question);
+formData.append(`description`, programInput.description);
+formData.append(`actions`, programInput.actions);
+formData.append(`responsible`, programInput.responsible);
+formData.append(`target_date`, programInput.target_date);
+formData.append(`completed_percentage`, programInput.completed_percentage);
+if(programInput.file !== undefined) {
+ formData.append(`file`, programInput.file);
+ }
+
+  return customFetch<putProgramsIdResponse>(getPutProgramsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutProgramsIdMutationKey = () => ['putProgramsId'] as const;
+
+export const getPutProgramsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putProgramsId>>, TError,PutProgramsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putProgramsId>>, TError,PutProgramsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutProgramsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putProgramsId>>, PutProgramsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putProgramsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutProgramsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putProgramsId>>>
+    export type PutProgramsIdMutationBody = ProgramInput
+    export type PutProgramsIdMutationError = ErrorResponse
+    export type PutProgramsIdMutationVariables = {id: string;data: ProgramInput}
+
+    /**
+ * @summary Update program item
+ */
+export const usePutProgramsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putProgramsId>>, TError,PutProgramsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putProgramsId>>,
+        TError,
+        PutProgramsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutProgramsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteProgramsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteProgramsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteProgramsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteProgramsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteProgramsIdResponseSuccess = (deleteProgramsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteProgramsIdResponseError = (deleteProgramsIdResponse401 | deleteProgramsIdResponse403 | deleteProgramsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteProgramsIdResponse = (deleteProgramsIdResponseSuccess | deleteProgramsIdResponseError)
+
+export const getDeleteProgramsIdUrl = (id: string,) => {
+
+
+
+
+  return `/programs/${id}`
+}
+
+/**
+ * Deletes an item of the program permanently and deletes the object of its file, if it has one, which stops being served. The deletion is never blocked: nothing points at a program item, so there are no linked records to count and no 409 is ever answered. Deleting the same item again responds 404. The row is locked while its storage key is read and the object is deleted only after the transaction committed. The request has no body. The confirmation R-12 requires is the interface's responsibility; the API confirms nothing. Requires the user or admin role.
+ * @summary Delete program item
+ */
+export const deleteProgramsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteProgramsIdResponse> => {
+
+  return customFetch<deleteProgramsIdResponse>(getDeleteProgramsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteProgramsIdMutationKey = () => ['deleteProgramsId'] as const;
+
+export const getDeleteProgramsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsId>>, TError,DeleteProgramsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsId>>, TError,DeleteProgramsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteProgramsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProgramsId>>, DeleteProgramsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteProgramsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteProgramsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProgramsId>>>
+
+    export type DeleteProgramsIdMutationError = ErrorResponse
+    export type DeleteProgramsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete program item
+ */
+export const useDeleteProgramsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsId>>, TError,DeleteProgramsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteProgramsId>>,
+        TError,
+        DeleteProgramsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteProgramsIdMutationOptions(options), queryClient);
+    }
+
+export type getProgramsIdFileResponse200 = {
+  data: Blob
+  status: 200
+}
+
+export type getProgramsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getProgramsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getProgramsIdFileResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getProgramsIdFileResponseSuccess = (getProgramsIdFileResponse200) & {
+  headers: Headers;
+};
+export type getProgramsIdFileResponseError = (getProgramsIdFileResponse401 | getProgramsIdFileResponse404 | getProgramsIdFileResponse500) & {
+  headers: Headers;
+};
+
+export type getProgramsIdFileResponse = (getProgramsIdFileResponseSuccess | getProgramsIdFileResponseError)
+
+export const getGetProgramsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/programs/${id}/file`
+}
+
+/**
+ * Streams the file of a program item to an authenticated user, with the stored MIME type, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered in the browser. There is no other way to reach the file: no static route, no signed URL and no public object. Requires only an authenticated user, so any role.
+ * @summary Download program item file
+ */
+export const getProgramsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getProgramsIdFileResponse> => {
+
+  return customFetch<getProgramsIdFileResponse>(getGetProgramsIdFileUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetProgramsIdFileQueryKey = (id: string,) => {
+    return [
+    `/programs/${id}/file`
+    ] as const;
+    }
+
+
+export const getGetProgramsIdFileQueryOptions = <TData = Awaited<ReturnType<typeof getProgramsIdFile>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetProgramsIdFileQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgramsIdFile>>> = ({ signal }) => getProgramsIdFile(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetProgramsIdFileQueryResult = NonNullable<Awaited<ReturnType<typeof getProgramsIdFile>>>
+export type GetProgramsIdFileQueryError = ErrorResponse
+
+
+export function useGetProgramsIdFile<TData = Awaited<ReturnType<typeof getProgramsIdFile>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsIdFile<TData = Awaited<ReturnType<typeof getProgramsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getProgramsIdFile>>,
+          TError,
+          Awaited<ReturnType<typeof getProgramsIdFile>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetProgramsIdFile<TData = Awaited<ReturnType<typeof getProgramsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download program item file
+ */
+
+export function useGetProgramsIdFile<TData = Awaited<ReturnType<typeof getProgramsIdFile>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProgramsIdFile>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetProgramsIdFileQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type deleteProgramsIdFileResponse200 = {
+  data: Program
+  status: 200
+}
+
+export type deleteProgramsIdFileResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteProgramsIdFileResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteProgramsIdFileResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteProgramsIdFileResponseSuccess = (deleteProgramsIdFileResponse200) & {
+  headers: Headers;
+};
+export type deleteProgramsIdFileResponseError = (deleteProgramsIdFileResponse401 | deleteProgramsIdFileResponse403 | deleteProgramsIdFileResponse404) & {
+  headers: Headers;
+};
+
+export type deleteProgramsIdFileResponse = (deleteProgramsIdFileResponseSuccess | deleteProgramsIdFileResponseError)
+
+export const getDeleteProgramsIdFileUrl = (id: string,) => {
+
+
+
+
+  return `/programs/${id}/file`
+}
+
+/**
+ * Removes the file of a program item and keeps the item, which starts answering file: null and stops offering the download. It is a route of its own rather than a flag on the PUT, where a missing file part always means 'keep'. Answers 200 with the updated item, and not 204, because the resource still exists and changed. An item that has no file answers 404 'Program file not found.', which is the difference between 'there was nothing' and 'I removed it' and makes a second call observably idempotent. The row is locked, the three file columns are cleared together and the object is deleted only after the transaction committed. Records who made the change in updated_by. Requires the user or admin role.
+ * @summary Remove program item file
+ */
+export const deleteProgramsIdFile = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteProgramsIdFileResponse> => {
+
+  return customFetch<deleteProgramsIdFileResponse>(getDeleteProgramsIdFileUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteProgramsIdFileMutationKey = () => ['deleteProgramsIdFile'] as const;
+
+export const getDeleteProgramsIdFileMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsIdFile>>, TError,DeleteProgramsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsIdFile>>, TError,DeleteProgramsIdFileMutationVariables, TContext> => {
+
+const mutationKey = getDeleteProgramsIdFileMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProgramsIdFile>>, DeleteProgramsIdFileMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteProgramsIdFile(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteProgramsIdFileMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProgramsIdFile>>>
+
+    export type DeleteProgramsIdFileMutationError = ErrorResponse
+    export type DeleteProgramsIdFileMutationVariables = {id: string}
+
+    /**
+ * @summary Remove program item file
+ */
+export const useDeleteProgramsIdFile = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProgramsIdFile>>, TError,DeleteProgramsIdFileMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteProgramsIdFile>>,
+        TError,
+        DeleteProgramsIdFileMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteProgramsIdFileMutationOptions(options), queryClient);
+    }
+
+export type getMatricesPeriodIdResponse200 = {
+  data: Matrix
+  status: 200
+}
+
+export type getMatricesPeriodIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getMatricesPeriodIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getMatricesPeriodIdResponseSuccess = (getMatricesPeriodIdResponse200) & {
+  headers: Headers;
+};
+export type getMatricesPeriodIdResponseError = (getMatricesPeriodIdResponse401 | getMatricesPeriodIdResponse404) & {
+  headers: Headers;
+};
+
+export type getMatricesPeriodIdResponse = (getMatricesPeriodIdResponseSuccess | getMatricesPeriodIdResponseError)
+
+export const getGetMatricesPeriodIdUrl = (periodId: string,) => {
+
+
+
+
+  return `/matrices/${periodId}`
+}
+
+/**
+ * Returns the matrix of the period. Reading never writes anything: a period whose matrix was not initialized answers initialized false, no rows and the copy_source it would be copied from, and nothing is created, whatever the role. An initialized period answers one row per existing activity, ordered by code ignoring case, with its six fields and the 21 values of its matrix item in this period, or 21 nulls when it has none (an activity created after the initialization, or blank in the source of a copy). The values of one period never change another's. Requires only an authenticated user, so any role; every role gets the same body.
+ * @summary Get the matrix of a period
+ */
+export const getMatricesPeriodId = async (periodId: string, options?: Parameters<typeof customFetch>[1]): Promise<getMatricesPeriodIdResponse> => {
+
+  return customFetch<getMatricesPeriodIdResponse>(getGetMatricesPeriodIdUrl(periodId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetMatricesPeriodIdQueryKey = (periodId: string,) => {
+    return [
+    `/matrices/${periodId}`
+    ] as const;
+    }
+
+
+export const getGetMatricesPeriodIdQueryOptions = <TData = Awaited<ReturnType<typeof getMatricesPeriodId>>, TError = ErrorResponse>(periodId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetMatricesPeriodIdQueryKey(periodId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getMatricesPeriodId>>> = ({ signal }) => getMatricesPeriodId(periodId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: periodId !== null && periodId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetMatricesPeriodIdQueryResult = NonNullable<Awaited<ReturnType<typeof getMatricesPeriodId>>>
+export type GetMatricesPeriodIdQueryError = ErrorResponse
+
+
+export function useGetMatricesPeriodId<TData = Awaited<ReturnType<typeof getMatricesPeriodId>>, TError = ErrorResponse>(
+ periodId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMatricesPeriodId>>,
+          TError,
+          Awaited<ReturnType<typeof getMatricesPeriodId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMatricesPeriodId<TData = Awaited<ReturnType<typeof getMatricesPeriodId>>, TError = ErrorResponse>(
+ periodId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMatricesPeriodId>>,
+          TError,
+          Awaited<ReturnType<typeof getMatricesPeriodId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetMatricesPeriodId<TData = Awaited<ReturnType<typeof getMatricesPeriodId>>, TError = ErrorResponse>(
+ periodId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get the matrix of a period
+ */
+
+export function useGetMatricesPeriodId<TData = Awaited<ReturnType<typeof getMatricesPeriodId>>, TError = ErrorResponse>(
+ periodId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getMatricesPeriodId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetMatricesPeriodIdQueryOptions(periodId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postMatricesPeriodIdResponse201 = {
+  data: Matrix
+  status: 201
+}
+
+export type postMatricesPeriodIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postMatricesPeriodIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postMatricesPeriodIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postMatricesPeriodIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postMatricesPeriodIdResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postMatricesPeriodIdResponseSuccess = (postMatricesPeriodIdResponse201) & {
+  headers: Headers;
+};
+export type postMatricesPeriodIdResponseError = (postMatricesPeriodIdResponse400 | postMatricesPeriodIdResponse401 | postMatricesPeriodIdResponse403 | postMatricesPeriodIdResponse404 | postMatricesPeriodIdResponse409) & {
+  headers: Headers;
+};
+
+export type postMatricesPeriodIdResponse = (postMatricesPeriodIdResponseSuccess | postMatricesPeriodIdResponseError)
+
+export const getPostMatricesPeriodIdUrl = (periodId: string,) => {
+
+
+
+
+  return `/matrices/${periodId}`
+}
+
+/**
+ * Starts the matrix of a period, once. With copy_from_period_id null it starts blank: only the period is marked as initialized and every activity reads as empty. With the id of the period's current copy_source it copies, for each filled item of that period (any of the 21 fields not null) whose activity still exists, an item with the same 21 values; blank items are not copied and their activities read as empty. The copies are independent: changing one never changes the source. Records who initialized the matrix and who created each copied item. Checked in this order: the body, then inside a transaction the period (locked in shared mode), the initialization (a second one answers 409, also when two run at once: one answers 201 and the other 409), and, on a copy, the copy source recalculated at that moment (409 when it is no longer the given period, for example because another period in between was initialized meanwhile, or when there is no copy source at all; nothing is created). The source period and the copied activities are locked in shared mode while copying, so deleting them waits for the copy. Answers the matrix as GET does. Requires the user or admin role.
+ * @summary Initialize the matrix of a period
+ */
+export const postMatricesPeriodId = async (periodId: string,
+    matrixInitializationInput: MatrixInitializationInput, options?: Parameters<typeof customFetch>[1]): Promise<postMatricesPeriodIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postMatricesPeriodIdResponse>(getPostMatricesPeriodIdUrl(periodId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(matrixInitializationInput)
+  }
+);}
+
+
+
+
+
+export const getPostMatricesPeriodIdMutationKey = () => ['postMatricesPeriodId'] as const;
+
+export const getPostMatricesPeriodIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMatricesPeriodId>>, TError,PostMatricesPeriodIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postMatricesPeriodId>>, TError,PostMatricesPeriodIdMutationVariables, TContext> => {
+
+const mutationKey = getPostMatricesPeriodIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postMatricesPeriodId>>, PostMatricesPeriodIdMutationVariables> = (props) => {
+          const {periodId,data} = props ?? {};
+
+          return  postMatricesPeriodId(periodId,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostMatricesPeriodIdMutationResult = NonNullable<Awaited<ReturnType<typeof postMatricesPeriodId>>>
+    export type PostMatricesPeriodIdMutationBody = MatrixInitializationInput
+    export type PostMatricesPeriodIdMutationError = ErrorResponse
+    export type PostMatricesPeriodIdMutationVariables = {periodId: string;data: MatrixInitializationInput}
+
+    /**
+ * @summary Initialize the matrix of a period
+ */
+export const usePostMatricesPeriodId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postMatricesPeriodId>>, TError,PostMatricesPeriodIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postMatricesPeriodId>>,
+        TError,
+        PostMatricesPeriodIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostMatricesPeriodIdMutationOptions(options), queryClient);
+    }
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse200 = {
+  data: MatrixRow
+  status: 200
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponseSuccess = (putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse200) & {
+  headers: Headers;
+};
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponseError = (putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse400 | putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse401 | putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse403 | putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse404 | putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse409) & {
+  headers: Headers;
+};
+
+export type putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse = (putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponseSuccess | putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponseError)
+
+export const getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldUrl = (periodId: string,
+    activityId: string,
+    field: 'hazard-type' | 'hazardous-event' | 'injuries' | 'causes' | 'exposure' | 'body-segment' | 'probability' | 'severity' | 'pure-risk-level' | 'pure-risk-classification' | 'risk-score' | 'elimination-substitution' | 'engineering-controls' | 'administrative-controls' | 'ppe' | 'control-level' | 'residual-risk-level' | 'residual-risk-classification' | 'required-actions' | 'project-status' | 'post-project-risk',) => {
+
+
+
+
+  return `/matrices/${periodId}/activities/${activityId}/fields/${field}`
+}
+
+/**
+ * Writes the given value into one of the 21 fields of the activity's item in the period, and answers the row as GET presents it. The value is absolute, so repeating the same request gives the same row, and only that field is written: writes of different fields of the same item never undo each other. The item is created on the first write of the activity in the period; null or a blank text empties the field, and an item whose 21 fields are all empty stays stored and counts as blank (it no longer blocks deleting the period or the activity). A text has \r\n turned into \n and is trimmed, and holds at most 5,000 characters; risk_score and post_project_risk accept high, medium, low or null, and project_status open, closed or null. Checked in this order: the field, the value, then inside a transaction the period (locked in shared mode), its initialization (the write never initializes a period), and the activity (locked in shared mode). Locking the period and then the activity before the item makes a write and the deletion of either serialize: either the item is written and the deletion counts it, or the period or the activity is gone and this answers 404. Records who created the item and who made the change. Requires the user or admin role.
+ * @summary Change one field of a matrix row
+ */
+export const putMatricesPeriodIdActivitiesActivityIdFieldsField = async (periodId: string,
+    activityId: string,
+    field: 'hazard-type' | 'hazardous-event' | 'injuries' | 'causes' | 'exposure' | 'body-segment' | 'probability' | 'severity' | 'pure-risk-level' | 'pure-risk-classification' | 'risk-score' | 'elimination-substitution' | 'engineering-controls' | 'administrative-controls' | 'ppe' | 'control-level' | 'residual-risk-level' | 'residual-risk-classification' | 'required-actions' | 'project-status' | 'post-project-risk',
+    matrixFieldInput: MatrixFieldInput, options?: Parameters<typeof customFetch>[1]): Promise<putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putMatricesPeriodIdActivitiesActivityIdFieldsFieldResponse>(getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldUrl(periodId,activityId,field),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(matrixFieldInput)
+  }
+);}
+
+
+
+
+
+export const getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationKey = () => ['putMatricesPeriodIdActivitiesActivityIdFieldsField'] as const;
+
+export const getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>, TError,PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>, TError,PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables, TContext> => {
+
+const mutationKey = getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>, PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables> = (props) => {
+          const {periodId,activityId,field,data} = props ?? {};
+
+          return  putMatricesPeriodIdActivitiesActivityIdFieldsField(periodId,activityId,field,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationResult = NonNullable<Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>>
+    export type PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationBody = MatrixFieldInput
+    export type PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationError = ErrorResponse
+    export type PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables = {periodId: string;activityId: string;field: 'hazard-type' | 'hazardous-event' | 'injuries' | 'causes' | 'exposure' | 'body-segment' | 'probability' | 'severity' | 'pure-risk-level' | 'pure-risk-classification' | 'risk-score' | 'elimination-substitution' | 'engineering-controls' | 'administrative-controls' | 'ppe' | 'control-level' | 'residual-risk-level' | 'residual-risk-classification' | 'required-actions' | 'project-status' | 'post-project-risk';data: MatrixFieldInput}
+
+    /**
+ * @summary Change one field of a matrix row
+ */
+export const usePutMatricesPeriodIdActivitiesActivityIdFieldsField = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>, TError,PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putMatricesPeriodIdActivitiesActivityIdFieldsField>>,
+        TError,
+        PutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationOptions(options), queryClient);
     }
