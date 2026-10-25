@@ -2,11 +2,21 @@ import {
   type Document,
   getDocumentsIdFile,
   getDocumentsTemplatesESocial,
+  getImprovementProjectsIdFilesAttachment,
+  getImprovementProjectsTemplatesTemplate,
+  getMaterialReceiptsIdFile,
+  getMaterialReceiptsTemplatesTemplate,
   getMeetingsIdFilesAttachment,
   getMeetingsTemplatesTemplate,
+  getProgramsIdFile,
+  getProgramsMaterialsMaterial,
   getTrainingsIdFile,
   getTrainingsTemplatesTemplate,
+  type ImprovementProject,
+  type MaterialReceipt,
   type Meeting,
+  type Program,
+  type ProgramMaterial,
   type Training,
 } from '@/http/api'
 import { FetchError } from '@/http/fetch-client'
@@ -51,6 +61,33 @@ export const MEETING_TEMPLATE_FILE_NAMES: Record<MeetingTemplateKey, string> = {
   minutes: 'ata-de-reunioes.docx',
   'presence-list': 'lista-de-presenca.docx',
 }
+
+/** Stable names the API serves the program materials under (§9, FR-012). */
+export const PROGRAM_MATERIAL_FILE_NAMES: Record<ProgramMaterial, string> = {
+  'material-specifications': 'especificacoes-materiais.docx',
+  'ergonomics-procedure': 'procedimento-ergonomia.docx',
+}
+
+/** The two photos of `/improvement-projects/{id}/files/{attachment}` (§10). */
+export type ImprovementProjectPhotoKey = Parameters<
+  typeof getImprovementProjectsIdFilesAttachment
+>[1]
+
+/** Field of the project record that describes each photo. */
+export const IMPROVEMENT_PROJECT_PHOTO_FIELDS = {
+  'before-photo': 'before_photo',
+  'after-photo': 'after_photo',
+} as const satisfies Record<
+  ImprovementProjectPhotoKey,
+  keyof ImprovementProject
+>
+
+/** Stable name the API serves the effectiveness verification form under (§10). */
+export const EFFECTIVENESS_VERIFICATION_FILE_NAME =
+  'verificacao-de-eficacia.pdf'
+
+/** Stable name the API serves the receiving materials form under (§10). */
+export const RECEIVING_MATERIALS_FILE_NAME = 'recebimento-de-materiais.pdf'
 
 /**
  * Hands a blob to the browser as a download under the given file name.
@@ -174,4 +211,116 @@ export async function downloadMeetingTemplate(template: MeetingTemplateKey) {
   }
 
   saveBlobAsFile(response.data, MEETING_TEMPLATE_FILE_NAMES[template])
+}
+
+/**
+ * Downloads the attachment of a program item and saves it under the name it
+ * was uploaded with, taken from the record (FR-016, R-10).
+ */
+export async function downloadProgramFile(record: Program) {
+  if (!record.file) return
+
+  const response = await getProgramsIdFile(record.id)
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, record.file.name)
+}
+
+/**
+ * Downloads one of the two fixed materials of the "Procedimento e Materiais"
+ * type (FR-012, R-13).
+ */
+export async function downloadProgramMaterial(material: ProgramMaterial) {
+  const response = await getProgramsMaterialsMaterial(material)
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, PROGRAM_MATERIAL_FILE_NAMES[material])
+}
+
+/**
+ * Fetches one photo of a project register as a `Blob`, or `null` when the
+ * record has none. The detail shows it from memory (FR-037): there is no URL
+ * the browser could load it from on its own.
+ */
+export async function fetchImprovementProjectPhoto(
+  record: ImprovementProject,
+  photo: ImprovementProjectPhotoKey,
+  signal?: AbortSignal
+) {
+  if (!record[IMPROVEMENT_PROJECT_PHOTO_FIELDS[photo]]) return null
+
+  const response = await getImprovementProjectsIdFilesAttachment(
+    record.id,
+    photo,
+    { signal }
+  )
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  return response.data
+}
+
+/**
+ * Downloads one photo of a project register and saves it under the name it
+ * was uploaded with, taken from the record (FR-039).
+ */
+export async function downloadImprovementProjectPhoto(
+  record: ImprovementProject,
+  photo: ImprovementProjectPhotoKey
+) {
+  const file = record[IMPROVEMENT_PROJECT_PHOTO_FIELDS[photo]]
+  const blob = await fetchImprovementProjectPhoto(record, photo)
+  if (!file || !blob) return
+
+  saveBlobAsFile(blob, file.name)
+}
+
+/** Downloads the static effectiveness verification form (FR-039, J7). */
+export async function downloadEffectivenessVerificationTemplate() {
+  const response = await getImprovementProjectsTemplatesTemplate(
+    'effectiveness-verification'
+  )
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, EFFECTIVENESS_VERIFICATION_FILE_NAME)
+}
+
+/**
+ * Downloads the receipt form of a material receipt and saves it under the
+ * name it was uploaded with, taken from the record (FR-039, R-17).
+ */
+export async function downloadMaterialReceiptFile(record: MaterialReceipt) {
+  if (!record.file) return
+
+  const response = await getMaterialReceiptsIdFile(record.id)
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, record.file.name)
+}
+
+/** Downloads the static receiving materials form (FR-039, J7). */
+export async function downloadReceivingMaterialsTemplate() {
+  const response = await getMaterialReceiptsTemplatesTemplate(
+    'receiving-materials'
+  )
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  saveBlobAsFile(response.data, RECEIVING_MATERIALS_FILE_NAME)
 }
