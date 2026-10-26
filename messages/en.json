@@ -1097,6 +1097,164 @@
       "removing": "Removing..."
     }
   },
+  "matrix": {
+    "title": "Matrix",
+    "description": "Ergonomic risks and controls of each activity, by period.",
+    "tabs": {
+      "label": "Matrix sections",
+      "results": "Results",
+      "charts": "Charts"
+    },
+    "searchLabel": "Search the Matrix",
+    "searchPlaceholder": "Search every column, including the hidden ones...",
+    "columnPicker": {
+      "label": "Columns ({visible}/{total})",
+      "title": "Visible columns",
+      "showAll": "Show all",
+      "filterActive": "Active filter on this column",
+      "hiddenFilterActive": "Active filter on a hidden column: it keeps filtering"
+    },
+    "filters": {
+      "label": "Filter {column}",
+      "all": "All",
+      "empty": "Empty",
+      "contains": "Contains..."
+    },
+    "export": {
+      "label": "Export",
+      "generating": "Generating file...",
+      "formats": {
+        "csv": "CSV",
+        "xlsx": "Excel (.xlsx)"
+      },
+      "error": "The file could not be generated. Please try again."
+    },
+    "projectsMenu": {
+      "title": "Improvement projects",
+      "label": "Improvement projects of activity {code}",
+      "loading": "Loading projects...",
+      "error": "The projects could not be loaded.",
+      "empty": "No linked record"
+    },
+    "itemLabel": "{count, plural, one {activity} other {activities}}",
+    "loadErrorTitle": "Could not load the Matrix",
+    "loadErrorDescription": "Try again. If the problem persists, check your access permissions.",
+    "noPeriods": {
+      "title": "No period registered.",
+      "description": "The Matrix is kept by period and depends on a registered period. An administrator can register it under Parameters › Periods."
+    },
+    "notInitialized": {
+      "title": "The Matrix of this period has not been started yet.",
+      "description": "It is started once per period, by someone who edits. Opening the Matrix records no data.",
+      "editorDescription": "Copy the values of the previous period or start blank. The Matrix is started only once per period.",
+      "blankOnlyDescription": "There is no previous period with the Matrix started, so it starts blank. The Matrix is started only once per period."
+    },
+    "start": {
+      "copy": "Copy from {period}",
+      "blank": "Start blank",
+      "copyTitle": "Copy the Matrix",
+      "blankTitle": "Start the Matrix blank",
+      "copyQuestion": "The filled values of <strong>{source}</strong> will be copied to <strong>{period}</strong>. Activities with no value in {source} start empty.",
+      "blankQuestion": "Every activity of <strong>{period}</strong> starts with empty fields.",
+      "once": "The Matrix is started only once and cannot be restarted afterwards.",
+      "copyConfirm": "Copy",
+      "blankConfirm": "Start blank",
+      "starting": "Starting..."
+    },
+    "edit": {
+      "label": "{column} of activity {code}: edit",
+      "title": "Edit {column} of activity {code}",
+      "textLabel": "New value",
+      "hint": "Ctrl/⌘+Enter saves · Esc cancels",
+      "listLabel": "Values",
+      "emptyOption": "Empty",
+      "saving": "Saving..."
+    },
+    "noActivities": {
+      "title": "No activity registered.",
+      "description": "The Matrix has one row per activity. An administrator can register them under Parameters › Activities."
+    },
+    "columns": {
+      "code": "Code",
+      "function": "Function / Role",
+      "name": "Activity / Name",
+      "fabric": "Fabric",
+      "line": "Line",
+      "area": "Area",
+      "hazard_type": "AEP / AET – Hazard type / Risk factors",
+      "hazardous_event": "AEP / AET – Hazardous event",
+      "injuries": "Injuries or illnesses",
+      "causes": "Causes",
+      "exposure": "Exposure",
+      "body_segment": "Body segment",
+      "probability": "Probability",
+      "severity": "Severity",
+      "pure_risk_level": "Risk level (pure)",
+      "pure_risk_classification": "Risk classification (pure)",
+      "risk_score": "AEP / AET – Score",
+      "elimination_substitution": "Elimination or substitution",
+      "engineering_controls": "Technical controls",
+      "administrative_controls": "Organizational controls",
+      "ppe": "PPE",
+      "control_level": "Control level",
+      "residual_risk_level": "Risk level (residual)",
+      "residual_risk_classification": "Risk classification (residual)",
+      "required_actions": "Required actions",
+      "project_status": "Project status",
+      "post_project_risk": "Post-project"
+    },
+    "help": {
+      "hazard_type": "Posture, Strength, Repetition, Vibration, Furniture, Environment, Organizational",
+      "body_segment": "Cervical, Dorsal, Lumbar spine; MMSS shoulder, elbow, wrists/hands and fingers; MMII",
+      "pure_risk_level": "Pure",
+      "pure_risk_classification": "Pure",
+      "risk_score": "High, medium, low",
+      "engineering_controls": "Engineering",
+      "administrative_controls": "Administrative",
+      "control_level": "%",
+      "residual_risk_level": "Residual",
+      "residual_risk_classification": "Residual",
+      "post_project_risk": "High, medium, low"
+    },
+    "values": {
+      "riskLevel": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "projectStatus": {
+        "open": "Open",
+        "closed": "Closed"
+      }
+    },
+    "charts": {
+      "maps": {
+        "risks": "Risk map",
+        "projects": "Project map",
+        "postProjectRisks": "Post-project risk map"
+      },
+      "tooltip": "{count, plural, one {# activity} other {# activities}} | {percent}%",
+      "sliceLabel": "{label}: {count, plural, one {# activity} other {# activities}}, {percent}%",
+      "description": "{title}: {summary}",
+      "withoutValue": "{missing} of {total, plural, one {# activity} other {# activities}} without a value",
+      "noData": "No data",
+      "views": {
+        "label": "Chart view",
+        "all": "Whole matrix",
+        "groups": "By fabric, area and function"
+      },
+      "groups": {
+        "fabric": "Fabrics",
+        "area": "Areas",
+        "function": "Functions",
+        "all": "All",
+        "filter": "{column}: show or hide charts",
+        "shown": "{shown} of {total}",
+        "empty": "No chart to show."
+      },
+      "notInitialized": "The charts show up once the Matrix is started, on the Results tab, by someone who edits. Opening the charts records no data."
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -1259,6 +1417,14 @@
     "materialReceiptFileNotFound": "This materials receipt has no receipt form.",
     "materialReceiptFileUnavailable": "The receipt form could not be delivered. Try again later.",
     "materialReceiptTemplateNotFound": "Receiving materials form not found.",
-    "materialReceiptTemplateUnavailable": "The receiving materials form could not be delivered. Try again later."
+    "materialReceiptTemplateUnavailable": "The receiving materials form could not be delivered. Try again later.",
+    "matrixFieldNotFound": "Matrix field not found.",
+    "matrixFieldValueInvalid": "Invalid value for the Matrix field.",
+    "matrixFieldValueTooLong": "The Matrix field must have at most 5,000 characters.",
+    "matrixCopySourceInvalid": "Invalid copy source period.",
+    "matrixAlreadyInitialized": "The Matrix of this period has already been started.",
+    "matrixCopySourceChanged": "The copy source period has changed. Check the new period before copying.",
+    "matrixNotInitialized": "The Matrix of this period has not been started yet.",
+    "matrixActivityNotFound": "Matrix activity not found."
   }
 }

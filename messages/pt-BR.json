@@ -1097,6 +1097,164 @@
       "removing": "Removendo..."
     }
   },
+  "matrix": {
+    "title": "Matriz",
+    "description": "Riscos ergonômicos e controles de cada atividade, por período.",
+    "tabs": {
+      "label": "Seções da Matriz",
+      "results": "Resultados",
+      "charts": "Gráficos"
+    },
+    "searchLabel": "Buscar na Matriz",
+    "searchPlaceholder": "Buscar em todas as colunas, inclusive as ocultas...",
+    "columnPicker": {
+      "label": "Colunas ({visible}/{total})",
+      "title": "Colunas visíveis",
+      "showAll": "Mostrar todas",
+      "filterActive": "Filtro ativo nesta coluna",
+      "hiddenFilterActive": "Filtro ativo em coluna oculta: ela continua filtrando"
+    },
+    "filters": {
+      "label": "Filtrar {column}",
+      "all": "Todos",
+      "empty": "Vazio",
+      "contains": "Contém..."
+    },
+    "export": {
+      "label": "Exportar",
+      "generating": "Gerando arquivo...",
+      "formats": {
+        "csv": "CSV",
+        "xlsx": "Excel (.xlsx)"
+      },
+      "error": "Não foi possível gerar o arquivo. Tente novamente."
+    },
+    "projectsMenu": {
+      "title": "Projetos de melhoria",
+      "label": "Projetos de melhoria da atividade {code}",
+      "loading": "Carregando projetos...",
+      "error": "Não foi possível carregar os projetos.",
+      "empty": "Nenhum registro vinculado"
+    },
+    "itemLabel": "{count, plural, one {atividade} other {atividades}}",
+    "loadErrorTitle": "Não foi possível carregar a Matriz",
+    "loadErrorDescription": "Tente novamente. Se o problema persistir, verifique suas permissões de acesso.",
+    "noPeriods": {
+      "title": "Nenhum período cadastrado.",
+      "description": "A Matriz é mantida por período e depende de haver um período cadastrado. Um administrador pode cadastrá-lo em Parâmetros › Períodos."
+    },
+    "notInitialized": {
+      "title": "A Matriz deste período ainda não foi iniciada.",
+      "description": "Ela é iniciada uma única vez por período, por quem edita. Abrir a Matriz não registra nenhum dado.",
+      "editorDescription": "Copie os valores do período anterior ou comece em branco. A Matriz é iniciada uma única vez por período.",
+      "blankOnlyDescription": "Não há período anterior com a Matriz iniciada, então ela começa em branco. A Matriz é iniciada uma única vez por período."
+    },
+    "start": {
+      "copy": "Copiar de {period}",
+      "blank": "Começar em branco",
+      "copyTitle": "Copiar a Matriz",
+      "blankTitle": "Começar a Matriz em branco",
+      "copyQuestion": "Os valores preenchidos de <strong>{source}</strong> serão copiados para <strong>{period}</strong>. As atividades sem valor em {source} começam vazias.",
+      "blankQuestion": "Todas as atividades de <strong>{period}</strong> começam com os campos vazios.",
+      "once": "A Matriz é iniciada uma única vez e não pode ser recomeçada depois.",
+      "copyConfirm": "Copiar",
+      "blankConfirm": "Começar em branco",
+      "starting": "Iniciando..."
+    },
+    "edit": {
+      "label": "{column} da atividade {code}: editar",
+      "title": "Editar {column} da atividade {code}",
+      "textLabel": "Novo valor",
+      "hint": "Ctrl/⌘+Enter salva · Esc cancela",
+      "listLabel": "Valores",
+      "emptyOption": "Vazio",
+      "saving": "Salvando..."
+    },
+    "noActivities": {
+      "title": "Nenhuma atividade cadastrada.",
+      "description": "A Matriz tem uma linha por atividade. Um administrador pode cadastrá-las em Parâmetros › Atividades."
+    },
+    "columns": {
+      "code": "Código",
+      "function": "Função / Cargo",
+      "name": "Atividade / Nome",
+      "fabric": "Fábrica",
+      "line": "Linha",
+      "area": "Área",
+      "hazard_type": "AEP / AET – Tipo de perigo / Fatores de risco",
+      "hazardous_event": "AEP / AET – Evento perigoso",
+      "injuries": "Lesões ou agravos",
+      "causes": "Causas",
+      "exposure": "Exposição",
+      "body_segment": "Segmento corporal",
+      "probability": "Probabilidade",
+      "severity": "Severidade",
+      "pure_risk_level": "Nível de risco (puro)",
+      "pure_risk_classification": "Classificação de risco (puro)",
+      "risk_score": "AEP / AET – Score",
+      "elimination_substitution": "Eliminação ou substituição",
+      "engineering_controls": "Controles técnicos",
+      "administrative_controls": "Controles organizacionais",
+      "ppe": "EPI",
+      "control_level": "Nível de controle",
+      "residual_risk_level": "Nível de risco (residual)",
+      "residual_risk_classification": "Classificação de risco (residual)",
+      "required_actions": "Ações necessárias",
+      "project_status": "Status do projeto",
+      "post_project_risk": "Pós-projeto"
+    },
+    "help": {
+      "hazard_type": "Postura, Força, Repetição, Vibração, Mobiliário, Ambiente, Organizacional",
+      "body_segment": "Coluna Cervical, Dorsal, Lombar; MMSS ombro, cotovelo, punhos/mãos e dedos; MMII",
+      "pure_risk_level": "Puro",
+      "pure_risk_classification": "Puro",
+      "risk_score": "Alto, médio, baixo",
+      "engineering_controls": "Engenharia",
+      "administrative_controls": "Administrativos",
+      "control_level": "%",
+      "residual_risk_level": "Residual",
+      "residual_risk_classification": "Residual",
+      "post_project_risk": "Alto, médio, baixo"
+    },
+    "values": {
+      "riskLevel": {
+        "high": "Alto",
+        "medium": "Médio",
+        "low": "Baixo"
+      },
+      "projectStatus": {
+        "open": "Aberto",
+        "closed": "Fechado"
+      }
+    },
+    "charts": {
+      "maps": {
+        "risks": "Mapa de Riscos",
+        "projects": "Mapa de Projetos",
+        "postProjectRisks": "Mapa de Riscos Pós-Projetos"
+      },
+      "tooltip": "{count, plural, =0 {# atividades} one {# atividade} other {# atividades}} | {percent}%",
+      "sliceLabel": "{label}: {count, plural, =0 {# atividades} one {# atividade} other {# atividades}}, {percent}%",
+      "description": "{title}: {summary}",
+      "withoutValue": "{missing} de {total, plural, one {# atividade} other {# atividades}} sem valor",
+      "noData": "Sem dados",
+      "views": {
+        "label": "Visão dos gráficos",
+        "all": "Toda a matriz",
+        "groups": "Por fábrica, área e função"
+      },
+      "groups": {
+        "fabric": "Fábricas",
+        "area": "Áreas",
+        "function": "Funções",
+        "all": "Todos",
+        "filter": "{column}: mostrar ou ocultar gráficos",
+        "shown": "{shown} de {total}",
+        "empty": "Nenhum gráfico para mostrar."
+      },
+      "notInitialized": "Os gráficos aparecem depois que a Matriz é iniciada, na aba Resultados, por quem edita. Abrir os gráficos não registra nenhum dado."
+    }
+  },
   "errors": {
     "invalidCredentials": "E-mail ou senha incorretos.",
     "sessionExpired": "Sua sessão expirou por inatividade. Entre novamente para continuar.",
@@ -1259,6 +1417,14 @@
     "materialReceiptFileNotFound": "Este recebimento de materiais não tem formulário de recebimento.",
     "materialReceiptFileUnavailable": "Não foi possível entregar o formulário de recebimento. Tente novamente mais tarde.",
     "materialReceiptTemplateNotFound": "Formulário de recebimento de materiais não encontrado.",
-    "materialReceiptTemplateUnavailable": "Não foi possível entregar o formulário de recebimento de materiais. Tente novamente mais tarde."
+    "materialReceiptTemplateUnavailable": "Não foi possível entregar o formulário de recebimento de materiais. Tente novamente mais tarde.",
+    "matrixFieldNotFound": "Campo da Matriz não encontrado.",
+    "matrixFieldValueInvalid": "Valor inválido para o campo da Matriz.",
+    "matrixFieldValueTooLong": "O campo da Matriz deve ter no máximo 5.000 caracteres.",
+    "matrixCopySourceInvalid": "Período de origem da cópia inválido.",
+    "matrixAlreadyInitialized": "A Matriz deste período já foi iniciada.",
+    "matrixCopySourceChanged": "O período de origem da cópia mudou. Confira o novo período antes de copiar.",
+    "matrixNotInitialized": "A Matriz deste período ainda não foi iniciada.",
+    "matrixActivityNotFound": "Atividade da Matriz não encontrada."
   }
 }

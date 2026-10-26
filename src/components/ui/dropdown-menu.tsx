@@ -45,10 +45,26 @@ function useDropdownMenuContext() {
 interface DropdownMenuProps {
   children: ReactNode
   className?: string
+  /** Controlled open state. Leave it out for the menu to keep its own. */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
-export function DropdownMenu({ children, className }: DropdownMenuProps) {
-  const [open, setOpen] = useState(false)
+export function DropdownMenu({
+  children,
+  className,
+  open: openProp,
+  onOpenChange,
+}: DropdownMenuProps) {
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const open = openProp ?? uncontrolledOpen
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (openProp === undefined) setUncontrolledOpen(next)
+      onOpenChange?.(next)
+    },
+    [openProp, onOpenChange]
+  )
   const triggerRef = useRef<HTMLButtonElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   const styles = dropdownMenu()
@@ -81,7 +97,7 @@ export function DropdownMenu({ children, className }: DropdownMenuProps) {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleEscape)
     }
-  }, [open])
+  }, [open, setOpen])
 
   return (
     <DropdownMenuContext.Provider
@@ -123,6 +139,11 @@ export function DropdownMenuTrigger({
 type DropdownMenuContentProps = ComponentProps<'div'> & {
   align?: 'start' | 'end'
   sideOffset?: number
+  /**
+   * Opens at this viewport point instead of below the trigger, e.g. where a
+   * context menu was asked for. Kept inside the viewport.
+   */
+  anchorPoint?: { x: number; y: number } | null
 }
 
 export function DropdownMenuContent({
@@ -130,6 +151,7 @@ export function DropdownMenuContent({
   children,
   align = 'end',
   sideOffset = 4,
+  anchorPoint,
   style,
   ...props
 }: DropdownMenuContentProps) {
@@ -152,9 +174,25 @@ export function DropdownMenuContent({
       const trigger = triggerRef.current
       if (!trigger) return
 
-      const rect = trigger.getBoundingClientRect()
       const contentWidth = contentRef.current?.offsetWidth ?? 180
 
+      if (anchorPoint) {
+        const contentHeight = contentRef.current?.offsetHeight ?? 0
+
+        setPosition({
+          top: Math.max(
+            0,
+            Math.min(anchorPoint.y, window.innerHeight - contentHeight)
+          ),
+          left: Math.max(
+            0,
+            Math.min(anchorPoint.x, window.innerWidth - contentWidth)
+          ),
+        })
+        return
+      }
+
+      const rect = trigger.getBoundingClientRect()
       const top = rect.bottom + sideOffset
       const left = align === 'end' ? rect.right - contentWidth : rect.left
 
@@ -170,7 +208,7 @@ export function DropdownMenuContent({
       window.removeEventListener('resize', updatePosition)
       window.removeEventListener('scroll', updatePosition, true)
     }
-  }, [open, align, sideOffset, triggerRef, contentRef])
+  }, [open, align, sideOffset, anchorPoint, triggerRef, contentRef])
 
   if (!open || !mounted) return null
 

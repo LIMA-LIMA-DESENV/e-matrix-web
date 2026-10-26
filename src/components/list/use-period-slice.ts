@@ -22,7 +22,15 @@ const UUID_PATTERN =
  * `usePeriodSlice` against the loaded periods.
  */
 export function isPeriodFilterValue(value: string) {
-  return value === ALL_PERIODS || UUID_PATTERN.test(value)
+  return value === ALL_PERIODS || isPeriodIdValue(value)
+}
+
+/**
+ * `?period=` validator of a screen without "all periods" (the Matrix): only
+ * something shaped like a period id, so `all` falls back to the default.
+ */
+export function isPeriodIdValue(value: string) {
+  return UUID_PATTERN.test(value)
 }
 
 /** The period the records were requested for no longer exists. */

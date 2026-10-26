@@ -198,6 +198,15 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Material receipt template not found.': 'materialReceiptTemplateNotFound',
   'Material receipt template is unavailable.':
     'materialReceiptTemplateUnavailable',
+  // 'Period not found.' is shared with periods, above.
+  'Matrix field not found.': 'matrixFieldNotFound',
+  'Invalid matrix field value.': 'matrixFieldValueInvalid',
+  'Matrix field value exceeds 5,000 characters.': 'matrixFieldValueTooLong',
+  'Invalid matrix copy source.': 'matrixCopySourceInvalid',
+  'Matrix already initialized.': 'matrixAlreadyInitialized',
+  'Matrix copy source has changed.': 'matrixCopySourceChanged',
+  'Matrix not initialized.': 'matrixNotInitialized',
+  'Matrix activity not found.': 'matrixActivityNotFound',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

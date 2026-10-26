@@ -27,6 +27,7 @@ export {
   type RowAction,
   RowActionsMenu,
   type RowActionsMenuProps,
+  rowActionsMenu,
 } from './row-actions-menu'
 export { SortableHeaderCell } from './sortable-header-cell'
 export {
@@ -39,6 +40,7 @@ export {
 export {
   ALL_PERIODS,
   isPeriodFilterValue,
+  isPeriodIdValue,
   type PeriodSliceQueryOptions,
   usePeriodSlice,
 } from './use-period-slice'

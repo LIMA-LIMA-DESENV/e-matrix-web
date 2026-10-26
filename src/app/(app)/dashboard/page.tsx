@@ -19,9 +19,9 @@ const modules = [
   { key: 'trainings', done: true },
   { key: 'meetings', done: true },
   { key: 'managementPlan', done: true },
-  { key: 'programs', done: false },
-  { key: 'projects', done: false },
-  { key: 'matrix', done: false },
+  { key: 'programs', done: true },
+  { key: 'projects', done: true },
+  { key: 'matrix', done: true },
 ] as const
 
 export default function DashboardPage() {

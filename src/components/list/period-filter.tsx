@@ -12,6 +12,11 @@ interface PeriodFilterProps {
   /** A period id or `all`; `''` while the default is being applied. */
   value: string
   onChange: (value: string) => void
+  /**
+   * Whether "all periods" is offered (default). The Matrix has no such
+   * option: pair `false` with the `isPeriodIdValue` validator.
+   */
+  includeAll?: boolean
 }
 
 /**
@@ -19,7 +24,12 @@ interface PeriodFilterProps {
  * newest first, plus "all periods". A native select, since `components/ui`
  * has no select primitive and the list of periods has no fixed size.
  */
-export function PeriodFilter({ periods, value, onChange }: PeriodFilterProps) {
+export function PeriodFilter({
+  periods,
+  value,
+  onChange,
+  includeAll = true,
+}: PeriodFilterProps) {
   const t = useTranslations('periodFilter')
   const formatDateOnly = useFormatDateOnly()
   const id = useId()
@@ -53,7 +63,7 @@ export function PeriodFilter({ periods, value, onChange }: PeriodFilterProps) {
             })}
           </option>
         ))}
-        <option value={ALL_PERIODS}>{t('all')}</option>
+        {includeAll && <option value={ALL_PERIODS}>{t('all')}</option>}
       </select>
     </div>
   )

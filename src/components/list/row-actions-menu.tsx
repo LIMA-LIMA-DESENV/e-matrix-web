@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui'
 
-const rowActionsMenu = tv({
+export const rowActionsMenu = tv({
   slots: {
     wrapper: 'flex items-center justify-end',
     trigger:
