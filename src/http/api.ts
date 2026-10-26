@@ -38,13 +38,12 @@ export interface Activity {
 }
 
 /**
- * Kind of record linked to an activity. The eleven evaluation types are aggregated into evaluations.
+ * Kind of record linked to an activity
  */
 export type ActivityLinkedRecordType = typeof ActivityLinkedRecordType[keyof typeof ActivityLinkedRecordType];
 
 
 export const ActivityLinkedRecordType = {
-  evaluations: 'evaluations',
   projects: 'projects',
   matrix: 'matrix',
 } as const;
@@ -224,7 +223,6 @@ export const PeriodLinkedRecordType = {
   matrix: 'matrix',
   trainings: 'trainings',
   meetings: 'meetings',
-  evaluations: 'evaluations',
   projects: 'projects',
 } as const;
 
@@ -2670,7 +2668,7 @@ export const getGetPeriodsIdUrl = (id: string,) => {
 }
 
 /**
- * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings, evaluations and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and its management plan, counted as 1 only when it is filled (an evaluated cell other than not_evaluated, or a goal above 0), and its filled matrix items, one each under matrix (blank matrix items are not counted), and nothing else until the remaining modules exist. Any authenticated role.
+ * Returns a period with the summary of its linked records: the records of other modules that belong to the period (management plan, matrix items, and trainings, meetings and projects dated within it). Only modules already migrated are counted and only types with at least one record are listed, so linked_records brings the trainings and the meetings dated inside the period and its management plan, counted as 1 only when it is filled (an evaluated cell other than not_evaluated, or a goal above 0), and its filled matrix items, one each under matrix (blank matrix items are not counted), and nothing else until the remaining modules exist. Any authenticated role.
  * @summary Get period
  */
 export const getPeriodsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getPeriodsIdResponse> => {
@@ -3288,7 +3286,7 @@ export const getGetActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its evaluations, its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. Requires admin role.
+ * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. Requires admin role.
  * @summary Get activity
  */
 export const getActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesIdResponse> => {

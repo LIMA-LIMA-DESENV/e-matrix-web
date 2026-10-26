@@ -269,7 +269,6 @@
     },
     "linkedRecords": {
       "types": {
-        "evaluations": "Avaliações",
         "projects": "Projetos de melhoria",
         "matrix": "Matriz"
       }
@@ -350,7 +349,6 @@
         "matrix": "Matriz",
         "trainings": "Treinamentos",
         "meetings": "Reuniões",
-        "evaluations": "Avaliações",
         "projects": "Projetos de melhoria"
       }
     },
