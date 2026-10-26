@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl'
 import { useId } from 'react'
 
+import { inputVariants } from '@/components/ui'
 import type { Period } from '@/http/api'
 import { useFormatDateOnly } from '@/lib/format-date'
 
@@ -51,7 +52,10 @@ export function PeriodFilter({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-12 cursor-pointer rounded-lg border-none bg-surface-container-low px-4 text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container/20"
+        className={inputVariants({
+          className:
+            'h-12 cursor-pointer rounded-lg border-none bg-surface-container-low px-4 text-sm font-medium text-on-surface focus:outline-none focus:ring-2 focus:ring-primary-container/20',
+        })}
       >
         {!value && <option value="">{t('resolving')}</option>}
         {options.map((period) => (

@@ -363,7 +363,9 @@ export function ImprovementProjectForm({
               <select
                 id="activity_id"
                 disabled={isSubmitting || !isActivitiesReady}
-                className={`${inputClasses} w-full cursor-pointer text-sm text-on-surface`}
+                className={inputVariants({
+                  className: `${inputClasses} w-full cursor-pointer text-sm text-on-surface`,
+                })}
                 {...register('activity_id')}
               >
                 <option value="">{t('activityPlaceholder')}</option>
@@ -476,7 +478,7 @@ export function ImprovementProjectForm({
         </div>
       </Card>
 
-      <div className="fixed right-0 bottom-0 z-40 w-full border-t border-outline-variant/30 bg-white/85 p-6 shadow-[0_-16px_40px_rgba(0,0,0,0.08)] backdrop-blur-md lg:w-[calc(100%-16rem)]">
+      <div className="fixed right-0 bottom-0 z-40 w-full border-t border-outline-variant/30 bg-white/85 p-6 shadow-[0_-16px_40px_rgba(0,0,0,0.08)] backdrop-blur-md lg:w-[calc(100%-var(--shell-sidebar-width,16rem))]">
         <div className="mx-auto flex max-w-6xl justify-end gap-3">
           <Link
             href={listHref}

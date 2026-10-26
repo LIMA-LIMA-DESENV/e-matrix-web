@@ -2,7 +2,13 @@ import type { ComponentProps } from 'react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const buttonVariants = tv({
-  base: 'inline-flex items-center justify-center gap-2 rounded-lg font-label font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none',
+  // Classic: the flat Paper button. The shadow and its color are important
+  // because pages pass shadow-lg (whose classic override in globals.css
+  // comes later) and a shadow color.
+  base: [
+    'inline-flex items-center justify-center gap-2 rounded-lg font-label font-semibold transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none',
+    'classic:border-0 classic:font-normal classic:uppercase classic:shadow-[1px_1px_4px_rgba(0,0,0,.4)]! classic:shadow-black/40! classic:active:shadow-none!',
+  ],
   variants: {
     variant: {
       solid: '',

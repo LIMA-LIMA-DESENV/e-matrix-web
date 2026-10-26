@@ -3,6 +3,8 @@
     "appName": "E-Matrix",
     "logoAlt": "E-Matrix logo",
     "copyright": "© {year} E-Matrix. All rights reserved.",
+    "classicCopyright": "© Copyright 2017 EF Ergonomia.",
+    "allRightsReserved": "All rights reserved.",
     "back": "Back",
     "backToLogin": "Back to sign in",
     "cancel": "Cancel",
@@ -20,6 +22,11 @@
   },
   "language": {
     "label": "Language"
+  },
+  "layout": {
+    "label": "Appearance",
+    "modern": "Modern",
+    "classic": "Classic"
   },
   "list": {
     "clearFilters": "Clear filters",
@@ -115,7 +122,10 @@
     "accountMenu": "Account menu",
     "changePassword": "Change password",
     "signOut": "Sign out",
-    "comingSoon": "Migrating"
+    "comingSoon": "Migrating",
+    "menu": "Menu",
+    "collapseMenu": "Collapse menu",
+    "expandMenu": "Expand menu"
   },
   "session": {
     "expiringTitle": "Session about to expire",

@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 /*
- * Design tokens. Component classes only reference these names (bg-primary,
- * text-on-surface...), so a future "modern" layout can swap the palette by
- * overriding the variables under [data-layout="modern"] without touching
- * components. Values follow the legacy E-Matrix palette
- * (coolors.co/00a79f-006b89-98c5ea-ff784f-c81d25).
+ * Design tokens of the modern layout, the default. Component classes only
+ * reference these names (bg-primary, text-on-surface...), so the classic
+ * layout swaps them by overriding the variables under [data-layout="classic"]
+ * (below) without touching components. Values follow the legacy E-Matrix
+ * palette (coolors.co/00a79f-006b89-98c5ea-ff784f-c81d25).
  */
 @theme {
   --color-primary: #00736d;
@@ -78,6 +78,95 @@
   --font-headline: var(--font-manrope), sans-serif;
   --font-body: var(--font-inter), sans-serif;
   --font-label: var(--font-inter), sans-serif;
+}
+
+/*
+ * Classic layout: the legacy look (Bootstrap 3 + Bootswatch Paper). The root
+ * layout sets data-layout="classic" on <html> from the EMATRIX_LAYOUT cookie.
+ * The `classic:` variant is only for src/components/ui, components/auth,
+ * components/shell and login/page.tsx; pages change through the tokens.
+ */
+@custom-variant classic (&:where([data-layout="classic"] *));
+
+/*
+ * Outside @layer theme on purpose: unlayered rules beat Tailwind's :root
+ * variables. The chart colors (--color-chart-*) are left untouched.
+ */
+[data-layout="classic"] {
+  --font-headline:
+    var(--font-roboto), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-body:
+    var(--font-roboto), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-label:
+    var(--font-roboto), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-brand: var(--font-alfa-slab), serif;
+
+  --radius-xs: 3px;
+  --radius-sm: 3px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+  --radius-2xl: 3px;
+
+  /* #00a79f darkened: white text on it reaches 4.5:1 (NFR-005). */
+  --color-primary-container: #00807a;
+  --color-primary: #00736d;
+  --color-secondary: #006b89;
+  --color-error: #c81d25;
+  --color-tertiary-container: #ff784f;
+
+  --color-surface: #ffffff;
+  --color-background: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f5f5;
+  --color-surface-container: #f5f5f5;
+  --color-surface-container-high: #eeeeee;
+  --color-surface-container-highest: #eeeeee;
+
+  --color-on-surface: #212121;
+  --color-on-background: #212121;
+  --color-on-surface-variant: #666666;
+
+  /* Paper's #bbb is a text color here (text-outline), 1.9:1 on white; the
+     darker gray reaches 4.5:1 on white, #f5f5f5 and the #eee zebra (NFR-005). */
+  --color-outline: #6b6b6b;
+  --color-outline-variant: #dddddd;
+
+  --color-ematrix-dark: #212121;
+}
+
+/*
+ * Tailwind 4 writes the shadow values (and the bare `rounded`) into the
+ * utilities instead of reading --shadow-*, so the Paper shadows replace the
+ * utility's --tw-shadow. In the utilities layer, after Tailwind's own, and
+ * with :where() keeping the specificity of the utility, so a state variant
+ * (hover:shadow-*) still wins; a shadow color (shadow-x/20) still applies
+ * through --tw-shadow-color.
+ */
+@layer utilities {
+  :where([data-layout="classic"]) .rounded {
+    border-radius: 3px;
+  }
+  :where([data-layout="classic"]) :is(.shadow-sm, .shadow, .shadow-md) {
+    --tw-shadow: 0 1px 2px var(--tw-shadow-color, rgb(0 0 0 / 0.3));
+  }
+  :where([data-layout="classic"]) :is(.shadow-lg, .shadow-xl, .shadow-2xl) {
+    --tw-shadow:
+      0 3px 6px var(--tw-shadow-color, rgb(0 0 0 / 0.16)),
+      0 3px 6px var(--tw-shadow-color, rgb(0 0 0 / 0.23));
+  }
+}
+
+/*
+ * Classic background (legacy main.scss): the image over a light blue, behind
+ * the white content panel. Only classic elements carry it (the access screens
+ * through `classic:classic-background`), so the modern layout never downloads
+ * the image.
+ */
+@utility classic-background {
+  background:
+    url("/classic/background.webp") center / cover no-repeat,
+    rgb(198 215 232 / 0.7);
 }
 
 /* Material Symbols */

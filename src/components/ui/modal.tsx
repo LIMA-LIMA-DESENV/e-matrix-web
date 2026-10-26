@@ -10,7 +10,7 @@ export function ModalOverlay({ className, ...props }: ModalOverlayProps) {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 bg-scrim/50 backdrop-blur-sm',
+        'fixed inset-0 z-50 bg-scrim/50 backdrop-blur-sm classic:backdrop-blur-none',
         className
       )}
       {...props}

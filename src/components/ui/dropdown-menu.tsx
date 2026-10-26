@@ -17,9 +17,11 @@ import { tv } from 'tailwind-variants'
 const dropdownMenu = tv({
   slots: {
     root: 'relative inline-block',
+    // Classic: the Paper dropdown-menu, without border and with its own
+    // shadow (important over the classic override of shadow-lg).
     content:
-      'fixed z-50 min-w-[180px] overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest py-1 shadow-lg',
-    item: 'flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-on-surface transition-colors hover:bg-surface-container-low disabled:pointer-events-none disabled:opacity-50',
+      'fixed z-50 min-w-[180px] overflow-hidden rounded-lg border border-outline-variant bg-surface-container-lowest py-1 shadow-lg classic:border-0 classic:shadow-[0_1px_4px_rgba(0,0,0,.3)]!',
+    item: 'flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-on-surface transition-colors hover:bg-surface-container-low disabled:pointer-events-none disabled:opacity-50 classic:hover:bg-[#eee]',
   },
 })
 

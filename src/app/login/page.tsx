@@ -9,7 +9,9 @@ import { Suspense, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { ClassicLogo } from '@/components/auth/classic-logo'
 import { LanguageSwitcher } from '@/components/language-switcher'
+import { LayoutSwitcher } from '@/components/layout-switcher'
 import { Button, Copyright, Input, Label, PasswordInput } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePostSessions } from '@/http/api'
@@ -82,9 +84,11 @@ function LoginForm() {
   }
 
   return (
-    <main className="flex h-full min-h-screen">
+    // Classic: a single centered white panel over the background image, like
+    // the legacy login and the AuthCard; the brand panel is not shown.
+    <main className="flex h-full min-h-screen classic:relative classic:flex-col classic:items-center classic:justify-center classic:px-4 classic:py-16 classic:classic-background">
       {/* Brand panel (desktop only) */}
-      <section className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-ematrix-dark p-16 lg:flex">
+      <section className="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-ematrix-dark p-16 lg:flex classic:lg:hidden">
         <div className="bg-login-gradient pointer-events-none absolute inset-0 opacity-50" />
         <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary-container opacity-20 blur-[120px]" />
         <div className="absolute right-0 bottom-0 h-80 w-80 rounded-full bg-tertiary-container opacity-10 blur-[100px]" />
@@ -115,20 +119,22 @@ function LoginForm() {
       </section>
 
       {/* Login form */}
-      <section className="relative flex w-full flex-col items-center justify-center bg-white px-8 py-12 lg:w-1/2 lg:px-20">
-        <div className="absolute top-4 right-4">
+      <section className="relative flex w-full flex-col items-center justify-center bg-white px-8 py-12 lg:w-1/2 lg:px-20 classic:static classic:max-w-md classic:rounded-[3px] classic:p-8 classic:shadow-[0_3px_6px_rgba(0,0,0,.16),0_3px_6px_rgba(0,0,0,.23)] md:classic:p-10 classic:lg:w-full classic:lg:px-10">
+        <div className="absolute top-4 right-4 flex items-center gap-1 classic:rounded-[3px] classic:bg-white">
           <LanguageSwitcher className="text-on-surface-variant" />
+          <LayoutSwitcher className="text-on-surface-variant" />
         </div>
 
         <div className="w-full max-w-md">
-          <div className="mb-10 flex flex-col items-center lg:items-start">
+          <div className="mb-10 flex flex-col items-center lg:items-start classic:lg:items-center">
             <Image
               src="/logo.png"
               alt={tc('logoAlt')}
               width={64}
               height={64}
-              className="mb-6 h-16 w-16 lg:hidden"
+              className="mb-6 h-16 w-16 lg:hidden classic:hidden"
             />
+            <ClassicLogo className="mb-6" />
             <h2 className="mb-2 font-headline text-3xl font-bold text-on-surface">
               {t('title')}
             </h2>
@@ -212,6 +218,8 @@ function LoginForm() {
           </form>
         </div>
       </section>
+
+      <Copyright className="mt-8 hidden text-center classic:block" />
     </main>
   )
 }
