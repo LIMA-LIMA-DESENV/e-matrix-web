@@ -43,26 +43,31 @@ token, refreshes the session silently and retries once on 401.
 ```text
 src/
 ├── app/
-│   ├── (app)/            # Authenticated area: layout.tsx is the shell
+│   ├── (app)/            # Authenticated area: layout.tsx keeps the session, redirects and expiry warning and renders the shell (components/shell)
 │   │   ├── dashboard/
 │   │   ├── alterar-senha/
 │   │   ├── documentos/   # list, novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── treinamentos/ # list sliced by period (?period=<id>|all), novo/, [id]/editar/, _form/; every role reads, canEdit writes
 │   │   ├── reunioes/     # list sliced by period (?period=<id>|all), detail modal, two attachments and two templates, novo/, [id]/editar/, _form/; every role reads, canEdit writes
+│   │   ├── programa/     # one GET for the items and the score derived by the API: score card, cards in the API order (no sort, search or pages), detail modal with the target-date days, attachment and type materials, novo/, [id]/editar/, _form/; every role reads, canEdit writes (card actions, "Novo item", ?created=/?updated=/?fileRemoved=/?deleted=<type>)
+│   │   ├── projetos/     # redirects to producao/ keeping the query; producao/ (RGP) and escritorio/ (RGA and RA) tabs share ?period= (ProjectsTabs); RGP list sliced by period, detail modal with photo thumbnails (blob: URLs revoked on close), effectiveness verification form; escritorio/ merges the RGA and RA queries into one table (?type=all|rga|ra), RA detail with its receipt form, receiving materials form; PDF of each RGP/RGA (row and detail) and the blank one (card), generated in the browser (see PDFs), none for RA; every role reads; canEdit writes RGP/RGA through _form/ (ImprovementProjectForm by scope, rgp|rga/novo and [id]/editar, the other scope redirects) and RA (MaterialReceiptForm, ra/novo and ra/[id]/editar), deletes on the listing only (DeleteProjectModal), "Novo" on the card and the empty state, ?created=/?updated=/?beforePhotoRemoved=/?afterPhotoRemoved=/?fileRemoved=<code>
 │   │   ├── plano-de-gestao/ # one GET for every period: SVG chart, mini-grids and the full grid of ?period=<id> (default resolved on the page, no "all"); every role reads, canEdit clicks cells and edits the goal (saved at once, not optimistic, grid locked while saving)
+│   │   ├── matriz/       # two tabs, each a route sharing only ?period= (MatrixTabs, like ProjectsTabs); graficos/ is the Gráficos tab: the same GET and period slice as Resultados (shared cache, read only), the three maps of the whole Matrix (charts.ts without React: maps, count, percent; MatrixPieChart in SVG without a library, legend, tooltip, "N de M sem valor", "Sem dados"; colors --color-chart-*); `?view=groups` (chips "Toda a matriz"/"Por fábrica, área e função", router.replace keeping ?period=, any other value is the whole Matrix) breaks each map into MatrixChartMapView: the general pie plus the Fábricas, Áreas and Funções columns (lg side by side, stacked below), groupMatrixChart in charts.ts groups by normalizeText with the first spelling in rows order as label, sorted by localeCompare base; groups with no value have no pie and no filter item; each column has a DropdownMenu of checkboxes with "Todos" that only shows/hides pies, local state reset on a new period or view; a slice with a count, or its legend button (click, Enter or Space), opens the Resultados of exactly its activities: getMatrixChartSliceTarget in charts.ts builds `/matriz?period=<id>&f.<field>=<value>` plus, on a group pie, `&f.<fabric|area|function>="<label>"` (the exact text filter, so the rows equal the tooltip count) and the columns that revealMatrixColumns shows before a router.push (back returns to the tab and view); slices with 0 and "Sem dados" open nothing; MatrixEmptyState variant="charts" without actions; Resultados tab: one GET of the Matrix of ?period=<id> (sliced by period, no "all": isPeriodIdValue and PeriodFilter includeAll={false}); not initialized → empty state; else one row per activity, columns.ts with the 27 columns (key, help, type, default), the 8 default ones shown, the visible columns remembered in localStorage (`ematrix.matrix.columns`, use-matrix-columns.ts, every access in try/catch, defaults when missing or invalid; ColumnPicker; revealMatrixColumns adds columns to the stored choice, outside React, hiding none), search over all 27 with the list values translated, a filter per column in the header kept in the URL as `f.<key>` (lists: all/values/`empty`; text: contains, or equals between double quotes — `"Solda"` keeps "Solda" and not "Solda Ponto", normalizeText on both sides, `""` or a lone quote stay contains; exactMatrixTextFilter builds that value), hidden columns keep filtering, "limpar" back to the default columns without search and filters keeping ?period=, sort and pages in the client; "Exportar" (ExportMenu, use-matrix-export.ts) saves the visible columns and the filtered rows of every page as CSV or .xlsx (see Exports); the ⋮ menu of each row (MatrixRowProjectsMenu, also on a right click on the row outside fields) lists the RGP and RGA of the activity by code from a single `GET /improvement-projects` loaded with the screen (use-matrix-projects.ts) and opens `/projetos/producao?period=all&q=<code>` or `/projetos/escritorio?period=all&type=rga&q=<code>`, with its own loading, empty and error/retry states; every role reads; canEdit starts the Matrix of a period once from the empty state (MatrixEmptyState: "Copiar de <copy_source>" and "Começar em branco", each confirmed with ConfirmActionModal; the POST answer replaces the cached Matrix; 409 `Matrix already initialized.` reads it again and shows the table, 409 `Matrix copy source has changed.` reads it again and shows the new origin with the message) and edits the 21 fields in their cells (MatrixCell, one editor open at a time, in a portal over the cell: lists save on choosing, text saves with Salvar or Ctrl/Cmd+Enter, Esc/Cancelar/click outside/blur never save; the cell shows the save and takes no other edit, not optimistic; use-update-matrix-field.ts puts the row the PUT answers with into the cache with setQueryData, only the saved field while two writes of the row overlap; a failure keeps the previous value with the translated error in the cell); the viewer gets plain text cells and no actions
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
-│   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/)
+│   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/); ParametersTabs carries the admin-only "reset program items" action of both tabs
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
 │   └── layout.tsx        # Root: fonts, NextIntlClientProvider, Providers
 ├── components/
 │   ├── ui/               # Primitive components (see ui/AGENTS.md)
 │   ├── list/             # List page building blocks (search, sort, states)
-│   ├── auth/             # Public auth page card
-│   └── language-switcher.tsx
-├── contexts/AuthContext.tsx
+│   ├── auth/             # Public auth page card and ClassicLogo (round legacy logo, classic only)
+│   ├── shell/            # Authenticated shell: nav-items, AccountMenu, ShellContent, ModernShell, ClassicShell (classic-shell.tsx)
+│   ├── language-switcher.tsx
+│   └── layout-switcher.tsx
+├── contexts/             # AuthContext, LayoutPreferenceContext
 ├── http/                 # Orval client + fetch mutator
 ├── i18n/                 # Locales and request config
-└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, periods, utils
+└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, layout-preference, periods, utils, pdf/, export/
 ```
 
 Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
@@ -92,8 +97,7 @@ Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
 
 ## Lists Sliced by Period
 
-Records dated within a period (trainings and meetings now; evaluations and
-projects next) are listed one period at a time. The slice is the
+Records dated within a period (trainings, meetings and projects) are listed one period at a time. The slice is the
 `period_id` parameter of the API, so changing it fetches again, while search,
 sort and pages stay in the client. The filter lives in the URL as `?period=`
 (a `ListStateConfig.filters` validator accepting a UUID or `all`) and its
@@ -122,15 +126,108 @@ the select; `isPeriodFilterValue` is the `?period=` validator and
 user; viewers only read). Hide what a role cannot do, but remember the API is
 the real guard.
 
-## Theming and the Future Layout Switch
+## Theming and the Two Layouts
 
 Components only use token classes (`bg-primary`, `text-on-surface`,
-`bg-ematrix-dark`...). The palette follows the legacy E-Matrix colors. The
-planned "modern layout" with a user toggle should override the tokens (for
-example under `[data-layout="modern"]`) and, where needed, swap the shell in
-`(app)/layout.tsx`, without forking page components.
+`bg-ematrix-dark`...). The palette follows the legacy E-Matrix colors.
+
+There are two layouts, chosen by each user in `LayoutSwitcher` (next to the
+`LanguageSwitcher`):
+
+- **Modern** (`modern`), the default: the tokens of `@theme` in
+  `globals.css`, with no attribute on `<html>`.
+- **Classic** (`classic`): the legacy look (Bootstrap 3 + Bootswatch Paper,
+  Roboto, 3px corners, Paper shadows). The block `[data-layout="classic"]` in
+  `globals.css` overrides the tokens, outside `@layer theme` so it beats
+  Tailwind's `:root`. Shadows (and the bare `rounded`) are written into the
+  utilities by Tailwind 4, so the same file overrides their `--tw-shadow`
+  in `@layer utilities`. The chart colors (`--color-chart-*`) never change.
+
+The choice lives in the `EMATRIX_LAYOUT` cookie (`modern`|`classic`, any
+other value is `modern`; `path=/`, `sameSite=lax`, 365 days), next to
+`EMATRIX_SIDEBAR` (`collapsed`|`expanded`) for the classic sidebar.
+`src/lib/layout-preference.ts` holds the names, the parsers and the client
+writes, without React. The root layout reads both cookies with `cookies()`,
+renders `<html data-layout="classic">` only for the classic layout (so the
+first frame never flashes the other one) and hands the values to
+`LayoutPreferenceProvider` (`useLayoutPreference()`: `layout`, `setLayout`,
+`isSidebarCollapsed`, `setSidebarCollapsed`). `setLayout` writes the cookie
+and the attribute in place, **without** `router.refresh()`, so the open
+screen keeps its filters, modals and forms. Signing out keeps the cookies.
+
+Roboto and Alfa Slab One (`--font-roboto`, `--font-alfa-slab`, the brand
+font `--font-brand` in the classic block) come from `next/font/google` with
+`preload: false`, so the modern layout never downloads them.
+
+The `classic:` variant (`@custom-variant classic`) styles what a token cannot
+express. Only `src/components/ui`, `src/components/auth`,
+`src/components/shell` and `src/app/login/page.tsx` may use it or read the
+layout; pages change only through the tokens and the primitives, never in
+two versions. A component that only uses token classes gets the classic
+layout for free. Where the shell needs another structure, `(app)/layout.tsx`
+swaps it: `ModernShell` or `ClassicShell`, always as a sibling of the same
+`ShellContent`, so the page stays mounted.
+
+The classic sidebar's "Menu" button calls `setSidebarCollapsed`, which writes
+`EMATRIX_SIDEBAR`; the root layout reads it, so the sidebar already renders
+at 60px when collapsed (wide screens only; below `lg` it is the drawer). A
+page element fixed beside the sidebar reads its width from
+`--shell-sidebar-width` (the classic `<main>` sets 265px or 60px; unset, it
+is the modern 16rem), as the fixed form footers do with
+`lg:w-[calc(100%-var(--shell-sidebar-width,16rem))]`. The
+classic header gradient lives in `headerClasses` of `classic-shell.tsx`, and
+the background image in the `classic-background` utility of `globals.css`,
+rendered only by classic elements (the access screens use
+`classic:classic-background`) so the modern layout never downloads
+`public/classic/*`. The access screens (login, `AuthCard`) show the
+`LayoutSwitcher` in both layouts; in the classic one they are a single white
+panel with the round logo (`ClassicLogo`, a CSS background, never an `<img>`)
+and `Copyright` shows the legacy footer text.
 
 ## PDFs
 
-Legacy PDF reports (wkhtmltopdf) will be rebuilt in the browser with `jspdf`
-and `jspdf-autotable`; add the dependencies with the first report.
+Legacy PDF reports (wkhtmltopdf) are rebuilt in the browser with `jspdf` and
+`jspdf-autotable`, pinned to exact versions in `package.json`. Reports live in
+`src/lib/pdf`, without React: the screen passes the translated labels and the
+already formatted values (dates with `useFormatDateOnly()`), and the module
+returns a `Blob` that the screen saves with `saveBlobAsFile`. Load them with
+`import()` only when the user asks for a PDF, so `jspdf` stays in its own
+chunk, out of the bundle of the screens. Use the standard Helvetica (WinAnsi):
+it covers the accents of pt-BR and es, but not characters outside cp1252.
+
+- `improvement-project-pdf.ts`: the project register (RGP/RGA) and its blank
+  form, landscape A4, with the colors of the legacy report.
+- `load-photo.ts`: turns an attachment `Blob` into a JPEG for the PDF, with
+  the EXIF orientation applied and the longest side at most 2,000 px, or
+  marks it unavailable when it does not decode. Use it for any photo that
+  goes into a report.
+
+`projetos/components/use-improvement-project-pdf.ts` is the screen side:
+it downloads the photos, generates one PDF at a time and reports a failure
+with `projects.pdf.error`.
+
+## Exports
+
+Tables are exported in the browser, from the rows the screen already holds,
+never by the API. Exporters live in `src/lib/export`, without React, like
+the PDFs: the screen passes an `ExportTable` (`table.ts`) with the
+translated column labels and the values already formatted for display
+(`null` is an empty cell), and the module returns a `Blob` that the screen
+saves with `saveBlobAsFile`. Name the file with `toExportFileName()`, which
+turns the characters invalid in file names into `-`.
+
+- `csv.ts` (no dependency): `;` as the separator (the legacy one, which
+  Excel in pt-BR splits on), UTF-8 with a BOM, CRLF and RFC 4180 quotes. A
+  value starting with `=`, `+`, `-`, `@`, tab or CR gets a `'` in front, so
+  spreadsheets do not run it as a formula.
+- `xlsx.ts`: one sheet, every cell of type string, no formatting. It loads
+  `write-excel-file` (pinned to an exact version in `package.json`) with
+  `import()`, and the screen loads the module with `import()` too, so the
+  library stays in its own chunk, downloaded only when the user asks for
+  Excel. Keep the library behind this module, so replacing it is a local
+  change.
+
+`matriz/components/use-matrix-export.ts` is the screen side: it exports the
+visible columns, in the order of the screen, and every row that passes the
+search and the filters, of every page, as `matriz-<period>.csv|.xlsx`, one
+file at a time, and reports a failure with `matrix.export.error`.
