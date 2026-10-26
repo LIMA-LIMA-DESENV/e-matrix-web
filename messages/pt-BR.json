@@ -291,6 +291,15 @@
       "label": "Seções de parâmetros",
       "activities": "Atividades",
       "periods": "Períodos"
+    },
+    "resetPrograms": {
+      "action": "Redefinir itens do programa",
+      "title": "Redefinir itens do programa",
+      "question": "Deseja realmente redefinir os itens do programa?",
+      "description": "Todos os itens atuais do programa e os seus anexos serão apagados de forma definitiva e substituídos pelos cinco itens padrão. Essa ação não pode ser desfeita.",
+      "confirm": "Redefinir itens",
+      "resetting": "Redefinindo...",
+      "success": "Os itens do programa foram redefinidos para os cinco itens padrão."
     }
   },
   "periods": {
@@ -772,6 +781,322 @@
       "action": "Cadastrar períodos em Parâmetros"
     }
   },
+  "programs": {
+    "title": "Programa",
+    "description": "Itens do programa de ergonomia da empresa: as cinco frentes, o que se verifica em cada uma, as ações previstas e o andamento, com a pontuação atual de 0 a 5.",
+    "count": "{count, plural, =0 {Nenhum item cadastrado} one {# item cadastrado} other {# itens cadastrados}}.",
+    "complete": "Completo",
+    "score": {
+      "title": "Pontuação atual",
+      "ofMax": "de {max}",
+      "valueText": "{value} de {max}"
+    },
+    "types": {
+      "ergonomics-team-and-trainings": "Equipe de Ergonomia e Treinamentos",
+      "procedures-and-materials": "Procedimento e Materiais",
+      "priority-list": "Lista de Prioridades",
+      "ergonomic-projects": "Projetos Ergonômicos",
+      "improvement-review-and-control": "Revisão e Controle de Melhorias"
+    },
+    "materials": {
+      "material-specifications": "Especificações de Materiais",
+      "ergonomics-procedure": "Procedimento Ergonomia"
+    },
+    "fields": {
+      "question": "Questão",
+      "description": "Descrição",
+      "actions": "Ações",
+      "responsible": "Responsável",
+      "targetDate": "Data-alvo",
+      "completedPercentage": "Percentual concluído",
+      "file": "Anexo",
+      "materials": "Materiais"
+    },
+    "days": {
+      "remaining": "{count, plural, one {Falta # dia} other {Faltam # dias}}",
+      "passed": "{count, plural, one {Passou-se # dia} other {Passaram-se # dias}}",
+      "today": "Vence hoje"
+    },
+    "viewItem": "Visualizar o item {type}",
+    "loadErrorTitle": "Não foi possível carregar o programa",
+    "loadErrorDescription": "Tente novamente. Se o problema persistir, verifique sua conexão ou permissões de acesso.",
+    "emptyTitle": "Nenhum item do programa cadastrado.",
+    "emptyDescription": "Os itens do programa de ergonomia aparecerão aqui, um card por item, assim que forem cadastrados.",
+    "downloadFile": "Baixar anexo",
+    "downloadFileNamed": "Baixar o anexo {name}",
+    "downloadMaterial": "Baixar",
+    "downloadMaterialNamed": "Baixar o material {name}",
+    "downloading": "Baixando...",
+    "noFile": "Sem anexo",
+    "newItem": "Novo item",
+    "deleteAction": "Excluir",
+    "editItem": "Editar o item {type}",
+    "deleteItem": "Excluir o item {type}",
+    "created": "Item {type} cadastrado com sucesso.",
+    "updated": "Item {type} alterado com sucesso.",
+    "deleted": "Item {type} excluído com sucesso.",
+    "fileRemoved": "Anexo do item {type} removido com sucesso.",
+    "form": {
+      "newTitle": "Novo item do programa",
+      "newDescription": "Escolha a frente, descreva o que se verifica e as ações previstas, e informe o responsável, a data-alvo e o andamento.",
+      "editTitle": "Editar item do programa",
+      "editDescription": "Altere os dados do item, troque o anexo ou mantenha o atual.",
+      "type": "Tipo",
+      "typePlaceholder": "Selecione o tipo",
+      "questionPlaceholder": "Ex.: Existe um procedimento claro de ergonomia?",
+      "descriptionPlaceholder": "O que se verifica neste item.",
+      "actionsPlaceholder": "As ações previstas, uma por linha.",
+      "responsiblePlaceholder": "Ex.: Ergonomista",
+      "fileHint": "Opcional. {extensions} de até {max} MB.",
+      "fileSelected": "Arquivo escolhido: {name}",
+      "fileKeepHint": "Deixe o campo em branco para manter o anexo atual.",
+      "removeFile": "Remover anexo",
+      "create": "Cadastrar item",
+      "creating": "Cadastrando...",
+      "update": "Salvar alterações",
+      "loadError": "Não foi possível carregar o item do programa"
+    },
+    "validation": {
+      "typeRequired": "Selecione o tipo do item.",
+      "questionRequired": "Informe a questão.",
+      "questionTooLong": "A questão deve ter no máximo {max} caracteres.",
+      "descriptionRequired": "Informe a descrição.",
+      "descriptionTooLong": "A descrição deve ter no máximo {max} caracteres.",
+      "actionsRequired": "Informe as ações.",
+      "actionsTooLong": "As ações devem ter no máximo {max} caracteres.",
+      "responsibleRequired": "Informe o responsável.",
+      "responsibleTooLong": "O responsável deve ter no máximo {max} caracteres.",
+      "targetDateRequired": "Informe a data-alvo.",
+      "completedPercentageInvalid": "Informe um número inteiro de 0 a 100.",
+      "textHint": "Com até {max} caracteres.",
+      "multilineHint": "Texto simples, com até {max} caracteres. As quebras de linha são mantidas.",
+      "targetDateHint": "Dia de calendário, sem hora. Pode estar no passado.",
+      "completedPercentageHint": "Número inteiro de 0 a 100.",
+      "fileTypeNotAllowed": "Tipo de arquivo não aceito. Escolha um arquivo Word, PowerPoint, PDF ou ZIP.",
+      "fileTooLarge": "O arquivo deve ter no máximo {max} MB."
+    },
+    "removeFile": {
+      "title": "Remover anexo",
+      "question": "Deseja realmente remover o anexo do item <strong>{type}</strong>?",
+      "description": "O item continua cadastrado, mas o anexo deixa de ser servido e não pode ser recuperado.",
+      "confirm": "Remover anexo",
+      "removing": "Removendo..."
+    },
+    "delete": {
+      "title": "Excluir item",
+      "question": "Deseja realmente excluir o item <strong>{type}</strong>?",
+      "description": "A exclusão é definitiva e não pode ser desfeita. O anexo do item, se houver, também é apagado, e a pontuação é recalculada.",
+      "confirm": "Excluir item",
+      "deleting": "Excluindo..."
+    }
+  },
+  "projects": {
+    "title": "Projetos",
+    "description": "Registros das ações de melhoria ergonômica do programa: os projetos de produção e de escritório e o recebimento de materiais.",
+    "tabs": {
+      "label": "Seções de projetos",
+      "production": "Produção",
+      "office": "Escritório"
+    },
+    "types": {
+      "rgp": "Registro de Projeto — Produção",
+      "rga": "Registro de Projeto — Escritório",
+      "ra": "Recebimento de Materiais"
+    },
+    "shortTypes": {
+      "rga": "RGA",
+      "ra": "RA"
+    },
+    "cards": {
+      "improvementProject": {
+        "title": "Registro de Projeto",
+        "description": "Registro de cada projeto de melhoria: atividade, preocupação, recomendação, prioridade e as fotos antes e depois."
+      },
+      "effectivenessVerification": {
+        "title": "Verificação de Eficácia",
+        "description": "Formulário para acompanhar a eficácia das melhorias implementadas.",
+        "download": "Baixar formulário"
+      },
+      "materialReceipt": {
+        "title": "Recebimento de Materiais",
+        "description": "Registro do recebimento de materiais por funcionário, com o formulário de recebimento assinado.",
+        "download": "Baixar formulário"
+      }
+    },
+    "production": {
+      "count": "{count, plural, =0 {Nenhum registro de projeto no recorte selecionado} one {# registro de projeto no recorte selecionado} other {# registros de projeto no recorte selecionado}}.",
+      "itemLabel": "{count, plural, one {registro} other {registros}}",
+      "searchPlaceholder": "Buscar por código, atividade, preocupação ou prioridade...",
+      "searchLabel": "Buscar registro de projeto",
+      "loadErrorTitle": "Não foi possível carregar os registros de projeto",
+      "loadErrorDescription": "Tente novamente. Se o problema persistir, verifique suas permissões de acesso.",
+      "emptyTitle": "Nenhum registro de projeto no recorte selecionado.",
+      "emptyDescription": "Os registros de projeto com data dentro do período escolhido aparecerão nesta listagem. Escolha outro período ou todos os períodos para ver os demais.",
+      "noResultsTitle": "Nenhum registro de projeto encontrado para a busca.",
+      "noResultsDescription": "Tente ajustar a busca por código, atividade, preocupação ou prioridade, ou limpe os filtros."
+    },
+    "office": {
+      "count": "{count, plural, =0 {Nenhum registro de projeto no recorte selecionado} one {# registro de projeto no recorte selecionado} other {# registros de projeto no recorte selecionado}}.",
+      "materialReceiptCount": "{count, plural, =0 {Nenhum recebimento de materiais no recorte selecionado} one {# recebimento de materiais no recorte selecionado} other {# recebimentos de materiais no recorte selecionado}}.",
+      "itemLabel": "{count, plural, one {registro} other {registros}}",
+      "searchPlaceholder": "Buscar por código, tipo, atividade, preocupação, prioridade, funcionário ou registro...",
+      "searchLabel": "Buscar registro do escritório",
+      "typeFilterLabel": "Filtrar por tipo",
+      "allTypes": "Todos",
+      "loadErrorTitle": "Não foi possível carregar os registros do escritório",
+      "loadErrorDescription": "Tente novamente. Se o problema persistir, verifique suas permissões de acesso.",
+      "emptyTitle": "Nenhum registro do escritório no recorte selecionado.",
+      "emptyDescription": "Os registros de projeto do escritório e os recebimentos de materiais com data dentro do período escolhido aparecerão nesta listagem. Escolha outro período ou todos os períodos para ver os demais.",
+      "noResultsTitle": "Nenhum registro do escritório encontrado para os filtros.",
+      "noResultsDescription": "Tente ajustar a busca ou o tipo, ou limpe os filtros."
+    },
+    "noPeriods": {
+      "title": "Nenhum período cadastrado.",
+      "description": "Todos os registros estão listados. O filtro por período depende de haver um período cadastrado, e a data de um registro precisa estar dentro de um período. Um administrador pode cadastrá-lo em Parâmetros › Períodos."
+    },
+    "columns": {
+      "code": "Código",
+      "type": "Tipo",
+      "date": "Data",
+      "activity": "Atividade",
+      "concern": "Preocupação",
+      "recommendation": "Recomendação de melhoria",
+      "priority": "Prioridade",
+      "employee": "Funcionário",
+      "employeeRegistry": "Registro do funcionário"
+    },
+    "photos": {
+      "before-photo": "Foto antes",
+      "after-photo": "Foto depois"
+    },
+    "details": {
+      "title": "Registro de Projeto",
+      "photos": "Fotos",
+      "noPhoto": "Sem foto",
+      "photoLoading": "Carregando foto...",
+      "photoUnavailable": "Foto indisponível",
+      "photoAlt": "{photo} de {code}: {name}"
+    },
+    "materialReceiptDetails": {
+      "title": "Recebimento de Materiais",
+      "file": "Formulário de recebimento",
+      "noFile": "Sem formulário",
+      "downloadFile": "Baixar formulário",
+      "downloadFileNamed": "Baixar o formulário de recebimento: {name}"
+    },
+    "downloadPhoto": "Baixar foto",
+    "downloadPhotoNamed": "Baixar {photo}: {name}",
+    "downloading": "Baixando...",
+    "pdf": {
+      "download": "Baixar PDF",
+      "downloadBlank": "Baixar PDF em branco",
+      "generating": "Gerando PDF...",
+      "error": "Não foi possível gerar o PDF. Tente novamente.",
+      "labels": {
+        "concern": "Preocupação:",
+        "recommendation": "Recomendação de melhoria:",
+        "date": "Data:",
+        "priority": "Prioridade de ação:",
+        "activity": "Atividade:",
+        "before": "Antes",
+        "after": "Depois",
+        "ergonomicRisk": "Risco ergonômico:",
+        "photoUnavailable": "Foto indisponível"
+      }
+    },
+    "newImprovementProject": "Novo registro de projeto",
+    "newMaterialReceipt": "Novo recebimento de materiais",
+    "newDisabledHint": "Cadastre um período antes: a data de um registro precisa estar dentro de um período.",
+    "feedback": {
+      "created": "Registro {code} cadastrado com sucesso.",
+      "updated": "Registro {code} atualizado com sucesso.",
+      "deleted": "Registro {code} excluído com sucesso.",
+      "photoRemoved": {
+        "before-photo": "Foto antes removida do registro {code}.",
+        "after-photo": "Foto depois removida do registro {code}."
+      },
+      "fileRemoved": "Formulário de recebimento removido do registro {code}."
+    },
+    "form": {
+      "newTitle": "Novo registro de projeto",
+      "newDescription": "{type}: escolha a atividade, informe data, preocupação, recomendação de melhoria e prioridade de ação, e anexe as fotos antes e depois se já houver.",
+      "editTitle": "Editar registro de projeto",
+      "editDescription": "{type}: altere os dados do registro e troque a foto antes, a foto depois ou as duas, ou mantenha as fotos atuais.",
+      "activityPlaceholder": "Selecione a atividade",
+      "activityHint": "Atividade cadastrada, identificada por código e nome.",
+      "activitiesLoading": "Carregando atividades...",
+      "activitiesLoadError": "Não foi possível carregar as atividades, e o registro não pode ser salvo sem elas.",
+      "activitiesEmpty": "Nenhuma atividade cadastrada. Um administrador pode cadastrá-las em Parâmetros › Atividades.",
+      "concernPlaceholder": "Ex.: Flexão de tronco ao pegar peças no chão",
+      "recommendationPlaceholder": "Ex.: Elevar o palete com mesa pantográfica",
+      "priority": "Prioridade de ação",
+      "priorityPlaceholder": "Ex.: Alta",
+      "fileHint": "Opcional. {extensions} de até {max} MB, de qualquer dimensão.",
+      "fileSelected": "Arquivo escolhido: {name}",
+      "downloadFile": "Baixar",
+      "downloadFileNamed": "Baixar {file}: {name}",
+      "photoKeepHint": {
+        "before-photo": "Deixe o campo em branco para manter a foto antes atual.",
+        "after-photo": "Deixe o campo em branco para manter a foto depois atual."
+      },
+      "removePhoto": {
+        "before-photo": "Remover foto antes",
+        "after-photo": "Remover foto depois"
+      },
+      "create": "Cadastrar registro",
+      "creating": "Cadastrando...",
+      "update": "Salvar alterações",
+      "loadError": "Não foi possível carregar o registro de projeto",
+      "loadErrorPeriods": "Não foi possível carregar os períodos",
+      "newReceiptTitle": "Novo recebimento de materiais",
+      "newReceiptDescription": "Recebimento de Materiais: informe funcionário, registro do funcionário e data, e anexe o formulário de recebimento se já houver.",
+      "editReceiptTitle": "Editar recebimento de materiais",
+      "editReceiptDescription": "Recebimento de Materiais: altere os dados do registro e troque o formulário de recebimento ou mantenha o atual.",
+      "employeePlaceholder": "Ex.: João Pereira",
+      "employeeRegistryPlaceholder": "Ex.: 004512",
+      "receiptFileHint": "Opcional. {extensions} de até {max} MB.",
+      "receiptFileKeepHint": "Deixe o campo em branco para manter o formulário de recebimento atual.",
+      "removeReceiptFile": "Remover formulário",
+      "createReceipt": "Cadastrar recebimento",
+      "loadReceiptError": "Não foi possível carregar o recebimento de materiais"
+    },
+    "validation": {
+      "activityRequired": "Selecione a atividade.",
+      "dateRequired": "Informe uma data válida para o registro.",
+      "dateOutsidePeriods": "A data precisa estar dentro de um período cadastrado.",
+      "dateHint": "Dia de calendário, dentro de um período cadastrado.",
+      "concernRequired": "Informe a preocupação.",
+      "concernTooLong": "A preocupação deve ter no máximo {max} caracteres.",
+      "recommendationRequired": "Informe a recomendação de melhoria.",
+      "recommendationTooLong": "A recomendação de melhoria deve ter no máximo {max} caracteres.",
+      "priorityRequired": "Informe a prioridade de ação.",
+      "priorityTooLong": "A prioridade de ação deve ter no máximo {max} caracteres.",
+      "textHint": "Com até {max} caracteres.",
+      "photoTypeNotAllowed": "Tipo de foto não aceito. Escolha uma imagem JPEG ou PNG.",
+      "photoTooLarge": "A foto deve ter no máximo {max} MB.",
+      "employeeRequired": "Informe o funcionário.",
+      "employeeTooLong": "O funcionário deve ter no máximo {max} caracteres.",
+      "employeeRegistryRequired": "Informe o registro do funcionário.",
+      "employeeRegistryTooLong": "O registro do funcionário deve ter no máximo {max} caracteres.",
+      "receiptFileTypeNotAllowed": "Tipo de arquivo não aceito. Escolha um arquivo Word, PowerPoint ou PDF.",
+      "receiptFileTooLarge": "O formulário de recebimento deve ter no máximo {max} MB."
+    },
+    "delete": {
+      "action": "Excluir",
+      "title": "Excluir registro",
+      "question": "Deseja realmente excluir o registro <strong>{code}</strong>?",
+      "description": "A exclusão é definitiva e não pode ser desfeita. Os anexos do registro, se houver, são apagados junto e não podem ser recuperados. O código não será reaproveitado.",
+      "confirm": "Excluir registro",
+      "deleting": "Excluindo..."
+    },
+    "removeFile": {
+      "title": "Remover anexo",
+      "question": "Deseja realmente remover <strong>{file}</strong> do registro <strong>{code}</strong>?",
+      "description": "O registro e os demais anexos continuam cadastrados, mas este arquivo é apagado e não pode ser recuperado.",
+      "confirm": "Remover anexo",
+      "removing": "Removendo..."
+    }
+  },
   "errors": {
     "invalidCredentials": "E-mail ou senha incorretos.",
     "sessionExpired": "Sua sessão expirou por inatividade. Entre novamente para continuar.",
@@ -879,6 +1204,61 @@
     "status404": "O registro solicitado não foi encontrado.",
     "status409": "Já existe um registro com os dados informados.",
     "status500": "Ocorreu um erro interno no servidor. Tente novamente mais tarde.",
-    "unexpected": "Ocorreu um erro inesperado. Tente novamente."
+    "unexpected": "Ocorreu um erro inesperado. Tente novamente.",
+    "programTypeInvalid": "Selecione um tipo de item do programa válido.",
+    "programQuestionRequired": "Informe a questão do item do programa.",
+    "programQuestionTooLong": "A questão do item do programa deve ter no máximo 255 caracteres.",
+    "programDescriptionRequired": "Informe a descrição do item do programa.",
+    "programDescriptionTooLong": "A descrição do item do programa deve ter no máximo 5.000 caracteres.",
+    "programActionsRequired": "Informe as ações do item do programa.",
+    "programActionsTooLong": "As ações do item do programa devem ter no máximo 5.000 caracteres.",
+    "programResponsibleRequired": "Informe o responsável pelo item do programa.",
+    "programResponsibleTooLong": "O responsável pelo item do programa deve ter no máximo 255 caracteres.",
+    "programTargetDateInvalid": "Informe uma data-alvo válida para o item do programa.",
+    "programCompletedPercentageInvalid": "O percentual concluído deve ser um número inteiro de 0 a 100.",
+    "programFileTypeNotAllowed": "Tipo de arquivo não aceito. Envie um arquivo Word, PowerPoint, PDF ou ZIP.",
+    "programFileEmpty": "O arquivo enviado está vazio.",
+    "programFileNameTooLong": "O nome do arquivo deve ter no máximo 255 caracteres.",
+    "programFileTooLarge": "O arquivo deve ter no máximo 25 MB.",
+    "programNotFound": "Item do programa não encontrado.",
+    "programFileNotFound": "Este item do programa não tem anexo.",
+    "programFileUnavailable": "Não foi possível entregar o anexo deste item do programa. Tente novamente mais tarde.",
+    "programMaterialNotFound": "Material do programa não encontrado.",
+    "programMaterialUnavailable": "Não foi possível entregar o material do programa. Tente novamente mais tarde.",
+    "improvementProjectScopeInvalid": "Selecione um tipo de registro de projeto válido.",
+    "improvementProjectActivityRequired": "Selecione a atividade do registro de projeto.",
+    "improvementProjectActivityNotFound": "A atividade escolhida não foi encontrada. Ela pode ter sido excluída.",
+    "improvementProjectDateInvalid": "Informe uma data válida para o registro de projeto.",
+    "improvementProjectConcernRequired": "Informe a preocupação do registro de projeto.",
+    "improvementProjectConcernTooLong": "A preocupação deve ter no máximo 255 caracteres.",
+    "improvementProjectRecommendationRequired": "Informe a recomendação de melhoria.",
+    "improvementProjectRecommendationTooLong": "A recomendação de melhoria deve ter no máximo 255 caracteres.",
+    "improvementProjectPriorityRequired": "Informe a prioridade de ação.",
+    "improvementProjectPriorityTooLong": "A prioridade de ação deve ter no máximo 255 caracteres.",
+    "improvementProjectDateOutsidePeriods": "A data do registro de projeto precisa estar dentro de um período cadastrado.",
+    "improvementProjectPhotoTypeNotAllowed": "Tipo de foto não aceito. Envie uma imagem JPG ou PNG.",
+    "improvementProjectPhotoEmpty": "A foto enviada está vazia.",
+    "improvementProjectPhotoNameTooLong": "O nome da foto deve ter no máximo 255 caracteres.",
+    "improvementProjectPhotoTooLarge": "A foto deve ter no máximo 10 MB.",
+    "improvementProjectNotFound": "Registro de projeto não encontrado.",
+    "improvementProjectPhotoNotFound": "Este registro de projeto não tem a foto solicitada.",
+    "improvementProjectPhotoUnavailable": "Não foi possível entregar a foto deste registro de projeto. Tente novamente mais tarde.",
+    "improvementProjectTemplateNotFound": "Formulário de projeto não encontrado.",
+    "improvementProjectTemplateUnavailable": "Não foi possível entregar o formulário. Tente novamente mais tarde.",
+    "materialReceiptEmployeeRequired": "Informe o funcionário do recebimento de materiais.",
+    "materialReceiptEmployeeTooLong": "O funcionário deve ter no máximo 255 caracteres.",
+    "materialReceiptEmployeeRegistryRequired": "Informe o registro do funcionário.",
+    "materialReceiptEmployeeRegistryTooLong": "O registro do funcionário deve ter no máximo 255 caracteres.",
+    "materialReceiptDateInvalid": "Informe uma data válida para o recebimento de materiais.",
+    "materialReceiptDateOutsidePeriods": "A data do recebimento de materiais precisa estar dentro de um período cadastrado.",
+    "materialReceiptFileTypeNotAllowed": "Tipo de arquivo não aceito. Envie um arquivo Word, PowerPoint ou PDF.",
+    "materialReceiptFileEmpty": "O arquivo enviado está vazio.",
+    "materialReceiptFileNameTooLong": "O nome do arquivo deve ter no máximo 255 caracteres.",
+    "materialReceiptFileTooLarge": "O arquivo deve ter no máximo 25 MB.",
+    "materialReceiptNotFound": "Recebimento de materiais não encontrado.",
+    "materialReceiptFileNotFound": "Este recebimento de materiais não tem formulário de recebimento.",
+    "materialReceiptFileUnavailable": "Não foi possível entregar o formulário de recebimento. Tente novamente mais tarde.",
+    "materialReceiptTemplateNotFound": "Formulário de recebimento de materiais não encontrado.",
+    "materialReceiptTemplateUnavailable": "Não foi possível entregar o formulário de recebimento de materiais. Tente novamente mais tarde."
   }
 }

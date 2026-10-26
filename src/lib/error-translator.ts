@@ -119,6 +119,85 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
     'managementPlanCellGreenBeforePreviousLevels',
   'Management plan goal must be an integer from 0 to 16.':
     'managementPlanGoalInvalid',
+  // 'Only one file is allowed.' is the generic upload message, mapped above.
+  'Invalid program type.': 'programTypeInvalid',
+  'Program question is required.': 'programQuestionRequired',
+  'Program question is too long.': 'programQuestionTooLong',
+  'Program description is required.': 'programDescriptionRequired',
+  'Program description is too long.': 'programDescriptionTooLong',
+  'Program actions are required.': 'programActionsRequired',
+  'Program actions are too long.': 'programActionsTooLong',
+  'Program responsible is required.': 'programResponsibleRequired',
+  'Program responsible is too long.': 'programResponsibleTooLong',
+  'Invalid program target date.': 'programTargetDateInvalid',
+  'Invalid program completed percentage.': 'programCompletedPercentageInvalid',
+  'Program file type not allowed.': 'programFileTypeNotAllowed',
+  'Program file is empty.': 'programFileEmpty',
+  'Program file name is too long.': 'programFileNameTooLong',
+  'Program file exceeds the 25 MB limit.': 'programFileTooLarge',
+  'Program not found.': 'programNotFound',
+  'Program file not found.': 'programFileNotFound',
+  'Program file is unavailable.': 'programFileUnavailable',
+  'Program material not found.': 'programMaterialNotFound',
+  'Program material is unavailable.': 'programMaterialUnavailable',
+  'Invalid improvement project scope.': 'improvementProjectScopeInvalid',
+  'Improvement project activity is required.':
+    'improvementProjectActivityRequired',
+  'Improvement project activity not found.':
+    'improvementProjectActivityNotFound',
+  'Invalid improvement project date.': 'improvementProjectDateInvalid',
+  'Improvement project concern is required.':
+    'improvementProjectConcernRequired',
+  'Improvement project concern is too long.':
+    'improvementProjectConcernTooLong',
+  'Improvement project recommendation is required.':
+    'improvementProjectRecommendationRequired',
+  'Improvement project recommendation is too long.':
+    'improvementProjectRecommendationTooLong',
+  'Improvement project priority is required.':
+    'improvementProjectPriorityRequired',
+  'Improvement project priority is too long.':
+    'improvementProjectPriorityTooLong',
+  'Improvement project date must fall within a registered period.':
+    'improvementProjectDateOutsidePeriods',
+  'Improvement project photo type not allowed.':
+    'improvementProjectPhotoTypeNotAllowed',
+  'Improvement project photo is empty.': 'improvementProjectPhotoEmpty',
+  'Improvement project photo name is too long.':
+    'improvementProjectPhotoNameTooLong',
+  'Improvement project photo exceeds the 10 MB limit.':
+    'improvementProjectPhotoTooLarge',
+  // 'Only one file per field is allowed.' is shared with meetings, above.
+  'Improvement project not found.': 'improvementProjectNotFound',
+  'Improvement project photo not found.': 'improvementProjectPhotoNotFound',
+  'Improvement project photo is unavailable.':
+    'improvementProjectPhotoUnavailable',
+  'Improvement project template not found.':
+    'improvementProjectTemplateNotFound',
+  'Improvement project template is unavailable.':
+    'improvementProjectTemplateUnavailable',
+  'Material receipt employee is required.': 'materialReceiptEmployeeRequired',
+  'Material receipt employee is too long.': 'materialReceiptEmployeeTooLong',
+  'Material receipt employee registry is required.':
+    'materialReceiptEmployeeRegistryRequired',
+  'Material receipt employee registry is too long.':
+    'materialReceiptEmployeeRegistryTooLong',
+  'Invalid material receipt date.': 'materialReceiptDateInvalid',
+  'Material receipt date must fall within a registered period.':
+    'materialReceiptDateOutsidePeriods',
+  'Material receipt file type not allowed.':
+    'materialReceiptFileTypeNotAllowed',
+  'Material receipt file is empty.': 'materialReceiptFileEmpty',
+  'Material receipt file name is too long.': 'materialReceiptFileNameTooLong',
+  'Material receipt file exceeds the 25 MB limit.':
+    'materialReceiptFileTooLarge',
+  // 'Only one file is allowed.' is the generic upload message, mapped above.
+  'Material receipt not found.': 'materialReceiptNotFound',
+  'Material receipt file not found.': 'materialReceiptFileNotFound',
+  'Material receipt file is unavailable.': 'materialReceiptFileUnavailable',
+  'Material receipt template not found.': 'materialReceiptTemplateNotFound',
+  'Material receipt template is unavailable.':
+    'materialReceiptTemplateUnavailable',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

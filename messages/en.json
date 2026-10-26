@@ -291,6 +291,15 @@
       "label": "Parameter sections",
       "activities": "Activities",
       "periods": "Periods"
+    },
+    "resetPrograms": {
+      "action": "Reset program items",
+      "title": "Reset program items",
+      "question": "Do you really want to reset the program items?",
+      "description": "All current program items and their attachments will be permanently erased and replaced with the five default items. This action cannot be undone.",
+      "confirm": "Reset items",
+      "resetting": "Resetting...",
+      "success": "The program items were reset to the five default items."
     }
   },
   "periods": {
@@ -772,6 +781,322 @@
       "action": "Register periods in Parameters"
     }
   },
+  "programs": {
+    "title": "Program",
+    "description": "Items of the company's ergonomics program: the five fronts, what is checked in each one, the planned actions and the progress, with the current score from 0 to 5.",
+    "count": "{count, plural, =0 {No items registered} one {# item registered} other {# items registered}}.",
+    "complete": "Completed",
+    "score": {
+      "title": "Current score",
+      "ofMax": "of {max}",
+      "valueText": "{value} of {max}"
+    },
+    "types": {
+      "ergonomics-team-and-trainings": "Ergonomics Team and Trainings",
+      "procedures-and-materials": "Procedures and Materials",
+      "priority-list": "Priority List",
+      "ergonomic-projects": "Ergonomic Projects",
+      "improvement-review-and-control": "Review and Control of Improvements"
+    },
+    "materials": {
+      "material-specifications": "Material Specifications",
+      "ergonomics-procedure": "Ergonomics Procedure"
+    },
+    "fields": {
+      "question": "Question",
+      "description": "Description",
+      "actions": "Actions",
+      "responsible": "Responsible",
+      "targetDate": "Target date",
+      "completedPercentage": "Completed percentage",
+      "file": "Attachment",
+      "materials": "Materials"
+    },
+    "days": {
+      "remaining": "{count, plural, one {# day left} other {# days left}}",
+      "passed": "{count, plural, one {# day ago} other {# days ago}}",
+      "today": "Due today"
+    },
+    "viewItem": "View the item {type}",
+    "loadErrorTitle": "The program could not be loaded",
+    "loadErrorDescription": "Try again. If the problem persists, check your connection or access permissions.",
+    "emptyTitle": "No program items registered.",
+    "emptyDescription": "The items of the ergonomics program will appear here, one card per item, as soon as they are registered.",
+    "downloadFile": "Download attachment",
+    "downloadFileNamed": "Download the attachment {name}",
+    "downloadMaterial": "Download",
+    "downloadMaterialNamed": "Download the material {name}",
+    "downloading": "Downloading...",
+    "noFile": "No attachment",
+    "newItem": "New item",
+    "deleteAction": "Delete",
+    "editItem": "Edit the item {type}",
+    "deleteItem": "Delete the item {type}",
+    "created": "Item {type} registered successfully.",
+    "updated": "Item {type} updated successfully.",
+    "deleted": "Item {type} deleted successfully.",
+    "fileRemoved": "Attachment of item {type} removed successfully.",
+    "form": {
+      "newTitle": "New program item",
+      "newDescription": "Choose the front, describe what is checked and the planned actions, and enter the responsible, the target date and the progress.",
+      "editTitle": "Edit program item",
+      "editDescription": "Change the item data, replace the attachment or keep the current one.",
+      "type": "Type",
+      "typePlaceholder": "Select the type",
+      "questionPlaceholder": "E.g.: Is there a clear ergonomics procedure?",
+      "descriptionPlaceholder": "What is checked in this item.",
+      "actionsPlaceholder": "The planned actions, one per line.",
+      "responsiblePlaceholder": "E.g.: Ergonomist",
+      "fileHint": "Optional. {extensions} up to {max} MB.",
+      "fileSelected": "Chosen file: {name}",
+      "fileKeepHint": "Leave the field blank to keep the current attachment.",
+      "removeFile": "Remove attachment",
+      "create": "Register item",
+      "creating": "Registering...",
+      "update": "Save changes",
+      "loadError": "Could not load the program item"
+    },
+    "validation": {
+      "typeRequired": "Select the item type.",
+      "questionRequired": "Enter the question.",
+      "questionTooLong": "The question must have at most {max} characters.",
+      "descriptionRequired": "Enter the description.",
+      "descriptionTooLong": "The description must have at most {max} characters.",
+      "actionsRequired": "Enter the actions.",
+      "actionsTooLong": "The actions must have at most {max} characters.",
+      "responsibleRequired": "Enter the responsible.",
+      "responsibleTooLong": "The responsible must have at most {max} characters.",
+      "targetDateRequired": "Enter the target date.",
+      "completedPercentageInvalid": "Enter a whole number from 0 to 100.",
+      "textHint": "Up to {max} characters.",
+      "multilineHint": "Plain text, up to {max} characters. Line breaks are kept.",
+      "targetDateHint": "Calendar day, without time. It may be in the past.",
+      "completedPercentageHint": "Whole number from 0 to 100.",
+      "fileTypeNotAllowed": "File type not accepted. Choose a Word, PowerPoint, PDF or ZIP file.",
+      "fileTooLarge": "The file must be at most {max} MB."
+    },
+    "removeFile": {
+      "title": "Remove attachment",
+      "question": "Do you really want to remove the attachment of item <strong>{type}</strong>?",
+      "description": "The item stays registered, but the attachment stops being served and cannot be recovered.",
+      "confirm": "Remove attachment",
+      "removing": "Removing..."
+    },
+    "delete": {
+      "title": "Delete item",
+      "question": "Do you really want to delete the item <strong>{type}</strong>?",
+      "description": "The deletion is final and cannot be undone. The attachment of the item, if any, is erased too, and the score is recalculated.",
+      "confirm": "Delete item",
+      "deleting": "Deleting..."
+    }
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Records of the program's ergonomic improvement actions: the production and office projects and the receiving of materials.",
+    "tabs": {
+      "label": "Project sections",
+      "production": "Production",
+      "office": "Office"
+    },
+    "types": {
+      "rgp": "Project Register — Production",
+      "rga": "Project Register — Office",
+      "ra": "Receiving Materials"
+    },
+    "shortTypes": {
+      "rga": "RGA",
+      "ra": "RA"
+    },
+    "cards": {
+      "improvementProject": {
+        "title": "Project Register",
+        "description": "Record of each improvement project: activity, concern, recommendation, priority and the before and after photos."
+      },
+      "effectivenessVerification": {
+        "title": "Effectiveness Verification",
+        "description": "Form to follow up the effectiveness of the improvements implemented.",
+        "download": "Download form"
+      },
+      "materialReceipt": {
+        "title": "Receiving Materials",
+        "description": "Record of the materials received by each employee, with the signed receipt form.",
+        "download": "Download form"
+      }
+    },
+    "production": {
+      "count": "{count, plural, =0 {No project register in the selected slice} one {# project register in the selected slice} other {# project registers in the selected slice}}.",
+      "itemLabel": "{count, plural, one {register} other {registers}}",
+      "searchPlaceholder": "Search by code, activity, concern or priority...",
+      "searchLabel": "Search project register",
+      "loadErrorTitle": "The project registers could not be loaded",
+      "loadErrorDescription": "Try again. If the problem persists, check your access permissions.",
+      "emptyTitle": "No project register in the selected slice.",
+      "emptyDescription": "The project registers dated within the chosen period will appear in this listing. Choose another period or every period to see the others.",
+      "noResultsTitle": "No project register found for the search.",
+      "noResultsDescription": "Try adjusting the search by code, activity, concern or priority, or clear the filters."
+    },
+    "office": {
+      "count": "{count, plural, =0 {No project register in the selected slice} one {# project register in the selected slice} other {# project registers in the selected slice}}.",
+      "materialReceiptCount": "{count, plural, =0 {No materials receipt in the selected slice} one {# materials receipt in the selected slice} other {# materials receipts in the selected slice}}.",
+      "itemLabel": "{count, plural, one {record} other {records}}",
+      "searchPlaceholder": "Search by code, type, activity, concern, priority, employee or employee ID...",
+      "searchLabel": "Search office record",
+      "typeFilterLabel": "Filter by type",
+      "allTypes": "All",
+      "loadErrorTitle": "The office records could not be loaded",
+      "loadErrorDescription": "Try again. If the problem persists, check your access permissions.",
+      "emptyTitle": "No office record in the selected slice.",
+      "emptyDescription": "The office project registers and the materials receipts dated within the chosen period will appear in this listing. Choose another period or every period to see the others.",
+      "noResultsTitle": "No office record found for the filters.",
+      "noResultsDescription": "Try adjusting the search or the type, or clear the filters."
+    },
+    "noPeriods": {
+      "title": "No period registered.",
+      "description": "Every record is listed. The period filter depends on a registered period, and a record's date must fall within a period. An administrator can register one in Parameters › Periods."
+    },
+    "columns": {
+      "code": "Code",
+      "type": "Type",
+      "date": "Date",
+      "activity": "Activity",
+      "concern": "Concern",
+      "recommendation": "Improvement recommendation",
+      "priority": "Priority",
+      "employee": "Employee",
+      "employeeRegistry": "Employee ID"
+    },
+    "photos": {
+      "before-photo": "Photo before",
+      "after-photo": "Photo after"
+    },
+    "details": {
+      "title": "Project Register",
+      "photos": "Photos",
+      "noPhoto": "No photo",
+      "photoLoading": "Loading photo...",
+      "photoUnavailable": "Photo unavailable",
+      "photoAlt": "{photo} of {code}: {name}"
+    },
+    "materialReceiptDetails": {
+      "title": "Receiving Materials",
+      "file": "Receipt form",
+      "noFile": "No form",
+      "downloadFile": "Download form",
+      "downloadFileNamed": "Download the receipt form: {name}"
+    },
+    "downloadPhoto": "Download photo",
+    "downloadPhotoNamed": "Download {photo}: {name}",
+    "downloading": "Downloading...",
+    "pdf": {
+      "download": "Download PDF",
+      "downloadBlank": "Download blank PDF",
+      "generating": "Generating PDF...",
+      "error": "Could not generate the PDF. Try again.",
+      "labels": {
+        "concern": "Concern:",
+        "recommendation": "Improvement recommendation:",
+        "date": "Date:",
+        "priority": "Action priority:",
+        "activity": "Activity:",
+        "before": "Before",
+        "after": "After",
+        "ergonomicRisk": "Ergonomic risk:",
+        "photoUnavailable": "Photo unavailable"
+      }
+    },
+    "newImprovementProject": "New project register",
+    "newMaterialReceipt": "New material receipt",
+    "newDisabledHint": "Register a period first: a record date must fall within a period.",
+    "feedback": {
+      "created": "Record {code} created successfully.",
+      "updated": "Record {code} updated successfully.",
+      "deleted": "Record {code} deleted successfully.",
+      "photoRemoved": {
+        "before-photo": "Photo before removed from record {code}.",
+        "after-photo": "Photo after removed from record {code}."
+      },
+      "fileRemoved": "Receipt form removed from record {code}."
+    },
+    "form": {
+      "newTitle": "New project register",
+      "newDescription": "{type}: pick the activity, fill in date, concern, improvement recommendation and action priority, and attach the photos before and after if there are any already.",
+      "editTitle": "Edit project register",
+      "editDescription": "{type}: change the record data and replace the photo before, the photo after or both, or keep the current photos.",
+      "activityPlaceholder": "Select the activity",
+      "activityHint": "A registered activity, identified by code and name.",
+      "activitiesLoading": "Loading activities...",
+      "activitiesLoadError": "Could not load the activities, and the record cannot be saved without them.",
+      "activitiesEmpty": "No activity registered. An administrator can register them in Parameters › Activities.",
+      "concernPlaceholder": "E.g.: Trunk flexion when picking parts from the floor",
+      "recommendationPlaceholder": "E.g.: Raise the pallet with a scissor lift table",
+      "priority": "Action priority",
+      "priorityPlaceholder": "E.g.: High",
+      "fileHint": "Optional. {extensions} up to {max} MB, of any dimensions.",
+      "fileSelected": "Chosen file: {name}",
+      "downloadFile": "Download",
+      "downloadFileNamed": "Download {file}: {name}",
+      "photoKeepHint": {
+        "before-photo": "Leave the field blank to keep the current photo before.",
+        "after-photo": "Leave the field blank to keep the current photo after."
+      },
+      "removePhoto": {
+        "before-photo": "Remove photo before",
+        "after-photo": "Remove photo after"
+      },
+      "create": "Create record",
+      "creating": "Creating...",
+      "update": "Save changes",
+      "loadError": "Could not load the project register",
+      "loadErrorPeriods": "Could not load the periods",
+      "newReceiptTitle": "New material receipt",
+      "newReceiptDescription": "Receiving Materials: fill in employee, employee ID and date, and attach the receipt form if there is one already.",
+      "editReceiptTitle": "Edit material receipt",
+      "editReceiptDescription": "Receiving Materials: change the record data and replace the receipt form or keep the current one.",
+      "employeePlaceholder": "E.g.: John Smith",
+      "employeeRegistryPlaceholder": "E.g.: 004512",
+      "receiptFileHint": "Optional. {extensions} up to {max} MB.",
+      "receiptFileKeepHint": "Leave the field blank to keep the current receipt form.",
+      "removeReceiptFile": "Remove form",
+      "createReceipt": "Create receipt",
+      "loadReceiptError": "Could not load the material receipt"
+    },
+    "validation": {
+      "activityRequired": "Select the activity.",
+      "dateRequired": "Enter a valid date for the record.",
+      "dateOutsidePeriods": "The date must fall within a registered period.",
+      "dateHint": "Calendar day, within a registered period.",
+      "concernRequired": "Enter the concern.",
+      "concernTooLong": "The concern must have at most {max} characters.",
+      "recommendationRequired": "Enter the improvement recommendation.",
+      "recommendationTooLong": "The improvement recommendation must have at most {max} characters.",
+      "priorityRequired": "Enter the action priority.",
+      "priorityTooLong": "The action priority must have at most {max} characters.",
+      "textHint": "Up to {max} characters.",
+      "photoTypeNotAllowed": "Photo type not allowed. Choose a JPEG or PNG image.",
+      "photoTooLarge": "The photo must be at most {max} MB.",
+      "employeeRequired": "Enter the employee.",
+      "employeeTooLong": "The employee must have at most {max} characters.",
+      "employeeRegistryRequired": "Enter the employee ID.",
+      "employeeRegistryTooLong": "The employee ID must have at most {max} characters.",
+      "receiptFileTypeNotAllowed": "File type not allowed. Choose a Word, PowerPoint or PDF file.",
+      "receiptFileTooLarge": "The receipt form must be at most {max} MB."
+    },
+    "delete": {
+      "action": "Delete",
+      "title": "Delete record",
+      "question": "Do you really want to delete the record <strong>{code}</strong>?",
+      "description": "The deletion is final and cannot be undone. The attachments of the record, if any, are erased with it and cannot be recovered. The code will not be reused.",
+      "confirm": "Delete record",
+      "deleting": "Deleting..."
+    },
+    "removeFile": {
+      "title": "Remove attachment",
+      "question": "Do you really want to remove <strong>{file}</strong> from record <strong>{code}</strong>?",
+      "description": "The record and its other attachments stay registered, but this file is erased and cannot be recovered.",
+      "confirm": "Remove attachment",
+      "removing": "Removing..."
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -879,6 +1204,61 @@
     "status404": "The requested record was not found.",
     "status409": "There is already a record with this information.",
     "status500": "Something went wrong on the server. Try again later.",
-    "unexpected": "Something unexpected happened. Try again."
+    "unexpected": "Something unexpected happened. Try again.",
+    "programTypeInvalid": "Select a valid program item type.",
+    "programQuestionRequired": "Enter the question of the program item.",
+    "programQuestionTooLong": "The question of the program item must have at most 255 characters.",
+    "programDescriptionRequired": "Enter the description of the program item.",
+    "programDescriptionTooLong": "The description of the program item must have at most 5,000 characters.",
+    "programActionsRequired": "Enter the actions of the program item.",
+    "programActionsTooLong": "The actions of the program item must have at most 5,000 characters.",
+    "programResponsibleRequired": "Enter who is responsible for the program item.",
+    "programResponsibleTooLong": "The responsible for the program item must have at most 255 characters.",
+    "programTargetDateInvalid": "Enter a valid target date for the program item.",
+    "programCompletedPercentageInvalid": "The completed percentage must be a whole number from 0 to 100.",
+    "programFileTypeNotAllowed": "File type not accepted. Send a Word, PowerPoint, PDF or ZIP file.",
+    "programFileEmpty": "The file sent is empty.",
+    "programFileNameTooLong": "The file name must have at most 255 characters.",
+    "programFileTooLarge": "The file must be at most 25 MB.",
+    "programNotFound": "Program item not found.",
+    "programFileNotFound": "This program item has no attachment.",
+    "programFileUnavailable": "The attachment of this program item could not be delivered. Try again later.",
+    "programMaterialNotFound": "Program material not found.",
+    "programMaterialUnavailable": "The program material could not be delivered. Try again later.",
+    "improvementProjectScopeInvalid": "Select a valid project register type.",
+    "improvementProjectActivityRequired": "Select the project register's activity.",
+    "improvementProjectActivityNotFound": "The chosen activity was not found. It may have been deleted.",
+    "improvementProjectDateInvalid": "Enter a valid date for the project register.",
+    "improvementProjectConcernRequired": "Enter the project register's concern.",
+    "improvementProjectConcernTooLong": "The concern must have at most 255 characters.",
+    "improvementProjectRecommendationRequired": "Enter the improvement recommendation.",
+    "improvementProjectRecommendationTooLong": "The improvement recommendation must have at most 255 characters.",
+    "improvementProjectPriorityRequired": "Enter the action priority.",
+    "improvementProjectPriorityTooLong": "The action priority must have at most 255 characters.",
+    "improvementProjectDateOutsidePeriods": "The project register date must fall within a registered period.",
+    "improvementProjectPhotoTypeNotAllowed": "Photo type not accepted. Send a JPG or PNG image.",
+    "improvementProjectPhotoEmpty": "The photo you sent is empty.",
+    "improvementProjectPhotoNameTooLong": "The photo name must have at most 255 characters.",
+    "improvementProjectPhotoTooLarge": "The photo must be at most 10 MB.",
+    "improvementProjectNotFound": "Project register not found.",
+    "improvementProjectPhotoNotFound": "This project register does not have the requested photo.",
+    "improvementProjectPhotoUnavailable": "The photo of this project register could not be delivered. Try again later.",
+    "improvementProjectTemplateNotFound": "Project form not found.",
+    "improvementProjectTemplateUnavailable": "The form could not be delivered. Try again later.",
+    "materialReceiptEmployeeRequired": "Enter the materials receipt's employee.",
+    "materialReceiptEmployeeTooLong": "The employee must have at most 255 characters.",
+    "materialReceiptEmployeeRegistryRequired": "Enter the employee ID.",
+    "materialReceiptEmployeeRegistryTooLong": "The employee ID must have at most 255 characters.",
+    "materialReceiptDateInvalid": "Enter a valid date for the materials receipt.",
+    "materialReceiptDateOutsidePeriods": "The materials receipt date must fall within a registered period.",
+    "materialReceiptFileTypeNotAllowed": "File type not accepted. Send a Word, PowerPoint or PDF file.",
+    "materialReceiptFileEmpty": "The file you sent is empty.",
+    "materialReceiptFileNameTooLong": "The file name must have at most 255 characters.",
+    "materialReceiptFileTooLarge": "The file must be at most 25 MB.",
+    "materialReceiptNotFound": "Materials receipt not found.",
+    "materialReceiptFileNotFound": "This materials receipt has no receipt form.",
+    "materialReceiptFileUnavailable": "The receipt form could not be delivered. Try again later.",
+    "materialReceiptTemplateNotFound": "Receiving materials form not found.",
+    "materialReceiptTemplateUnavailable": "The receiving materials form could not be delivered. Try again later."
   }
 }
