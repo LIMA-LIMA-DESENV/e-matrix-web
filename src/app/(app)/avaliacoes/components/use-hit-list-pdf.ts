@@ -24,7 +24,7 @@ import { formatEvaluationActivity } from './listing'
  * The 10 Hit List items, in the order of the legacy report and of the API
  * catalog: the key of their answers, of their image and of their name.
  */
-const HIT_LIST_ITEMS = [
+export const HIT_LIST_ITEMS = [
   'washRag',
   'elbowsOut',
   'shoulderHighLow',

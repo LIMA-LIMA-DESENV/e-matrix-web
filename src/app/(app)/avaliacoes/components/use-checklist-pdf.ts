@@ -3,12 +3,7 @@
 import { useFormatter, useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 
-import {
-  type Checklist,
-  type ChecklistAnswers,
-  type ChecklistBlockScore,
-  getEvaluationsChecklistsId,
-} from '@/http/api'
+import { type Checklist, getEvaluationsChecklistsId } from '@/http/api'
 import { saveBlobAsFile } from '@/lib/download-file'
 import { toExportFileName } from '@/lib/export/table'
 import { useFormatDateOnly } from '@/lib/format-date'
@@ -18,48 +13,12 @@ import type {
   ChecklistPdfRecord,
 } from '@/lib/pdf/checklist-pdf'
 
+import {
+  CHECKLIST_BLOCKS,
+  checklistAnswerOf,
+  formatChecklistPercentage,
+} from './checklist-blocks'
 import { formatEvaluationActivity } from './listing'
-
-type ChecklistBlockName = ChecklistBlockScore['block']
-
-/**
- * The 11 blocks of the Coleta de Dados In Loco, in the order of the legacy
- * form and of the API score, with their questions and the ones whose expected
- * answer is "no" (`equal: false` in the legacy `checklist.pdf.twig`, the
- * `ratedValue` of `CheckList::calculate`). The web's single source of the
- * points of each option: the expected answer is worth 1, the other 0.
- */
-const CHECKLIST_BLOCKS = [
-  { block: 'layout', questions: [1, 2, 3], expectedNo: [3] },
-  {
-    block: 'physical_environment',
-    questions: [4, 5, 6, 7, 8],
-    expectedNo: [6, 7, 8],
-  },
-  { block: 'posture', questions: [9, 10, 11, 12, 13], expectedNo: [12, 13] },
-  { block: 'work_organization', questions: [14, 15, 16], expectedNo: [] },
-  { block: 'chair', questions: [17, 18, 19, 20, 21, 22, 23], expectedNo: [] },
-  {
-    block: 'monitor',
-    questions: [24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
-    expectedNo: [30, 31, 32, 33, 34],
-  },
-  {
-    block: 'desk',
-    questions: [35, 36, 37, 38, 39, 40, 41, 42],
-    expectedNo: [],
-  },
-  { block: 'keyboard', questions: [43, 44], expectedNo: [] },
-  { block: 'cabinet_cpu', questions: [45, 46, 47], expectedNo: [45, 46, 47] },
-  { block: 'accessories', questions: [48, 49, 50, 51, 52], expectedNo: [] },
-  { block: 'laptop', questions: [53, 54, 55], expectedNo: [] },
-] as const satisfies readonly {
-  block: ChecklistBlockName
-  questions: readonly number[]
-  expectedNo: readonly number[]
-}[]
-
-type QuestionNumber = (typeof CHECKLIST_BLOCKS)[number]['questions'][number]
 
 const BANDS = ['excellent', 'good', 'reasonable', 'bad', 'terrible'] as const
 
@@ -70,12 +29,6 @@ const BLANK: PdfTarget = 'blank'
 
 /** The blank form's file (H-4). */
 const BLANK_FILE_NAME = 'coleta-de-dados.pdf'
-
-/** A yes/no answer: `null` marks neither option. */
-function answerOf(answers: ChecklistAnswers, n: QuestionNumber) {
-  const value = answers[`question${n}`]
-  return typeof value === 'boolean' ? value : null
-}
 
 /**
  * Generates in the browser the report of a Coleta de Dados In Loco and its
@@ -97,8 +50,10 @@ export function useChecklistPdf(onError: (message: string) => void) {
 
   /** `60%`, `96,36%` in pt-BR and es, `96.36%` in en; `null` is blank. */
   function percentage(value: number | null | undefined) {
-    if (typeof value !== 'number') return ''
-    return `${format.number(value, { maximumFractionDigits: 2 })}%`
+    return formatChecklistPercentage(
+      (number, options) => format.number(number, options),
+      value
+    )
   }
 
   function labels(): ChecklistPdfLabels {
@@ -135,7 +90,9 @@ export function useChecklistPdf(onError: (message: string) => void) {
         title: t(`pdf.checklist.blocks.${block}`),
         questions: questions.map((n) => {
           const expected = !(expectedNo as readonly number[]).includes(n)
-          const answer = checklist ? answerOf(checklist.answers, n) : null
+          const answer = checklist
+            ? checklistAnswerOf(checklist.answers, n)
+            : null
 
           return {
             number: n,
