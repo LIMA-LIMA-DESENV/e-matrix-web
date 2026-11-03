@@ -669,6 +669,146 @@ export interface ChecklistItem {
   updated_at: string;
 }
 
+/**
+ * The answers of a Coleta de Dados write: question1..55, every one optional. A key outside them is refused, not ignored. true is yes, false is no; null is the same as leaving the question out, which has no answer and does not score. The PUT replaces every answer: a key left out loses its value.
+ */
+export interface ChecklistAnswersInput {
+  /** @nullable */
+  question1?: boolean | null;
+  /** @nullable */
+  question2?: boolean | null;
+  /** @nullable */
+  question3?: boolean | null;
+  /** @nullable */
+  question4?: boolean | null;
+  /** @nullable */
+  question5?: boolean | null;
+  /** @nullable */
+  question6?: boolean | null;
+  /** @nullable */
+  question7?: boolean | null;
+  /** @nullable */
+  question8?: boolean | null;
+  /** @nullable */
+  question9?: boolean | null;
+  /** @nullable */
+  question10?: boolean | null;
+  /** @nullable */
+  question11?: boolean | null;
+  /** @nullable */
+  question12?: boolean | null;
+  /** @nullable */
+  question13?: boolean | null;
+  /** @nullable */
+  question14?: boolean | null;
+  /** @nullable */
+  question15?: boolean | null;
+  /** @nullable */
+  question16?: boolean | null;
+  /** @nullable */
+  question17?: boolean | null;
+  /** @nullable */
+  question18?: boolean | null;
+  /** @nullable */
+  question19?: boolean | null;
+  /** @nullable */
+  question20?: boolean | null;
+  /** @nullable */
+  question21?: boolean | null;
+  /** @nullable */
+  question22?: boolean | null;
+  /** @nullable */
+  question23?: boolean | null;
+  /** @nullable */
+  question24?: boolean | null;
+  /** @nullable */
+  question25?: boolean | null;
+  /** @nullable */
+  question26?: boolean | null;
+  /** @nullable */
+  question27?: boolean | null;
+  /** @nullable */
+  question28?: boolean | null;
+  /** @nullable */
+  question29?: boolean | null;
+  /** @nullable */
+  question30?: boolean | null;
+  /** @nullable */
+  question31?: boolean | null;
+  /** @nullable */
+  question32?: boolean | null;
+  /** @nullable */
+  question33?: boolean | null;
+  /** @nullable */
+  question34?: boolean | null;
+  /** @nullable */
+  question35?: boolean | null;
+  /** @nullable */
+  question36?: boolean | null;
+  /** @nullable */
+  question37?: boolean | null;
+  /** @nullable */
+  question38?: boolean | null;
+  /** @nullable */
+  question39?: boolean | null;
+  /** @nullable */
+  question40?: boolean | null;
+  /** @nullable */
+  question41?: boolean | null;
+  /** @nullable */
+  question42?: boolean | null;
+  /** @nullable */
+  question43?: boolean | null;
+  /** @nullable */
+  question44?: boolean | null;
+  /** @nullable */
+  question45?: boolean | null;
+  /** @nullable */
+  question46?: boolean | null;
+  /** @nullable */
+  question47?: boolean | null;
+  /** @nullable */
+  question48?: boolean | null;
+  /** @nullable */
+  question49?: boolean | null;
+  /** @nullable */
+  question50?: boolean | null;
+  /** @nullable */
+  question51?: boolean | null;
+  /** @nullable */
+  question52?: boolean | null;
+  /** @nullable */
+  question53?: boolean | null;
+  /** @nullable */
+  question54?: boolean | null;
+  /** @nullable */
+  question55?: boolean | null;
+}
+
+/**
+ * The fields of a Coleta de Dados creation or update, as JSON. Any other top-level field (id, number, code, score, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface ChecklistInput {
+  /** An existing activity (see GET /evaluations/checklists/activities) */
+  activity_id: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  name: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  sector: string;
+  /** Required: a real calendar day, YYYY-MM-DD */
+  date: string;
+  /** Absent or null is the same as {}: no answer at all */
+  answers?: ChecklistAnswersInput | null;
+}
+
 export type HitListAnswersImprovement1SelectedItem = typeof HitListAnswersImprovement1SelectedItem[keyof typeof HitListAnswersImprovement1SelectedItem];
 
 
@@ -1799,6 +1939,889 @@ export interface MatrixFieldInput {
      * @nullable
      */
   value: string | null;
+}
+
+export type HitListAnswersInputImprovement1SelectedItem = typeof HitListAnswersInputImprovement1SelectedItem[keyof typeof HitListAnswersInputImprovement1SelectedItem];
+
+
+export const HitListAnswersInputImprovement1SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement2SelectedItem = typeof HitListAnswersInputImprovement2SelectedItem[keyof typeof HitListAnswersInputImprovement2SelectedItem];
+
+
+export const HitListAnswersInputImprovement2SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement3SelectedItem = typeof HitListAnswersInputImprovement3SelectedItem[keyof typeof HitListAnswersInputImprovement3SelectedItem];
+
+
+export const HitListAnswersInputImprovement3SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement4SelectedItem = typeof HitListAnswersInputImprovement4SelectedItem[keyof typeof HitListAnswersInputImprovement4SelectedItem];
+
+
+export const HitListAnswersInputImprovement4SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement5SelectedItem = typeof HitListAnswersInputImprovement5SelectedItem[keyof typeof HitListAnswersInputImprovement5SelectedItem];
+
+
+export const HitListAnswersInputImprovement5SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement6SelectedItem = typeof HitListAnswersInputImprovement6SelectedItem[keyof typeof HitListAnswersInputImprovement6SelectedItem];
+
+
+export const HitListAnswersInputImprovement6SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement7SelectedItem = typeof HitListAnswersInputImprovement7SelectedItem[keyof typeof HitListAnswersInputImprovement7SelectedItem];
+
+
+export const HitListAnswersInputImprovement7SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement8SelectedItem = typeof HitListAnswersInputImprovement8SelectedItem[keyof typeof HitListAnswersInputImprovement8SelectedItem];
+
+
+export const HitListAnswersInputImprovement8SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement9SelectedItem = typeof HitListAnswersInputImprovement9SelectedItem[keyof typeof HitListAnswersInputImprovement9SelectedItem];
+
+
+export const HitListAnswersInputImprovement9SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersInputImprovement10SelectedItem = typeof HitListAnswersInputImprovement10SelectedItem[keyof typeof HitListAnswersInputImprovement10SelectedItem];
+
+
+export const HitListAnswersInputImprovement10SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+/**
+ * The answers of a Hit List write. Every key is optional and must belong to the Hit List catalog (the legacy camelCase keys): an unknown key is refused, not ignored. Texts are trimmed, an empty text is stored as absent and the limit is 5000 characters (code points) after the trim; booleans are true or false; item lists hold known item keys with no repetition. null, an empty text and an empty list are stored as absent and read back as null. The PUT replaces every answer: a key left out loses its value.
+ */
+export interface HitListAnswersInput {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  department?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  site?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  turn?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  station?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  product?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task5?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task6?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task7?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  task8?: string | null;
+  /** @nullable */
+  washRag?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  washRagImprovements?: string | null;
+  /** @nullable */
+  elbowsOut?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  elbowsOutImprovements?: string | null;
+  /** @nullable */
+  shoulderHighLow?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  shoulderHighLowImprovements?: string | null;
+  /** @nullable */
+  hungryHead?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  hungryHeadImprovements?: string | null;
+  /** @nullable */
+  buttsUp?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  buttsUpImprovements?: string | null;
+  /** @nullable */
+  twistAndShout?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  twistAndShoutImprovements?: string | null;
+  /** @nullable */
+  horizontalDistance?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  horizontalDistanceImprovements?: string | null;
+  /** @nullable */
+  sitStand?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sitStandImprovements?: string | null;
+  /** @nullable */
+  badVibes?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  badVibesImprovements?: string | null;
+  /** @nullable */
+  contact?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactTask1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactTask2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactTask3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactTask4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactRootCause1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactRootCause2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactRootCause3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactRootCause4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  contactImprovements?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesA?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesB?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesC?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesD?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesE?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesF?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesG?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  rootCausesH?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement1?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement1Selected?: HitListAnswersInputImprovement1SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement2?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement2Selected?: HitListAnswersInputImprovement2SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement3?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement3Selected?: HitListAnswersInputImprovement3SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement4?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement4Selected?: HitListAnswersInputImprovement4SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement5?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement5Selected?: HitListAnswersInputImprovement5SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement6?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement6Selected?: HitListAnswersInputImprovement6SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement7?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement7Selected?: HitListAnswersInputImprovement7SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement8?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement8Selected?: HitListAnswersInputImprovement8SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement9?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement9Selected?: HitListAnswersInputImprovement9SelectedItem[] | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvement10?: string | null;
+  /**
+     * Item keys the improvement addresses, with no repetition; stored in the order of the items, whatever order was sent. An empty list is stored as absent
+     * @nullable
+     */
+  improvement10Selected?: HitListAnswersInputImprovement10SelectedItem[] | null;
+  /** @nullable */
+  isAnotherWorkstationAffected?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  anotherWorkstationAffected?: string | null;
+  /** @nullable */
+  isCreatedOtherProblem?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  createdOtherProblem?: string | null;
+  /** @nullable */
+  isProblemSolved?: boolean | null;
+  /** @nullable */
+  isEngineeringAware?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  engineeringAware?: string | null;
+  /** @nullable */
+  documentNeedUpdate?: boolean | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  responsibleEngineeringToUpdateDoc?: string | null;
+}
+
+/**
+ * The fields of a Hit List creation or update, as JSON. Any other top-level field (id, number, code, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface HitListInput {
+  /** An existing activity (see GET /evaluations/hit-lists/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD */
+  assessment_date: string;
+  /** Absent or null is the same as {}: no answer at all */
+  answers?: HitListAnswersInput | null;
 }
 
 export type PostSessionsBody = {
@@ -11385,7 +12408,7 @@ export const getGetEvaluationsHitListsUrl = () => {
 }
 
 /**
- * Every hit list of the installation (the Produção tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers are only in the detail. Requires only an authenticated user, so any role, and hit_list enabled by EVALUATION_TYPES. There is no write route in this delivery.
+ * Every hit list of the installation (the Produção tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers are only in the detail. Requires only an authenticated user, so any role, and hit_list enabled by EVALUATION_TYPES.
  * @summary List hit lists
  */
 export const getEvaluationsHitLists = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsHitListsResponse> => {
@@ -11466,6 +12489,255 @@ export function useGetEvaluationsHitLists<TData = Awaited<ReturnType<typeof getE
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetEvaluationsHitListsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsHitListsResponse201 = {
+  data: HitList
+  status: 201
+}
+
+export type postEvaluationsHitListsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsHitListsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsHitListsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsHitListsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsHitListsResponseSuccess = (postEvaluationsHitListsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsHitListsResponseError = (postEvaluationsHitListsResponse400 | postEvaluationsHitListsResponse401 | postEvaluationsHitListsResponse403 | postEvaluationsHitListsResponse404) & {
+  headers: Headers;
+};
+
+export type postEvaluationsHitListsResponse = (postEvaluationsHitListsResponseSuccess | postEvaluationsHitListsResponseError)
+
+export const getPostEvaluationsHitListsUrl = () => {
+
+
+
+
+  return `/evaluations/hit-lists`
+}
+
+/**
+ * Creates a Hit List from a JSON body. The number is the next one of the hit lists sequence, taken inside the INSERT, and is never handed out again, not even after the hit list is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new hit list (409 there) or finished first (400 here), never a foreign key violation. Answers the same body as GET /evaluations/hit-lists/{id}. Not idempotent: sending it again creates another hit list. Requires the user or admin role and hit_list enabled by EVALUATION_TYPES.
+ * @summary Create hit list
+ */
+export const postEvaluationsHitLists = async (hitListInput: HitListInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsHitListsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsHitListsResponse>(getPostEvaluationsHitListsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(hitListInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsHitListsMutationKey = () => ['postEvaluationsHitLists'] as const;
+
+export const getPostEvaluationsHitListsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsHitLists>>, TError,PostEvaluationsHitListsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsHitLists>>, TError,PostEvaluationsHitListsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsHitListsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsHitLists>>, PostEvaluationsHitListsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsHitLists(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsHitListsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsHitLists>>>
+    export type PostEvaluationsHitListsMutationBody = HitListInput
+    export type PostEvaluationsHitListsMutationError = ErrorResponse
+    export type PostEvaluationsHitListsMutationVariables = {data: HitListInput}
+
+    /**
+ * @summary Create hit list
+ */
+export const usePostEvaluationsHitLists = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsHitLists>>, TError,PostEvaluationsHitListsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsHitLists>>,
+        TError,
+        PostEvaluationsHitListsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsHitListsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsHitListsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsHitListsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsHitListsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsHitListsActivitiesResponseSuccess = (getEvaluationsHitListsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsHitListsActivitiesResponseError = (getEvaluationsHitListsActivitiesResponse401 | getEvaluationsHitListsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsHitListsActivitiesResponse = (getEvaluationsHitListsActivitiesResponseSuccess | getEvaluationsHitListsActivitiesResponseError)
+
+export const getGetEvaluationsHitListsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/hit-lists/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Hit List form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and hit_list enabled by EVALUATION_TYPES.
+ * @summary List the activities a hit list can belong to
+ */
+export const getEvaluationsHitListsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsHitListsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsHitListsActivitiesResponse>(getGetEvaluationsHitListsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsHitListsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/hit-lists/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsHitListsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsHitListsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>> = ({ signal }) => getEvaluationsHitListsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsHitListsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>>
+export type GetEvaluationsHitListsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsHitListsActivities<TData = Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitListsActivities<TData = Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitListsActivities<TData = Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a hit list can belong to
+ */
+
+export function useGetEvaluationsHitListsActivities<TData = Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsHitListsActivitiesQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -11604,6 +12876,234 @@ export function useGetEvaluationsHitListsId<TData = Awaited<ReturnType<typeof ge
 
 
 
+export type putEvaluationsHitListsIdResponse200 = {
+  data: HitList
+  status: 200
+}
+
+export type putEvaluationsHitListsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsHitListsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsHitListsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsHitListsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsHitListsIdResponseSuccess = (putEvaluationsHitListsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsHitListsIdResponseError = (putEvaluationsHitListsIdResponse400 | putEvaluationsHitListsIdResponse401 | putEvaluationsHitListsIdResponse403 | putEvaluationsHitListsIdResponse404) & {
+  headers: Headers;
+};
+
+export type putEvaluationsHitListsIdResponse = (putEvaluationsHitListsIdResponseSuccess | putEvaluationsHitListsIdResponseError)
+
+export const getPutEvaluationsHitListsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/hit-lists/${id}`
+}
+
+/**
+ * Replaces every field of a Hit List with the JSON body: the activity may change, and an answer left out of answers loses its value (absent answers empties them all). number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the hit list will point at is locked (shared) and then the hit list's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/hit-lists/{id}. Requires the user or admin role and hit_list enabled by EVALUATION_TYPES.
+ * @summary Update hit list
+ */
+export const putEvaluationsHitListsId = async (id: string,
+    hitListInput: HitListInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsHitListsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsHitListsIdResponse>(getPutEvaluationsHitListsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(hitListInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsHitListsIdMutationKey = () => ['putEvaluationsHitListsId'] as const;
+
+export const getPutEvaluationsHitListsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsHitListsId>>, TError,PutEvaluationsHitListsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsHitListsId>>, TError,PutEvaluationsHitListsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsHitListsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsHitListsId>>, PutEvaluationsHitListsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsHitListsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsHitListsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsHitListsId>>>
+    export type PutEvaluationsHitListsIdMutationBody = HitListInput
+    export type PutEvaluationsHitListsIdMutationError = ErrorResponse
+    export type PutEvaluationsHitListsIdMutationVariables = {id: string;data: HitListInput}
+
+    /**
+ * @summary Update hit list
+ */
+export const usePutEvaluationsHitListsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsHitListsId>>, TError,PutEvaluationsHitListsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsHitListsId>>,
+        TError,
+        PutEvaluationsHitListsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsHitListsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsHitListsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsHitListsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsHitListsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsHitListsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsHitListsIdResponseSuccess = (deleteEvaluationsHitListsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsHitListsIdResponseError = (deleteEvaluationsHitListsIdResponse401 | deleteEvaluationsHitListsIdResponse403 | deleteEvaluationsHitListsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsHitListsIdResponse = (deleteEvaluationsHitListsIdResponseSuccess | deleteEvaluationsHitListsIdResponseError)
+
+export const getDeleteEvaluationsHitListsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/hit-lists/${id}`
+}
+
+/**
+ * Deletes a Hit List permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same hit list again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and hit_list enabled by EVALUATION_TYPES.
+ * @summary Delete hit list
+ */
+export const deleteEvaluationsHitListsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsHitListsIdResponse> => {
+
+  return customFetch<deleteEvaluationsHitListsIdResponse>(getDeleteEvaluationsHitListsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsHitListsIdMutationKey = () => ['deleteEvaluationsHitListsId'] as const;
+
+export const getDeleteEvaluationsHitListsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>, TError,DeleteEvaluationsHitListsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>, TError,DeleteEvaluationsHitListsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsHitListsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>, DeleteEvaluationsHitListsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsHitListsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsHitListsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>>
+
+    export type DeleteEvaluationsHitListsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsHitListsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete hit list
+ */
+export const useDeleteEvaluationsHitListsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>, TError,DeleteEvaluationsHitListsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsHitListsId>>,
+        TError,
+        DeleteEvaluationsHitListsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsHitListsIdMutationOptions(options), queryClient);
+    }
+
 export type getEvaluationsChecklistsResponse200 = {
   data: ChecklistItem[]
   status: 200
@@ -11637,7 +13137,7 @@ export const getGetEvaluationsChecklistsUrl = () => {
 }
 
 /**
- * Every Coleta de Dados In Loco of the installation (the Escritório tab of the legacy evaluations, CheckList in the legacy code), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers and the score are only in the detail. Requires only an authenticated user, so any role, and checklist enabled by EVALUATION_TYPES. There is no write route in this delivery.
+ * Every Coleta de Dados In Loco of the installation (the Escritório tab of the legacy evaluations, CheckList in the legacy code), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers and the score are only in the detail. Requires only an authenticated user, so any role, and checklist enabled by EVALUATION_TYPES.
  * @summary List checklists
  */
 export const getEvaluationsChecklists = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChecklistsResponse> => {
@@ -11718,6 +13218,255 @@ export function useGetEvaluationsChecklists<TData = Awaited<ReturnType<typeof ge
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetEvaluationsChecklistsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsChecklistsResponse201 = {
+  data: Checklist
+  status: 201
+}
+
+export type postEvaluationsChecklistsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsChecklistsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsChecklistsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsChecklistsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsChecklistsResponseSuccess = (postEvaluationsChecklistsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsChecklistsResponseError = (postEvaluationsChecklistsResponse400 | postEvaluationsChecklistsResponse401 | postEvaluationsChecklistsResponse403 | postEvaluationsChecklistsResponse404) & {
+  headers: Headers;
+};
+
+export type postEvaluationsChecklistsResponse = (postEvaluationsChecklistsResponseSuccess | postEvaluationsChecklistsResponseError)
+
+export const getPostEvaluationsChecklistsUrl = () => {
+
+
+
+
+  return `/evaluations/checklists`
+}
+
+/**
+ * Creates a Coleta de Dados In Loco from a JSON body. The number is the next one of the checklists sequence, taken inside the INSERT, and is never handed out again, not even after the checklist is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new checklist (409 there) or finished first (400 here), never a foreign key violation. Answers the same body as GET /evaluations/checklists/{id}, score included. Not idempotent: sending it again creates another checklist. Requires the user or admin role and checklist enabled by EVALUATION_TYPES.
+ * @summary Create checklist
+ */
+export const postEvaluationsChecklists = async (checklistInput: ChecklistInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsChecklistsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsChecklistsResponse>(getPostEvaluationsChecklistsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(checklistInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsChecklistsMutationKey = () => ['postEvaluationsChecklists'] as const;
+
+export const getPostEvaluationsChecklistsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChecklists>>, TError,PostEvaluationsChecklistsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChecklists>>, TError,PostEvaluationsChecklistsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsChecklistsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsChecklists>>, PostEvaluationsChecklistsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsChecklists(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsChecklistsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsChecklists>>>
+    export type PostEvaluationsChecklistsMutationBody = ChecklistInput
+    export type PostEvaluationsChecklistsMutationError = ErrorResponse
+    export type PostEvaluationsChecklistsMutationVariables = {data: ChecklistInput}
+
+    /**
+ * @summary Create checklist
+ */
+export const usePostEvaluationsChecklists = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChecklists>>, TError,PostEvaluationsChecklistsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsChecklists>>,
+        TError,
+        PostEvaluationsChecklistsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsChecklistsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsChecklistsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsChecklistsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChecklistsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChecklistsActivitiesResponseSuccess = (getEvaluationsChecklistsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChecklistsActivitiesResponseError = (getEvaluationsChecklistsActivitiesResponse401 | getEvaluationsChecklistsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChecklistsActivitiesResponse = (getEvaluationsChecklistsActivitiesResponseSuccess | getEvaluationsChecklistsActivitiesResponseError)
+
+export const getGetEvaluationsChecklistsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/checklists/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Coleta de Dados form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and checklist enabled by EVALUATION_TYPES.
+ * @summary List the activities a checklist can belong to
+ */
+export const getEvaluationsChecklistsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChecklistsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsChecklistsActivitiesResponse>(getGetEvaluationsChecklistsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChecklistsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/checklists/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChecklistsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChecklistsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>> = ({ signal }) => getEvaluationsChecklistsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChecklistsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>>
+export type GetEvaluationsChecklistsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChecklistsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklistsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklistsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a checklist can belong to
+ */
+
+export function useGetEvaluationsChecklistsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChecklistsActivitiesQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -11849,3 +13598,237 @@ export function useGetEvaluationsChecklistsId<TData = Awaited<ReturnType<typeof 
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export type putEvaluationsChecklistsIdResponse200 = {
+  data: Checklist
+  status: 200
+}
+
+export type putEvaluationsChecklistsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsChecklistsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsChecklistsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsChecklistsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsChecklistsIdResponseSuccess = (putEvaluationsChecklistsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsChecklistsIdResponseError = (putEvaluationsChecklistsIdResponse400 | putEvaluationsChecklistsIdResponse401 | putEvaluationsChecklistsIdResponse403 | putEvaluationsChecklistsIdResponse404) & {
+  headers: Headers;
+};
+
+export type putEvaluationsChecklistsIdResponse = (putEvaluationsChecklistsIdResponseSuccess | putEvaluationsChecklistsIdResponseError)
+
+export const getPutEvaluationsChecklistsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/checklists/${id}`
+}
+
+/**
+ * Replaces every field of a Coleta de Dados In Loco with the JSON body: the activity may change, and an answer left out of answers loses its value (absent answers empties them all), so the score follows. number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the checklist will point at is locked (shared) and then the checklist's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/checklists/{id}. Requires the user or admin role and checklist enabled by EVALUATION_TYPES.
+ * @summary Update checklist
+ */
+export const putEvaluationsChecklistsId = async (id: string,
+    checklistInput: ChecklistInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsChecklistsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsChecklistsIdResponse>(getPutEvaluationsChecklistsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(checklistInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsChecklistsIdMutationKey = () => ['putEvaluationsChecklistsId'] as const;
+
+export const getPutEvaluationsChecklistsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChecklistsId>>, TError,PutEvaluationsChecklistsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChecklistsId>>, TError,PutEvaluationsChecklistsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsChecklistsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsChecklistsId>>, PutEvaluationsChecklistsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsChecklistsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsChecklistsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsChecklistsId>>>
+    export type PutEvaluationsChecklistsIdMutationBody = ChecklistInput
+    export type PutEvaluationsChecklistsIdMutationError = ErrorResponse
+    export type PutEvaluationsChecklistsIdMutationVariables = {id: string;data: ChecklistInput}
+
+    /**
+ * @summary Update checklist
+ */
+export const usePutEvaluationsChecklistsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChecklistsId>>, TError,PutEvaluationsChecklistsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsChecklistsId>>,
+        TError,
+        PutEvaluationsChecklistsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsChecklistsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsChecklistsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsChecklistsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsChecklistsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsChecklistsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsChecklistsIdResponseSuccess = (deleteEvaluationsChecklistsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsChecklistsIdResponseError = (deleteEvaluationsChecklistsIdResponse401 | deleteEvaluationsChecklistsIdResponse403 | deleteEvaluationsChecklistsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsChecklistsIdResponse = (deleteEvaluationsChecklistsIdResponseSuccess | deleteEvaluationsChecklistsIdResponseError)
+
+export const getDeleteEvaluationsChecklistsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/checklists/${id}`
+}
+
+/**
+ * Deletes a Coleta de Dados In Loco permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same checklist again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and checklist enabled by EVALUATION_TYPES.
+ * @summary Delete checklist
+ */
+export const deleteEvaluationsChecklistsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsChecklistsIdResponse> => {
+
+  return customFetch<deleteEvaluationsChecklistsIdResponse>(getDeleteEvaluationsChecklistsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsChecklistsIdMutationKey = () => ['deleteEvaluationsChecklistsId'] as const;
+
+export const getDeleteEvaluationsChecklistsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>, TError,DeleteEvaluationsChecklistsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>, TError,DeleteEvaluationsChecklistsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsChecklistsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>, DeleteEvaluationsChecklistsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsChecklistsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsChecklistsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>>
+
+    export type DeleteEvaluationsChecklistsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsChecklistsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete checklist
+ */
+export const useDeleteEvaluationsChecklistsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>, TError,DeleteEvaluationsChecklistsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsChecklistsId>>,
+        TError,
+        DeleteEvaluationsChecklistsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsChecklistsIdMutationOptions(options), queryClient);
+    }
