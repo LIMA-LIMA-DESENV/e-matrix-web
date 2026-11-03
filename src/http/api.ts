@@ -46,6 +46,7 @@ export type ActivityLinkedRecordType = typeof ActivityLinkedRecordType[keyof typ
 export const ActivityLinkedRecordType = {
   projects: 'projects',
   matrix: 'matrix',
+  evaluations: 'evaluations',
 } as const;
 
 export type ActivityLinkedRecordsItemsItem = {
@@ -408,6 +409,150 @@ export interface ProjectFile {
   mime_type: string;
 }
 
+export type EvaluationTypeItemType = typeof EvaluationTypeItemType[keyof typeof EvaluationTypeItemType];
+
+
+export const EvaluationTypeItemType = {
+  hit_list: 'hit_list',
+  checklist: 'checklist',
+} as const;
+
+/**
+ * Prefix of the readable code of the type's evaluations
+ */
+export type EvaluationTypeItemCode = typeof EvaluationTypeItemCode[keyof typeof EvaluationTypeItemCode];
+
+
+export const EvaluationTypeItemCode = {
+  HL: 'HL',
+  CDIA: 'CDIA',
+} as const;
+
+/**
+ * An evaluation type enabled in this installation. checklist is the 'Coleta de Dados In Loco' of the screens.
+ */
+export interface EvaluationTypeItem {
+  type: EvaluationTypeItemType;
+  /** Prefix of the readable code of the type's evaluations */
+  code: EvaluationTypeItemCode;
+}
+
+/**
+ * question1..55, always present: true is yes, false is no, null when absent or stored with another type. Keys outside the catalog are never answered.
+ */
+export type ChecklistAnswers = {
+  /** @nullable */
+  question1: boolean | null;
+  /** @nullable */
+  question2: boolean | null;
+  /** @nullable */
+  question3: boolean | null;
+  /** @nullable */
+  question4: boolean | null;
+  /** @nullable */
+  question5: boolean | null;
+  /** @nullable */
+  question6: boolean | null;
+  /** @nullable */
+  question7: boolean | null;
+  /** @nullable */
+  question8: boolean | null;
+  /** @nullable */
+  question9: boolean | null;
+  /** @nullable */
+  question10: boolean | null;
+  /** @nullable */
+  question11: boolean | null;
+  /** @nullable */
+  question12: boolean | null;
+  /** @nullable */
+  question13: boolean | null;
+  /** @nullable */
+  question14: boolean | null;
+  /** @nullable */
+  question15: boolean | null;
+  /** @nullable */
+  question16: boolean | null;
+  /** @nullable */
+  question17: boolean | null;
+  /** @nullable */
+  question18: boolean | null;
+  /** @nullable */
+  question19: boolean | null;
+  /** @nullable */
+  question20: boolean | null;
+  /** @nullable */
+  question21: boolean | null;
+  /** @nullable */
+  question22: boolean | null;
+  /** @nullable */
+  question23: boolean | null;
+  /** @nullable */
+  question24: boolean | null;
+  /** @nullable */
+  question25: boolean | null;
+  /** @nullable */
+  question26: boolean | null;
+  /** @nullable */
+  question27: boolean | null;
+  /** @nullable */
+  question28: boolean | null;
+  /** @nullable */
+  question29: boolean | null;
+  /** @nullable */
+  question30: boolean | null;
+  /** @nullable */
+  question31: boolean | null;
+  /** @nullable */
+  question32: boolean | null;
+  /** @nullable */
+  question33: boolean | null;
+  /** @nullable */
+  question34: boolean | null;
+  /** @nullable */
+  question35: boolean | null;
+  /** @nullable */
+  question36: boolean | null;
+  /** @nullable */
+  question37: boolean | null;
+  /** @nullable */
+  question38: boolean | null;
+  /** @nullable */
+  question39: boolean | null;
+  /** @nullable */
+  question40: boolean | null;
+  /** @nullable */
+  question41: boolean | null;
+  /** @nullable */
+  question42: boolean | null;
+  /** @nullable */
+  question43: boolean | null;
+  /** @nullable */
+  question44: boolean | null;
+  /** @nullable */
+  question45: boolean | null;
+  /** @nullable */
+  question46: boolean | null;
+  /** @nullable */
+  question47: boolean | null;
+  /** @nullable */
+  question48: boolean | null;
+  /** @nullable */
+  question49: boolean | null;
+  /** @nullable */
+  question50: boolean | null;
+  /** @nullable */
+  question51: boolean | null;
+  /** @nullable */
+  question52: boolean | null;
+  /** @nullable */
+  question53: boolean | null;
+  /** @nullable */
+  question54: boolean | null;
+  /** @nullable */
+  question55: boolean | null;
+};
+
 /**
  * The activity of the project as it is now: changing the activity's code changes what is shown here, never the link, which is by id.
  */
@@ -415,6 +560,647 @@ export interface ImprovementProjectActivity {
   id: string;
   code: string;
   name: string;
+}
+
+export type ChecklistBlockScoreBlock = typeof ChecklistBlockScoreBlock[keyof typeof ChecklistBlockScoreBlock];
+
+
+export const ChecklistBlockScoreBlock = {
+  layout: 'layout',
+  physical_environment: 'physical_environment',
+  posture: 'posture',
+  work_organization: 'work_organization',
+  chair: 'chair',
+  monitor: 'monitor',
+  desk: 'desk',
+  keyboard: 'keyboard',
+  cabinet_cpu: 'cabinet_cpu',
+  accessories: 'accessories',
+  laptop: 'laptop',
+} as const;
+
+/**
+ * The score of one block of the checklist.
+ */
+export interface ChecklistBlockScore {
+  block: ChecklistBlockScoreBlock;
+  /**
+     * Answers equal to the expected answer of the question (a no scores where the expected answer is no); a null answer never scores
+     * @minimum 0
+     */
+  sum: number;
+  /**
+     * Questions of the block
+     * @minimum 1
+     */
+  total: number;
+  /**
+     * sum/total × 100, rounded to two decimals; null when no question of the checklist is answered
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  percentage: number | null;
+}
+
+/**
+ * The score of the checklist, derived on every read by the rules of the legacy CheckList::calculate and never stored. The web formats the percentages in the user's language.
+ */
+export interface ChecklistScore {
+  /**
+     * The 11 blocks, in order: layout, physical_environment, posture, work_organization, chair, monitor, desk, keyboard, cabinet_cpu, accessories, laptop.
+     * @minItems 11
+     * @maxItems 11
+     */
+  blocks: ChecklistBlockScore[];
+  /**
+     * Mean of the 11 block percentages (the legacy averageClassification), rounded to two decimals; null when no question is answered
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  average: number | null;
+}
+
+/**
+ * A checklist with its answers and its score.
+ */
+export interface Checklist {
+  id: string;
+  /**
+     * Sequential number of the checklists, never changed; the data migration keeps the legacy number, so there may be gaps
+     * @minimum 1
+     */
+  number: number;
+  /** CDIA-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** @maxLength 255 */
+  name: string;
+  /** @maxLength 255 */
+  sector: string;
+  date: string;
+  created_at: string;
+  updated_at: string;
+  /** question1..55, always present: true is yes, false is no, null when absent or stored with another type. Keys outside the catalog are never answered. */
+  answers: ChecklistAnswers;
+  score: ChecklistScore;
+}
+
+/**
+ * An item of the checklists listing (the Coleta de Dados In Loco of the Escritório tab). The activity is the one shown for projects: as it is now.
+ */
+export interface ChecklistItem {
+  id: string;
+  /**
+     * Sequential number of the checklists, never changed; the data migration keeps the legacy number, so there may be gaps
+     * @minimum 1
+     */
+  number: number;
+  /** CDIA-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** @maxLength 255 */
+  name: string;
+  /** @maxLength 255 */
+  sector: string;
+  date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type HitListAnswersImprovement1SelectedItem = typeof HitListAnswersImprovement1SelectedItem[keyof typeof HitListAnswersImprovement1SelectedItem];
+
+
+export const HitListAnswersImprovement1SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement2SelectedItem = typeof HitListAnswersImprovement2SelectedItem[keyof typeof HitListAnswersImprovement2SelectedItem];
+
+
+export const HitListAnswersImprovement2SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement3SelectedItem = typeof HitListAnswersImprovement3SelectedItem[keyof typeof HitListAnswersImprovement3SelectedItem];
+
+
+export const HitListAnswersImprovement3SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement4SelectedItem = typeof HitListAnswersImprovement4SelectedItem[keyof typeof HitListAnswersImprovement4SelectedItem];
+
+
+export const HitListAnswersImprovement4SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement5SelectedItem = typeof HitListAnswersImprovement5SelectedItem[keyof typeof HitListAnswersImprovement5SelectedItem];
+
+
+export const HitListAnswersImprovement5SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement6SelectedItem = typeof HitListAnswersImprovement6SelectedItem[keyof typeof HitListAnswersImprovement6SelectedItem];
+
+
+export const HitListAnswersImprovement6SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement7SelectedItem = typeof HitListAnswersImprovement7SelectedItem[keyof typeof HitListAnswersImprovement7SelectedItem];
+
+
+export const HitListAnswersImprovement7SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement8SelectedItem = typeof HitListAnswersImprovement8SelectedItem[keyof typeof HitListAnswersImprovement8SelectedItem];
+
+
+export const HitListAnswersImprovement8SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement9SelectedItem = typeof HitListAnswersImprovement9SelectedItem[keyof typeof HitListAnswersImprovement9SelectedItem];
+
+
+export const HitListAnswersImprovement9SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+export type HitListAnswersImprovement10SelectedItem = typeof HitListAnswersImprovement10SelectedItem[keyof typeof HitListAnswersImprovement10SelectedItem];
+
+
+export const HitListAnswersImprovement10SelectedItem = {
+  washRag: 'washRag',
+  elbowsOut: 'elbowsOut',
+  shoulderHighLow: 'shoulderHighLow',
+  hungryHead: 'hungryHead',
+  buttsUp: 'buttsUp',
+  twistAndShout: 'twistAndShout',
+  horizontalDistance: 'horizontalDistance',
+  sitStand: 'sitStand',
+  badVibes: 'badVibes',
+  contact: 'contact',
+} as const;
+
+/**
+ * Every key of the Hit List catalog (the legacy camelCase keys), always present: the value when it has the type of its kind, null otherwise. Keys outside the catalog are never answered. Items, in order: washRag, elbowsOut, shoulderHighLow, hungryHead, buttsUp, twistAndShout, horizontalDistance, sitStand, badVibes, contact.
+ */
+export type HitListAnswers = {
+  /** @nullable */
+  department: string | null;
+  /** @nullable */
+  site: string | null;
+  /** @nullable */
+  turn: string | null;
+  /** @nullable */
+  station: string | null;
+  /** @nullable */
+  product: string | null;
+  /** @nullable */
+  task1: string | null;
+  /** @nullable */
+  task2: string | null;
+  /** @nullable */
+  task3: string | null;
+  /** @nullable */
+  task4: string | null;
+  /** @nullable */
+  task5: string | null;
+  /** @nullable */
+  task6: string | null;
+  /** @nullable */
+  task7: string | null;
+  /** @nullable */
+  task8: string | null;
+  /** @nullable */
+  washRag: boolean | null;
+  /** @nullable */
+  washRagTask1: string | null;
+  /** @nullable */
+  washRagTask2: string | null;
+  /** @nullable */
+  washRagTask3: string | null;
+  /** @nullable */
+  washRagTask4: string | null;
+  /** @nullable */
+  washRagRootCause1: string | null;
+  /** @nullable */
+  washRagRootCause2: string | null;
+  /** @nullable */
+  washRagRootCause3: string | null;
+  /** @nullable */
+  washRagRootCause4: string | null;
+  /** @nullable */
+  washRagImprovements: string | null;
+  /** @nullable */
+  elbowsOut: boolean | null;
+  /** @nullable */
+  elbowsOutTask1: string | null;
+  /** @nullable */
+  elbowsOutTask2: string | null;
+  /** @nullable */
+  elbowsOutTask3: string | null;
+  /** @nullable */
+  elbowsOutTask4: string | null;
+  /** @nullable */
+  elbowsOutRootCause1: string | null;
+  /** @nullable */
+  elbowsOutRootCause2: string | null;
+  /** @nullable */
+  elbowsOutRootCause3: string | null;
+  /** @nullable */
+  elbowsOutRootCause4: string | null;
+  /** @nullable */
+  elbowsOutImprovements: string | null;
+  /** @nullable */
+  shoulderHighLow: boolean | null;
+  /** @nullable */
+  shoulderHighLowTask1: string | null;
+  /** @nullable */
+  shoulderHighLowTask2: string | null;
+  /** @nullable */
+  shoulderHighLowTask3: string | null;
+  /** @nullable */
+  shoulderHighLowTask4: string | null;
+  /** @nullable */
+  shoulderHighLowRootCause1: string | null;
+  /** @nullable */
+  shoulderHighLowRootCause2: string | null;
+  /** @nullable */
+  shoulderHighLowRootCause3: string | null;
+  /** @nullable */
+  shoulderHighLowRootCause4: string | null;
+  /** @nullable */
+  shoulderHighLowImprovements: string | null;
+  /** @nullable */
+  hungryHead: boolean | null;
+  /** @nullable */
+  hungryHeadTask1: string | null;
+  /** @nullable */
+  hungryHeadTask2: string | null;
+  /** @nullable */
+  hungryHeadTask3: string | null;
+  /** @nullable */
+  hungryHeadTask4: string | null;
+  /** @nullable */
+  hungryHeadRootCause1: string | null;
+  /** @nullable */
+  hungryHeadRootCause2: string | null;
+  /** @nullable */
+  hungryHeadRootCause3: string | null;
+  /** @nullable */
+  hungryHeadRootCause4: string | null;
+  /** @nullable */
+  hungryHeadImprovements: string | null;
+  /** @nullable */
+  buttsUp: boolean | null;
+  /** @nullable */
+  buttsUpTask1: string | null;
+  /** @nullable */
+  buttsUpTask2: string | null;
+  /** @nullable */
+  buttsUpTask3: string | null;
+  /** @nullable */
+  buttsUpTask4: string | null;
+  /** @nullable */
+  buttsUpRootCause1: string | null;
+  /** @nullable */
+  buttsUpRootCause2: string | null;
+  /** @nullable */
+  buttsUpRootCause3: string | null;
+  /** @nullable */
+  buttsUpRootCause4: string | null;
+  /** @nullable */
+  buttsUpImprovements: string | null;
+  /** @nullable */
+  twistAndShout: boolean | null;
+  /** @nullable */
+  twistAndShoutTask1: string | null;
+  /** @nullable */
+  twistAndShoutTask2: string | null;
+  /** @nullable */
+  twistAndShoutTask3: string | null;
+  /** @nullable */
+  twistAndShoutTask4: string | null;
+  /** @nullable */
+  twistAndShoutRootCause1: string | null;
+  /** @nullable */
+  twistAndShoutRootCause2: string | null;
+  /** @nullable */
+  twistAndShoutRootCause3: string | null;
+  /** @nullable */
+  twistAndShoutRootCause4: string | null;
+  /** @nullable */
+  twistAndShoutImprovements: string | null;
+  /** @nullable */
+  horizontalDistance: boolean | null;
+  /** @nullable */
+  horizontalDistanceTask1: string | null;
+  /** @nullable */
+  horizontalDistanceTask2: string | null;
+  /** @nullable */
+  horizontalDistanceTask3: string | null;
+  /** @nullable */
+  horizontalDistanceTask4: string | null;
+  /** @nullable */
+  horizontalDistanceRootCause1: string | null;
+  /** @nullable */
+  horizontalDistanceRootCause2: string | null;
+  /** @nullable */
+  horizontalDistanceRootCause3: string | null;
+  /** @nullable */
+  horizontalDistanceRootCause4: string | null;
+  /** @nullable */
+  horizontalDistanceImprovements: string | null;
+  /** @nullable */
+  sitStand: boolean | null;
+  /** @nullable */
+  sitStandTask1: string | null;
+  /** @nullable */
+  sitStandTask2: string | null;
+  /** @nullable */
+  sitStandTask3: string | null;
+  /** @nullable */
+  sitStandTask4: string | null;
+  /** @nullable */
+  sitStandRootCause1: string | null;
+  /** @nullable */
+  sitStandRootCause2: string | null;
+  /** @nullable */
+  sitStandRootCause3: string | null;
+  /** @nullable */
+  sitStandRootCause4: string | null;
+  /** @nullable */
+  sitStandImprovements: string | null;
+  /** @nullable */
+  badVibes: boolean | null;
+  /** @nullable */
+  badVibesTask1: string | null;
+  /** @nullable */
+  badVibesTask2: string | null;
+  /** @nullable */
+  badVibesTask3: string | null;
+  /** @nullable */
+  badVibesTask4: string | null;
+  /** @nullable */
+  badVibesRootCause1: string | null;
+  /** @nullable */
+  badVibesRootCause2: string | null;
+  /** @nullable */
+  badVibesRootCause3: string | null;
+  /** @nullable */
+  badVibesRootCause4: string | null;
+  /** @nullable */
+  badVibesImprovements: string | null;
+  /** @nullable */
+  contact: boolean | null;
+  /** @nullable */
+  contactTask1: string | null;
+  /** @nullable */
+  contactTask2: string | null;
+  /** @nullable */
+  contactTask3: string | null;
+  /** @nullable */
+  contactTask4: string | null;
+  /** @nullable */
+  contactRootCause1: string | null;
+  /** @nullable */
+  contactRootCause2: string | null;
+  /** @nullable */
+  contactRootCause3: string | null;
+  /** @nullable */
+  contactRootCause4: string | null;
+  /** @nullable */
+  contactImprovements: string | null;
+  /** @nullable */
+  rootCausesA: string | null;
+  /** @nullable */
+  rootCausesB: string | null;
+  /** @nullable */
+  rootCausesC: string | null;
+  /** @nullable */
+  rootCausesD: string | null;
+  /** @nullable */
+  rootCausesE: string | null;
+  /** @nullable */
+  rootCausesF: string | null;
+  /** @nullable */
+  rootCausesG: string | null;
+  /** @nullable */
+  rootCausesH: string | null;
+  /** @nullable */
+  improvement1: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement1Selected: HitListAnswersImprovement1SelectedItem[] | null;
+  /** @nullable */
+  improvement2: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement2Selected: HitListAnswersImprovement2SelectedItem[] | null;
+  /** @nullable */
+  improvement3: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement3Selected: HitListAnswersImprovement3SelectedItem[] | null;
+  /** @nullable */
+  improvement4: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement4Selected: HitListAnswersImprovement4SelectedItem[] | null;
+  /** @nullable */
+  improvement5: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement5Selected: HitListAnswersImprovement5SelectedItem[] | null;
+  /** @nullable */
+  improvement6: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement6Selected: HitListAnswersImprovement6SelectedItem[] | null;
+  /** @nullable */
+  improvement7: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement7Selected: HitListAnswersImprovement7SelectedItem[] | null;
+  /** @nullable */
+  improvement8: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement8Selected: HitListAnswersImprovement8SelectedItem[] | null;
+  /** @nullable */
+  improvement9: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement9Selected: HitListAnswersImprovement9SelectedItem[] | null;
+  /** @nullable */
+  improvement10: string | null;
+  /**
+     * The items the improvement addresses, in the stored order; only known item keys
+     * @nullable
+     */
+  improvement10Selected: HitListAnswersImprovement10SelectedItem[] | null;
+  /** @nullable */
+  isAnotherWorkstationAffected: boolean | null;
+  /** @nullable */
+  anotherWorkstationAffected: string | null;
+  /** @nullable */
+  isCreatedOtherProblem: boolean | null;
+  /** @nullable */
+  createdOtherProblem: string | null;
+  /** @nullable */
+  isProblemSolved: boolean | null;
+  /** @nullable */
+  isEngineeringAware: boolean | null;
+  /** @nullable */
+  engineeringAware: string | null;
+  /** @nullable */
+  documentNeedUpdate: boolean | null;
+  /** @nullable */
+  responsibleEngineeringToUpdateDoc: string | null;
+};
+
+/**
+ * A hit list with its answers.
+ */
+export interface HitList {
+  id: string;
+  /**
+     * Sequential number of the hit lists, never changed; the data migration keeps the legacy number, so there may be gaps
+     * @minimum 1
+     */
+  number: number;
+  /** HL-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  assessment_date: string;
+  created_at: string;
+  updated_at: string;
+  /** Every key of the Hit List catalog (the legacy camelCase keys), always present: the value when it has the type of its kind, null otherwise. Keys outside the catalog are never answered. Items, in order: washRag, elbowsOut, shoulderHighLow, hungryHead, buttsUp, twistAndShout, horizontalDistance, sitStand, badVibes, contact. */
+  answers: HitListAnswers;
+}
+
+/**
+ * An item of the hit lists listing (the Hit List of the Produção tab). The activity is the one shown for projects: as it is now.
+ */
+export interface HitListItem {
+  id: string;
+  /**
+     * Sequential number of the hit lists, never changed; the data migration keeps the legacy number, so there may be gaps
+     * @minimum 1
+     */
+  number: number;
+  /** HL-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  assessment_date: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ImprovementProject {
@@ -3286,7 +4072,7 @@ export const getGetActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its improvement projects and its filled matrix items). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. Requires admin role.
+ * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its improvement projects, its filled matrix items and its evaluations). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. The Hit Lists and the Coletas de Dados In Loco of the activity count together under evaluations, whatever types EVALUATION_TYPES enables. Requires admin role.
  * @summary Get activity
  */
 export const getActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesIdResponse> => {
@@ -3551,7 +4337,7 @@ export const getDeleteActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction: an activity with a filled matrix item in any period is not deleted, and its blank matrix items are removed together with it. Deleting the same activity again responds 404. The request has no body. Requires admin role.
+ * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction: an activity with a filled matrix item in any period is not deleted, and its blank matrix items are removed together with it. An activity with a Hit List or a Coleta de Dados In Loco is not deleted either, even when that evaluation type is disabled in EVALUATION_TYPES. Deleting the same activity again responds 404. The request has no body. Requires admin role.
  * @summary Delete activity
  */
 export const deleteActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteActivitiesIdResponse> => {
@@ -10444,3 +11230,622 @@ export const usePutMatricesPeriodIdActivitiesActivityIdFieldsField = <TError = E
       > => {
       return useMutation(getPutMatricesPeriodIdActivitiesActivityIdFieldsFieldMutationOptions(options), queryClient);
     }
+
+export type getEvaluationsTypesResponse200 = {
+  data: EvaluationTypeItem[]
+  status: 200
+}
+
+export type getEvaluationsTypesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsTypesResponseSuccess = (getEvaluationsTypesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsTypesResponseError = (getEvaluationsTypesResponse401) & {
+  headers: Headers;
+};
+
+export type getEvaluationsTypesResponse = (getEvaluationsTypesResponseSuccess | getEvaluationsTypesResponseError)
+
+export const getGetEvaluationsTypesUrl = () => {
+
+
+
+
+  return `/evaluations/types`
+}
+
+/**
+ * Answers the evaluation types enabled by the EVALUATION_TYPES variable of the deployment, read once when the server starts, always in the canonical order hit_list, checklist (never the order of the variable). Empty when no type is enabled. The only route under /evaluations that does not depend on an enabled type: every route of a type answers 404 'Evaluation type not available.' while that type is disabled. Requires only an authenticated user, so any role; nothing in the API changes the configuration.
+ * @summary List the evaluation types this installation enables
+ */
+export const getEvaluationsTypes = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsTypesResponse> => {
+
+  return customFetch<getEvaluationsTypesResponse>(getGetEvaluationsTypesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsTypesQueryKey = () => {
+    return [
+    `/evaluations/types`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsTypesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsTypes>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsTypesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsTypes>>> = ({ signal }) => getEvaluationsTypes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsTypesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsTypes>>>
+export type GetEvaluationsTypesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsTypes<TData = Awaited<ReturnType<typeof getEvaluationsTypes>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsTypes>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsTypes<TData = Awaited<ReturnType<typeof getEvaluationsTypes>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsTypes>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsTypes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsTypes<TData = Awaited<ReturnType<typeof getEvaluationsTypes>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the evaluation types this installation enables
+ */
+
+export function useGetEvaluationsTypes<TData = Awaited<ReturnType<typeof getEvaluationsTypes>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsTypes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsTypesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsHitListsResponse200 = {
+  data: HitListItem[]
+  status: 200
+}
+
+export type getEvaluationsHitListsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsHitListsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsHitListsResponseSuccess = (getEvaluationsHitListsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsHitListsResponseError = (getEvaluationsHitListsResponse401 | getEvaluationsHitListsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsHitListsResponse = (getEvaluationsHitListsResponseSuccess | getEvaluationsHitListsResponseError)
+
+export const getGetEvaluationsHitListsUrl = () => {
+
+
+
+
+  return `/evaluations/hit-lists`
+}
+
+/**
+ * Every hit list of the installation (the Produção tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers are only in the detail. Requires only an authenticated user, so any role, and hit_list enabled by EVALUATION_TYPES. There is no write route in this delivery.
+ * @summary List hit lists
+ */
+export const getEvaluationsHitLists = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsHitListsResponse> => {
+
+  return customFetch<getEvaluationsHitListsResponse>(getGetEvaluationsHitListsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsHitListsQueryKey = () => {
+    return [
+    `/evaluations/hit-lists`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsHitListsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsHitListsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsHitLists>>> = ({ signal }) => getEvaluationsHitLists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsHitListsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsHitLists>>>
+export type GetEvaluationsHitListsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsHitLists<TData = Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitLists>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitLists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitLists<TData = Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitLists>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitLists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitLists<TData = Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List hit lists
+ */
+
+export function useGetEvaluationsHitLists<TData = Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitLists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsHitListsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsHitListsIdResponse200 = {
+  data: HitList
+  status: 200
+}
+
+export type getEvaluationsHitListsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsHitListsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsHitListsIdResponseSuccess = (getEvaluationsHitListsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsHitListsIdResponseError = (getEvaluationsHitListsIdResponse401 | getEvaluationsHitListsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsHitListsIdResponse = (getEvaluationsHitListsIdResponseSuccess | getEvaluationsHitListsIdResponseError)
+
+export const getGetEvaluationsHitListsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/hit-lists/${id}`
+}
+
+/**
+ * One hit list: the item of the listing plus its answers, with every key of the Hit List catalog. An absent key, or a value stored with the wrong type, is null; a stored key outside the catalog is never answered. Texts are answered as stored. Requires only an authenticated user, so any role, and hit_list enabled by EVALUATION_TYPES.
+ * @summary Get hit list
+ */
+export const getEvaluationsHitListsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsHitListsIdResponse> => {
+
+  return customFetch<getEvaluationsHitListsIdResponse>(getGetEvaluationsHitListsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsHitListsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/hit-lists/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsHitListsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsHitListsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsHitListsId>>> = ({ signal }) => getEvaluationsHitListsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsHitListsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsHitListsId>>>
+export type GetEvaluationsHitListsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsHitListsId<TData = Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitListsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitListsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitListsId<TData = Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsHitListsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsHitListsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsHitListsId<TData = Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get hit list
+ */
+
+export function useGetEvaluationsHitListsId<TData = Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsHitListsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsHitListsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsChecklistsResponse200 = {
+  data: ChecklistItem[]
+  status: 200
+}
+
+export type getEvaluationsChecklistsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChecklistsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChecklistsResponseSuccess = (getEvaluationsChecklistsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChecklistsResponseError = (getEvaluationsChecklistsResponse401 | getEvaluationsChecklistsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChecklistsResponse = (getEvaluationsChecklistsResponseSuccess | getEvaluationsChecklistsResponseError)
+
+export const getGetEvaluationsChecklistsUrl = () => {
+
+
+
+
+  return `/evaluations/checklists`
+}
+
+/**
+ * Every Coleta de Dados In Loco of the installation (the Escritório tab of the legacy evaluations, CheckList in the legacy code), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers and the score are only in the detail. Requires only an authenticated user, so any role, and checklist enabled by EVALUATION_TYPES. There is no write route in this delivery.
+ * @summary List checklists
+ */
+export const getEvaluationsChecklists = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChecklistsResponse> => {
+
+  return customFetch<getEvaluationsChecklistsResponse>(getGetEvaluationsChecklistsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChecklistsQueryKey = () => {
+    return [
+    `/evaluations/checklists`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChecklistsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChecklistsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChecklists>>> = ({ signal }) => getEvaluationsChecklists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChecklistsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChecklists>>>
+export type GetEvaluationsChecklistsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChecklists<TData = Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklists>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklists<TData = Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklists>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklists<TData = Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List checklists
+ */
+
+export function useGetEvaluationsChecklists<TData = Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChecklistsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsChecklistsIdResponse200 = {
+  data: Checklist
+  status: 200
+}
+
+export type getEvaluationsChecklistsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChecklistsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChecklistsIdResponseSuccess = (getEvaluationsChecklistsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChecklistsIdResponseError = (getEvaluationsChecklistsIdResponse401 | getEvaluationsChecklistsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChecklistsIdResponse = (getEvaluationsChecklistsIdResponseSuccess | getEvaluationsChecklistsIdResponseError)
+
+export const getGetEvaluationsChecklistsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/checklists/${id}`
+}
+
+/**
+ * One checklist: the item of the listing plus its answers, question1..55, each true (yes), false (no) or null (absent, or stored with the wrong type), and the score derived on every read by the rules of the legacy CheckList::calculate. The sums, percentages and averageClassification the legacy stored are never answered. Requires only an authenticated user, so any role, and checklist enabled by EVALUATION_TYPES.
+ * @summary Get checklist
+ */
+export const getEvaluationsChecklistsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChecklistsIdResponse> => {
+
+  return customFetch<getEvaluationsChecklistsIdResponse>(getGetEvaluationsChecklistsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChecklistsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/checklists/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChecklistsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChecklistsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>> = ({ signal }) => getEvaluationsChecklistsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChecklistsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>>
+export type GetEvaluationsChecklistsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChecklistsId<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklistsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklistsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklistsId<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChecklistsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChecklistsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChecklistsId<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get checklist
+ */
+
+export function useGetEvaluationsChecklistsId<TData = Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChecklistsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChecklistsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
