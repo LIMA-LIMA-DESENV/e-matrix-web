@@ -53,6 +53,7 @@ src/
 │   │   ├── projetos/     # redirects to producao/ keeping the query; producao/ (RGP) and escritorio/ (RGA and RA) tabs share ?period= (ProjectsTabs); RGP list sliced by period, detail modal with photo thumbnails (blob: URLs revoked on close), effectiveness verification form; escritorio/ merges the RGA and RA queries into one table (?type=all|rga|ra), RA detail with its receipt form, receiving materials form; PDF of each RGP/RGA (row and detail) and the blank one (card), generated in the browser (see PDFs), none for RA; every role reads; canEdit writes RGP/RGA through _form/ (ImprovementProjectForm by scope, rgp|rga/novo and [id]/editar, the other scope redirects) and RA (MaterialReceiptForm, ra/novo and ra/[id]/editar), deletes on the listing only (DeleteProjectModal), "Novo" on the card and the empty state, ?created=/?updated=/?beforePhotoRemoved=/?afterPhotoRemoved=/?fileRemoved=<code>
 │   │   ├── plano-de-gestao/ # one GET for every period: SVG chart, mini-grids and the full grid of ?period=<id> (default resolved on the page, no "all"); every role reads, canEdit clicks cells and edits the goal (saved at once, not optimistic, grid locked while saving)
 │   │   ├── matriz/       # two tabs, each a route sharing only ?period= (MatrixTabs, like ProjectsTabs); graficos/ is the Gráficos tab: the same GET and period slice as Resultados (shared cache, read only), the three maps of the whole Matrix (charts.ts without React: maps, count, percent; MatrixPieChart in SVG without a library, legend, tooltip, "N de M sem valor", "Sem dados"; colors --color-chart-*); `?view=groups` (chips "Toda a matriz"/"Por fábrica, área e função", router.replace keeping ?period=, any other value is the whole Matrix) breaks each map into MatrixChartMapView: the general pie plus the Fábricas, Áreas and Funções columns (lg side by side, stacked below), groupMatrixChart in charts.ts groups by normalizeText with the first spelling in rows order as label, sorted by localeCompare base; groups with no value have no pie and no filter item; each column has a DropdownMenu of checkboxes with "Todos" that only shows/hides pies, local state reset on a new period or view; a slice with a count, or its legend button (click, Enter or Space), opens the Resultados of exactly its activities: getMatrixChartSliceTarget in charts.ts builds `/matriz?period=<id>&f.<field>=<value>` plus, on a group pie, `&f.<fabric|area|function>="<label>"` (the exact text filter, so the rows equal the tooltip count) and the columns that revealMatrixColumns shows before a router.push (back returns to the tab and view); slices with 0 and "Sem dados" open nothing; MatrixEmptyState variant="charts" without actions; Resultados tab: one GET of the Matrix of ?period=<id> (sliced by period, no "all": isPeriodIdValue and PeriodFilter includeAll={false}); not initialized → empty state; else one row per activity, columns.ts with the 27 columns (key, help, type, default), the 8 default ones shown, the visible columns remembered in localStorage (`ematrix.matrix.columns`, use-matrix-columns.ts, every access in try/catch, defaults when missing or invalid; ColumnPicker; revealMatrixColumns adds columns to the stored choice, outside React, hiding none), search over all 27 with the list values translated, a filter per column in the header kept in the URL as `f.<key>` (lists: all/values/`empty`; text: contains, or equals between double quotes — `"Solda"` keeps "Solda" and not "Solda Ponto", normalizeText on both sides, `""` or a lone quote stay contains; exactMatrixTextFilter builds that value), hidden columns keep filtering, "limpar" back to the default columns without search and filters keeping ?period=, sort and pages in the client; "Exportar" (ExportMenu, use-matrix-export.ts) saves the visible columns and the filtered rows of every page as CSV or .xlsx (see Exports); the ⋮ menu of each row (MatrixRowProjectsMenu, also on a right click on the row outside fields) lists the RGP and RGA of the activity by code from a single `GET /improvement-projects` loaded with the screen (use-matrix-projects.ts) and opens `/projetos/producao?period=all&q=<code>` or `/projetos/escritorio?period=all&type=rga&q=<code>`, with its own loading, empty and error/retry states; every role reads; canEdit starts the Matrix of a period once from the empty state (MatrixEmptyState: "Copiar de <copy_source>" and "Começar em branco", each confirmed with ConfirmActionModal; the POST answer replaces the cached Matrix; 409 `Matrix already initialized.` reads it again and shows the table, 409 `Matrix copy source has changed.` reads it again and shows the new origin with the message) and edits the 21 fields in their cells (MatrixCell, one editor open at a time, in a portal over the cell: lists save on choosing, text saves with Salvar or Ctrl/Cmd+Enter, Esc/Cancelar/click outside/blur never save; the cell shows the save and takes no other edit, not optimistic; use-update-matrix-field.ts puts the row the PUT answers with into the cache with setQueryData, only the saved field while two writes of the row overlap; a failure keeps the previous value with the translated error in the cell); the viewer gets plain text cells and no actions
+│   │   ├── avaliacoes/   # optional module (see Optional Modules): redirects to the tab of the first enabled type, or is not found with none; hit-list/ and coleta-de-dados/ (the checklist of the API) are one tab each, only for the enabled types, a disabled one is not found (notFound()); one global list per type, never sliced by period (no usePeriodSlice): code badge, type, name ("Hit List" translated, or the checklist name), activity, registered and changed at (date and time), search, sort and pages in the client, newest registered first; each tab has "PDF" in the ⋮ menu of each row and "PDF em branco" beside the search, shown in every state (see PDFs); every role reads, nothing is written
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/); ParametersTabs carries the admin-only "reset program items" action of both tabs
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
@@ -67,7 +68,7 @@ src/
 ├── contexts/             # AuthContext, LayoutPreferenceContext
 ├── http/                 # Orval client + fetch mutator
 ├── i18n/                 # Locales and request config
-└── lib/                  # error-translator, format-date, jwt, auth-storage, download-file, layout-preference, periods, utils, pdf/, export/
+└── lib/                  # error-translator, evaluation-types, format-date, jwt, auth-storage, download-file, layout-preference, periods, utils, pdf/, export/
 ```
 
 Routes are in Portuguese, as in tax-advice (`/usuarios/novo`).
@@ -119,6 +120,21 @@ runs the module's records query (a module-scope hook taking `periodId` and the
 query options); `PeriodFilter` (texts in the `periodFilter` namespace) renders
 the select; `isPeriodFilterValue` is the `?period=` validator and
 `ALL_PERIODS` the `all` value.
+
+## Optional Modules
+
+Avaliações is optional per installation and per type (`hit_list`,
+`checklist`), switched by `EVALUATION_TYPES` in the API. The web never has a
+`NEXT_PUBLIC_*` variable for it: it asks the API. `useEvaluationTypes()` in
+`src/lib/evaluation-types.ts` reads `GET /evaluations/types`, cached for the
+whole session (`staleTime: Infinity`), and `EVALUATION_TYPE_HREFS` maps each
+type to its tab. The shells take their items from `useVisibleNavItems()`
+(`components/shell/use-nav-items.ts`): an item with `requiresEvaluationTypes`
+shows only when at least one type is enabled, and stays hidden while loading
+and when the request fails, rather than offering a screen that would answer
+404. A route of a disabled type calls `notFound()` before requesting its
+listing. Changing `EVALUATION_TYPES` needs the API restarted, and the web
+shows it only after the page is reloaded.
 
 ## Access Roles
 
@@ -197,6 +213,21 @@ it covers the accents of pt-BR and es, but not characters outside cp1252.
 
 - `improvement-project-pdf.ts`: the project register (RGP/RGA) and its blank
   form, landscape A4, with the colors of the legacy report.
+- `hit-list-pdf.ts`: the Hit List and its blank form, portrait A4, in the
+  seven steps of the legacy `hitlist.pdf.twig` (step 5 starts a page), with
+  its colors. The 14 legacy images live in `public/evaluations/hit-list/`,
+  copied unchanged; the screen fetches them only when a PDF is asked for and
+  passes them through `loadPdfPhoto`, so they go in as JPEG. The item names
+  and the "Lembre-se" captions are the legacy English names in every
+  language, as in the images.
+- `checklist-pdf.ts`: the Coleta de Dados In Loco (`checklist`) and its blank
+  form, portrait A4, as the legacy `checklist.pdf.twig`: the identification,
+  one table per block with each question, "Sim (pontos)", "Não (pontos)"
+  (the marked one bold with the legacy pink rounded border) and the point it
+  scored, the block's sum and percentage, the legend of the five bands and
+  the summary with the global classification, kept on one page. The 55
+  questions, the 11 block titles and the bands are in
+  `evaluations.pdf.checklist`.
 - `load-photo.ts`: turns an attachment `Blob` into a JPEG for the PDF, with
   the EXIF orientation applied and the longest side at most 2,000 px, or
   marks it unavailable when it does not decode. Use it for any photo that
@@ -204,7 +235,20 @@ it covers the accents of pt-BR and es, but not characters outside cp1252.
 
 `projetos/components/use-improvement-project-pdf.ts` is the screen side:
 it downloads the photos, generates one PDF at a time and reports a failure
-with `projects.pdf.error`.
+with `projects.pdf.error`. `avaliacoes/components/use-hit-list-pdf.ts` does
+the same for the Hit List: it fetches the detail (`GET
+/evaluations/hit-lists/{id}`) on the click, turns the answers into the
+report's texts (an empty or mistyped answer is blank, a yes/no not answered
+marks neither), saves `toExportFileName(code, 'hit-list', 'pdf')` or
+`hit-list.pdf`, and reports a failure with `evaluations.pdf.error`.
+`avaliacoes/components/use-checklist-pdf.ts` does the same for the Coleta de
+Dados (`GET /evaluations/checklists/{id}`). It holds the web's only copy of
+the 11 blocks and of the questions whose expected answer is "no", which give
+the points of each option; the sums and percentages come from the API
+`score`, the percentages formatted with `useFormatter().number` (at most two
+decimals, then `%`: `96,36%` in pt-BR and es, `96.36%` in en; `null` is
+blank). It saves `toExportFileName(code, 'coleta-de-dados', 'pdf')` or
+`coleta-de-dados.pdf`.
 
 ## Exports
 
