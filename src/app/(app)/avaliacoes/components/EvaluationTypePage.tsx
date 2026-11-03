@@ -1,6 +1,11 @@
 'use client'
 
-import { notFound, usePathname, useRouter } from 'next/navigation'
+import {
+  notFound,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { type ReactNode, Suspense, useMemo, useState } from 'react'
 
@@ -19,6 +24,7 @@ import {
   useListState,
 } from '@/components/list'
 import { Button, Input } from '@/components/ui'
+import { useAuth } from '@/contexts/AuthContext'
 import {
   type ChecklistItem,
   type HitListItem,
@@ -27,6 +33,8 @@ import {
 } from '@/http/api'
 import { type EvaluationType, useEvaluationTypes } from '@/lib/evaluation-types'
 
+import { evaluationFormHref, evaluationFormPath } from '../_form/list-href'
+import { DeleteEvaluationModal } from './DeleteEvaluationModal'
 import { EvaluationsTable, useEvaluationTableColumns } from './EvaluationsTable'
 import { EvaluationsTabs } from './EvaluationsTabs'
 import {
@@ -36,10 +44,12 @@ import {
 } from './listing'
 import type { EvaluationRow } from './types'
 import { useChecklistPdf } from './use-checklist-pdf'
+import { useDeleteEvaluation } from './use-delete-evaluation'
+import { useEvaluationFeedback } from './use-evaluation-feedback'
 import { useHitListPdf } from './use-hit-list-pdf'
 
 /**
- * The tab of one evaluation type (J-1), for every role and read only. A type
+ * The tab of one evaluation type (J-1), for every role. A type
  * the API does not enable is the not found page (J-4, FR-011); its listing
  * is never requested.
  */
@@ -80,9 +90,102 @@ function EnabledEvaluationType({ type }: { type: EvaluationType }) {
 }
 
 /**
- * The Hit List has no name of its own: the name is the translated type. Its
- * PDF is the way to see a record (D-7): "PDF" on each row and the blank form
- * at the top of the tab, which needs no record (J-2, J-3).
+ * The record actions of a type (FR-015, J1 to J4): "Visualizar" for every
+ * role and "Alterar" and "Excluir" for who may edit in the ⋮ menu of each
+ * row, beside the row's PDF, and "Nova …" for who may edit. The record routes
+ * carry the tab's state, so going back keeps it. "Excluir" asks for
+ * confirmation and reports the result on the tab's feedback strip (FR-016).
+ */
+function useEvaluationRecordActions(
+  type: EvaluationType,
+  newLabel: string,
+  onDownloadPdf: (row: EvaluationRow) => void,
+  setFeedback: (message: ListFeedbackMessage | null) => void
+) {
+  const t = useTranslations('evaluations')
+  const tc = useTranslations('common')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { canEdit } = useAuth()
+  const deleteEvaluation = useDeleteEvaluation(type)
+  const [pendingDelete, setPendingDelete] = useState<EvaluationRow | null>(null)
+
+  function open(target: Parameters<typeof evaluationFormPath>[1]) {
+    router.push(
+      evaluationFormHref(evaluationFormPath(type, target), searchParams)
+    )
+  }
+
+  function getRowActions(row: EvaluationRow): RowActionsMenuProps {
+    const view = {
+      label: tc('view'),
+      icon: 'visibility',
+      onSelect: () => open({ id: row.id }),
+    }
+
+    return {
+      edit: canEdit
+        ? [
+            view,
+            {
+              label: t('actions.edit'),
+              icon: 'edit',
+              onSelect: () => open({ id: row.id, edit: true }),
+            },
+          ]
+        : [view],
+      business: [
+        {
+          label: t('pdf.download'),
+          icon: 'picture_as_pdf',
+          onSelect: () => onDownloadPdf(row),
+        },
+      ],
+      exit: canEdit
+        ? [
+            {
+              label: t('delete.action'),
+              icon: 'delete',
+              onSelect: () => {
+                setFeedback(null)
+                setPendingDelete(row)
+              },
+            },
+          ]
+        : undefined,
+    }
+  }
+
+  const deleteModal = (
+    <DeleteEvaluationModal
+      record={pendingDelete}
+      onConfirm={deleteEvaluation}
+      onClose={() => setPendingDelete(null)}
+      onDeleted={(record) => {
+        setPendingDelete(null)
+        setFeedback({
+          tone: 'success',
+          text: t('feedback.deleted', { code: record.code }),
+        })
+      }}
+    />
+  )
+
+  const newButton = canEdit ? (
+    <NewEvaluationButton
+      label={newLabel}
+      onClick={() => open({ create: true })}
+    />
+  ) : null
+
+  return { getRowActions, newButton, deleteModal }
+}
+
+/**
+ * The Hit List has no name of its own: the name is the translated type. Each
+ * row has "Visualizar" and "PDF" for every role and "Alterar" and "Excluir"
+ * for who may edit; the top of the tab has the blank form and, for who may edit, "Nova
+ * Hit List" (FR-015, J1 to J3).
  */
 function HitListList() {
   const t = useTranslations('evaluations')
@@ -90,6 +193,8 @@ function HitListList() {
   const name = t('types.hit_list')
   const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
   const pdf = useHitListPdf((text) => setFeedback({ tone: 'error', text }))
+
+  useEvaluationFeedback(setFeedback)
 
   function handleDownloadPdf(row: EvaluationRow) {
     if (pdf.isGenerating) return
@@ -105,17 +210,12 @@ function HitListList() {
     void pdf.downloadBlankPdf()
   }
 
-  function getRowActions(row: EvaluationRow): RowActionsMenuProps {
-    return {
-      business: [
-        {
-          label: t('pdf.download'),
-          icon: 'picture_as_pdf',
-          onSelect: () => handleDownloadPdf(row),
-        },
-      ],
-    }
-  }
+  const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
+    'hit_list',
+    t('newHitList'),
+    handleDownloadPdf,
+    setFeedback
+  )
 
   const rows = useMemo<EvaluationRow[] | undefined>(
     () =>
@@ -141,24 +241,59 @@ function HitListList() {
       isError={query.isError}
       onRetry={() => void query.refetch()}
       getRowActions={getRowActions}
-      actions={<BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />}
+      actions={
+        <>
+          <BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />
+          {newButton}
+        </>
+      }
+      emptyAction={newButton}
       feedback={
         <ListFeedback message={feedback} onDismiss={() => setFeedback(null)} />
       }
+      dialogs={deleteModal}
     />
   )
 }
 
 /**
+ * "Nova …" of a type, beside the search and on the empty state (FR-015).
+ * Rendered only for who may edit.
+ */
+function NewEvaluationButton({
+  label,
+  onClick,
+}: {
+  label: string
+  onClick: () => void
+}) {
+  return (
+    <Button
+      type="button"
+      onClick={onClick}
+      className="bg-primary-container text-on-primary-container shadow-lg shadow-primary-container/20 hover:opacity-90"
+    >
+      <span className="material-symbols-outlined text-lg" aria-hidden>
+        add
+      </span>
+      {label}
+    </Button>
+  )
+}
+
+/**
  * The Coleta de Dados In Loco shows the `name` of each record. Like the Hit
- * List, its PDF is the way to see a record: "PDF" on each row and the blank
- * form at the top of the tab (J-2, J-3).
+ * List, each row has "Visualizar" and "PDF" for every role and "Alterar" and
+ * "Excluir" for who may edit; the top of the tab has the blank form and, for who may edit,
+ * "Nova Coleta de Dados" (FR-015, J1 to J3).
  */
 function ChecklistList() {
   const t = useTranslations('evaluations')
   const query = useGetEvaluationsChecklists()
   const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
   const pdf = useChecklistPdf((text) => setFeedback({ tone: 'error', text }))
+
+  useEvaluationFeedback(setFeedback)
 
   function handleDownloadPdf(row: EvaluationRow) {
     if (pdf.isGenerating) return
@@ -174,17 +309,12 @@ function ChecklistList() {
     void pdf.downloadBlankPdf()
   }
 
-  function getRowActions(row: EvaluationRow): RowActionsMenuProps {
-    return {
-      business: [
-        {
-          label: t('pdf.download'),
-          icon: 'picture_as_pdf',
-          onSelect: () => handleDownloadPdf(row),
-        },
-      ],
-    }
-  }
+  const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
+    'checklist',
+    t('newChecklist'),
+    handleDownloadPdf,
+    setFeedback
+  )
 
   const rows = useMemo<EvaluationRow[] | undefined>(
     () =>
@@ -210,10 +340,17 @@ function ChecklistList() {
       isError={query.isError}
       onRetry={() => void query.refetch()}
       getRowActions={getRowActions}
-      actions={<BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />}
+      actions={
+        <>
+          <BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />
+          {newButton}
+        </>
+      }
+      emptyAction={newButton}
       feedback={
         <ListFeedback message={feedback} onDismiss={() => setFeedback(null)} />
       }
+      dialogs={deleteModal}
     />
   )
 }
@@ -254,8 +391,12 @@ interface EvaluationListProps {
   getRowActions?: (row: EvaluationRow) => RowActionsMenuProps
   /** Buttons at the top of the tab, beside the search, shown in every state. */
   actions?: ReactNode
+  /** The action of the empty state ("Nova …", for who may edit). */
+  emptyAction?: ReactNode
   /** The strip that reports the result of an action. */
   feedback?: ReactNode
+  /** Dialogs of the row actions (the deletion confirmation). */
+  dialogs?: ReactNode
 }
 
 /**
@@ -270,7 +411,9 @@ function EvaluationList({
   onRetry,
   getRowActions,
   actions,
+  emptyAction,
   feedback,
+  dialogs,
 }: EvaluationListProps) {
   const t = useTranslations('evaluations')
   const columns = useEvaluationTableColumns()
@@ -326,6 +469,9 @@ function EvaluationList({
           icon="assignment"
           title={t('list.emptyTitle')}
           description={t('list.emptyDescription')}
+          action={
+            emptyAction ? <div className="mt-2">{emptyAction}</div> : undefined
+          }
         />
       )
     }
@@ -390,6 +536,7 @@ function EvaluationList({
 
       {feedback}
       {renderContent()}
+      {dialogs}
     </>
   )
 }

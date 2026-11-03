@@ -210,6 +210,18 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Evaluation type not available.': 'evaluationTypeNotAvailable',
   'Hit list not found.': 'hitListNotFound',
   'Checklist not found.': 'checklistNotFound',
+  'Hit list activity is required.': 'hitListActivityRequired',
+  'Hit list activity not found.': 'hitListActivityNotFound',
+  'Invalid hit list assessment date.': 'hitListAssessmentDateInvalid',
+  'Invalid hit list answers.': 'hitListAnswersInvalid',
+  'Checklist activity is required.': 'checklistActivityRequired',
+  'Checklist activity not found.': 'checklistActivityNotFound',
+  'Checklist name is required.': 'checklistNameRequired',
+  'Checklist name is too long.': 'checklistNameTooLong',
+  'Checklist sector is required.': 'checklistSectorRequired',
+  'Checklist sector is too long.': 'checklistSectorTooLong',
+  'Invalid checklist date.': 'checklistDateInvalid',
+  'Invalid checklist answers.': 'checklistAnswersInvalid',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

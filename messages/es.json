@@ -1464,6 +1464,87 @@
           "question55": "¿Tiene un ratón suelto?"
         }
       }
+    },
+    "newHitList": "Nueva Hit List",
+    "newChecklist": "Nueva Recopilación de Datos",
+    "actions": {
+      "edit": "Modificar"
+    },
+    "feedback": {
+      "created": "Evaluación {code} registrada correctamente.",
+      "updated": "Evaluación {code} modificada correctamente.",
+      "deleted": "Evaluación {code} eliminada correctamente."
+    },
+    "form": {
+      "newDescription": "{type}: elija la actividad y la fecha de la evaluación. Los demás campos son opcionales.",
+      "editDescription": "{type}: modifique los campos de la evaluación, incluida la actividad. Un campo vaciado queda sin respuesta.",
+      "viewDescription": "{type}: evaluación registrada, solo lectura.",
+      "activityPlaceholder": "Seleccione la actividad",
+      "activityHint": "Actividad registrada, identificada por código y nombre.",
+      "activitiesLoading": "Cargando actividades...",
+      "activitiesLoadError": "No fue posible cargar las actividades, y la evaluación no se puede guardar sin ellas.",
+      "activitiesEmpty": "Ninguna actividad registrada. Un administrador puede registrarlas en Parámetros › Actividades.",
+      "noAnswer": "Sin respuesta",
+      "create": "Registrar evaluación",
+      "creating": "Registrando...",
+      "update": "Guardar cambios",
+      "loadError": "No fue posible cargar la {type}",
+      "backToList": "Volver a {type}"
+    },
+    "validation": {
+      "activityRequired": "Seleccione la actividad.",
+      "assessmentDateRequired": "Ingrese una fecha válida para la evaluación.",
+      "textTooLong": "Este campo debe tener como máximo {max} caracteres.",
+      "nameRequired": "Ingrese el nombre.",
+      "sectorRequired": "Ingrese el sector.",
+      "checklistDateRequired": "Ingrese una fecha válida."
+    },
+    "hitListForm": {
+      "sections": {
+        "identification": "Identificación",
+        "tasks": "Tareas",
+        "items": "Factores de riesgo",
+        "rootCauses": "Causas raíz generales",
+        "improvements": "Mejoras sugeridas",
+        "closing": "Cierre"
+      },
+      "fields": {
+        "assessmentDate": "Fecha de la evaluación",
+        "department": "Departamento",
+        "site": "Sitio",
+        "turn": "Turno",
+        "station": "Estación",
+        "product": "Producto",
+        "itemMark": "¿Se observó {item}?",
+        "itemImprovements": "Mejoras",
+        "improvement": "Mejora {n}",
+        "improvementText": "Descripción de la mejora {n}",
+        "improvementItems": "Elementos de Hit List vinculados a la mejora {n}",
+        "engineeringAware": "Ingeniero consciente de la solución",
+        "responsibleEngineeringToUpdateDoc": "Responsable de actualizar el documento"
+      }
+    },
+    "checklistForm": {
+      "newDescription": "{type}: elija la actividad e ingrese el nombre, el sector y la fecha. Las preguntas pueden quedar sin respuesta.",
+      "questionsDescription": "Responda cada pregunta con sí o no; entre paréntesis, los puntos de cada opción. La suma y el porcentaje de cada bloque y la clasificación global se actualizan mientras responde.",
+      "sections": {
+        "identification": "Identificación",
+        "questions": "Preguntas",
+        "score": "Clasificación"
+      },
+      "fields": {
+        "name": "Nombre",
+        "sector": "Sector",
+        "date": "Fecha"
+      }
+    },
+    "delete": {
+      "action": "Eliminar",
+      "title": "Eliminar evaluación",
+      "question": "¿Desea realmente eliminar la evaluación <strong>{code}</strong>?",
+      "description": "La eliminación es definitiva y no se puede deshacer. El código no será reutilizado.",
+      "confirm": "Eliminar evaluación",
+      "deleting": "Eliminando..."
     }
   },
   "errors": {
@@ -1639,6 +1720,18 @@
     "matrixActivityNotFound": "Actividad de la Matriz no encontrada.",
     "evaluationTypeNotAvailable": "Este tipo de evaluación no está disponible en esta instalación.",
     "hitListNotFound": "Hit List no encontrada.",
-    "checklistNotFound": "Recopilación de Datos In Loco no encontrada."
+    "checklistNotFound": "Recopilación de Datos In Loco no encontrada.",
+    "hitListActivityRequired": "Seleccione la actividad de la Hit List.",
+    "hitListActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "hitListAssessmentDateInvalid": "Ingrese una fecha válida para la evaluación de la Hit List.",
+    "hitListAnswersInvalid": "Algunas respuestas de la Hit List no son válidas. Revise los campos e intente nuevamente.",
+    "checklistActivityRequired": "Seleccione la actividad de la Recopilación de Datos In Loco.",
+    "checklistActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "checklistNameRequired": "Ingrese el nombre de la Recopilación de Datos In Loco.",
+    "checklistNameTooLong": "El nombre de la Recopilación de Datos In Loco debe tener como máximo 255 caracteres.",
+    "checklistSectorRequired": "Ingrese el sector de la Recopilación de Datos In Loco.",
+    "checklistSectorTooLong": "El sector de la Recopilación de Datos In Loco debe tener como máximo 255 caracteres.",
+    "checklistDateInvalid": "Ingrese una fecha válida para la Recopilación de Datos In Loco.",
+    "checklistAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco no son válidas. Revise las preguntas e intente nuevamente."
   }
 }

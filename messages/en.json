@@ -1464,6 +1464,87 @@
           "question55": "Is there a separate mouse?"
         }
       }
+    },
+    "newHitList": "New Hit List",
+    "newChecklist": "New Data Collection",
+    "actions": {
+      "edit": "Edit"
+    },
+    "feedback": {
+      "created": "Evaluation {code} created successfully.",
+      "updated": "Evaluation {code} updated successfully.",
+      "deleted": "Evaluation {code} deleted successfully."
+    },
+    "form": {
+      "newDescription": "{type}: choose the activity and the assessment date. The other fields are optional.",
+      "editDescription": "{type}: change the fields of the evaluation, including the activity. A field left empty has no answer.",
+      "viewDescription": "{type}: registered evaluation, read only.",
+      "activityPlaceholder": "Select the activity",
+      "activityHint": "A registered activity, identified by code and name.",
+      "activitiesLoading": "Loading activities...",
+      "activitiesLoadError": "The activities could not be loaded, and the evaluation cannot be saved without them.",
+      "activitiesEmpty": "No activity registered. An administrator can register them in Parameters › Activities.",
+      "noAnswer": "No answer",
+      "create": "Create evaluation",
+      "creating": "Creating...",
+      "update": "Save changes",
+      "loadError": "The {type} could not be loaded",
+      "backToList": "Back to {type}"
+    },
+    "validation": {
+      "activityRequired": "Select the activity.",
+      "assessmentDateRequired": "Enter a valid assessment date.",
+      "textTooLong": "This field must have at most {max} characters.",
+      "nameRequired": "Enter the name.",
+      "sectorRequired": "Enter the sector.",
+      "checklistDateRequired": "Enter a valid date."
+    },
+    "hitListForm": {
+      "sections": {
+        "identification": "Identification",
+        "tasks": "Tasks",
+        "items": "Risk factors",
+        "rootCauses": "General root causes",
+        "improvements": "Suggested improvements",
+        "closing": "Closing"
+      },
+      "fields": {
+        "assessmentDate": "Assessment date",
+        "department": "Department",
+        "site": "Site",
+        "turn": "Shift",
+        "station": "Station",
+        "product": "Product",
+        "itemMark": "Was {item} observed?",
+        "itemImprovements": "Improvements",
+        "improvement": "Improvement {n}",
+        "improvementText": "Description of improvement {n}",
+        "improvementItems": "Hit List items linked to improvement {n}",
+        "engineeringAware": "Engineer aware of the solution",
+        "responsibleEngineeringToUpdateDoc": "Responsible for updating the document"
+      }
+    },
+    "checklistForm": {
+      "newDescription": "{type}: choose the activity and enter the name, the sector and the date. Questions may be left unanswered.",
+      "questionsDescription": "Answer each question with yes or no; the points of each option are in parentheses. The sum and percentage of each block and the overall classification update as you answer.",
+      "sections": {
+        "identification": "Identification",
+        "questions": "Questions",
+        "score": "Classification"
+      },
+      "fields": {
+        "name": "Name",
+        "sector": "Sector",
+        "date": "Date"
+      }
+    },
+    "delete": {
+      "action": "Delete",
+      "title": "Delete evaluation",
+      "question": "Do you really want to delete the evaluation <strong>{code}</strong>?",
+      "description": "The deletion is final and cannot be undone. The code will not be reused.",
+      "confirm": "Delete evaluation",
+      "deleting": "Deleting..."
     }
   },
   "errors": {
@@ -1639,6 +1720,18 @@
     "matrixActivityNotFound": "Matrix activity not found.",
     "evaluationTypeNotAvailable": "This evaluation type is not available in this installation.",
     "hitListNotFound": "Hit List not found.",
-    "checklistNotFound": "In Loco Data Collection not found."
+    "checklistNotFound": "In Loco Data Collection not found.",
+    "hitListActivityRequired": "Select the activity of the Hit List.",
+    "hitListActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "hitListAssessmentDateInvalid": "Enter a valid assessment date for the Hit List.",
+    "hitListAnswersInvalid": "Some answers of the Hit List are invalid. Review the fields and try again.",
+    "checklistActivityRequired": "Select the activity of the In Loco Data Collection.",
+    "checklistActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "checklistNameRequired": "Enter the name of the In Loco Data Collection.",
+    "checklistNameTooLong": "The name of the In Loco Data Collection must have at most 255 characters.",
+    "checklistSectorRequired": "Enter the sector of the In Loco Data Collection.",
+    "checklistSectorTooLong": "The sector of the In Loco Data Collection must have at most 255 characters.",
+    "checklistDateInvalid": "Enter a valid date for the In Loco Data Collection.",
+    "checklistAnswersInvalid": "Some answers of the In Loco Data Collection are invalid. Review the questions and try again."
   }
 }

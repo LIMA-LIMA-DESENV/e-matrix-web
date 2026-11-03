@@ -1464,6 +1464,87 @@
           "question55": "Possui mouse avulso?"
         }
       }
+    },
+    "newHitList": "Nova Hit List",
+    "newChecklist": "Nova Coleta de Dados",
+    "actions": {
+      "edit": "Alterar"
+    },
+    "feedback": {
+      "created": "Avaliação {code} cadastrada com sucesso.",
+      "updated": "Avaliação {code} alterada com sucesso.",
+      "deleted": "Avaliação {code} excluída com sucesso."
+    },
+    "form": {
+      "newDescription": "{type}: escolha a atividade e a data da avaliação. Os demais campos são opcionais.",
+      "editDescription": "{type}: altere os campos da avaliação, inclusive a atividade. Um campo esvaziado fica sem resposta.",
+      "viewDescription": "{type}: avaliação registrada, somente para leitura.",
+      "activityPlaceholder": "Selecione a atividade",
+      "activityHint": "Atividade cadastrada, identificada por código e nome.",
+      "activitiesLoading": "Carregando atividades...",
+      "activitiesLoadError": "Não foi possível carregar as atividades, e a avaliação não pode ser salva sem elas.",
+      "activitiesEmpty": "Nenhuma atividade cadastrada. Um administrador pode cadastrá-las em Parâmetros › Atividades.",
+      "noAnswer": "Sem resposta",
+      "create": "Cadastrar avaliação",
+      "creating": "Cadastrando...",
+      "update": "Salvar alterações",
+      "loadError": "Não foi possível carregar a {type}",
+      "backToList": "Voltar para {type}"
+    },
+    "validation": {
+      "activityRequired": "Selecione a atividade.",
+      "assessmentDateRequired": "Informe uma data válida para a avaliação.",
+      "textTooLong": "Este campo deve ter no máximo {max} caracteres.",
+      "nameRequired": "Informe o nome.",
+      "sectorRequired": "Informe o setor.",
+      "checklistDateRequired": "Informe uma data válida."
+    },
+    "hitListForm": {
+      "sections": {
+        "identification": "Identificação",
+        "tasks": "Tarefas",
+        "items": "Fatores de risco",
+        "rootCauses": "Causas raiz gerais",
+        "improvements": "Melhorias sugeridas",
+        "closing": "Fechamento"
+      },
+      "fields": {
+        "assessmentDate": "Data da avaliação",
+        "department": "Departamento",
+        "site": "Site",
+        "turn": "Turno",
+        "station": "Estação",
+        "product": "Produto",
+        "itemMark": "{item} foi observado?",
+        "itemImprovements": "Melhorias",
+        "improvement": "Melhoria {n}",
+        "improvementText": "Descrição da melhoria {n}",
+        "improvementItems": "Itens do Hit List ligados à melhoria {n}",
+        "engineeringAware": "Engenheiro ciente da solução",
+        "responsibleEngineeringToUpdateDoc": "Responsável pela atualização do documento"
+      }
+    },
+    "checklistForm": {
+      "newDescription": "{type}: escolha a atividade e informe o nome, o setor e a data. As perguntas podem ficar sem resposta.",
+      "questionsDescription": "Responda a cada pergunta com sim ou não; entre parênteses, os pontos da opção. A soma e o percentual de cada bloco e a classificação global se atualizam enquanto você responde.",
+      "sections": {
+        "identification": "Identificação",
+        "questions": "Perguntas",
+        "score": "Classificação"
+      },
+      "fields": {
+        "name": "Nome",
+        "sector": "Setor",
+        "date": "Data"
+      }
+    },
+    "delete": {
+      "action": "Excluir",
+      "title": "Excluir avaliação",
+      "question": "Deseja realmente excluir a avaliação <strong>{code}</strong>?",
+      "description": "A exclusão é definitiva e não pode ser desfeita. O código não será reaproveitado.",
+      "confirm": "Excluir avaliação",
+      "deleting": "Excluindo..."
     }
   },
   "errors": {
@@ -1639,6 +1720,18 @@
     "matrixActivityNotFound": "Atividade da Matriz não encontrada.",
     "evaluationTypeNotAvailable": "Este tipo de avaliação não está disponível nesta instalação.",
     "hitListNotFound": "Hit List não encontrada.",
-    "checklistNotFound": "Coleta de Dados In Loco não encontrada."
+    "checklistNotFound": "Coleta de Dados In Loco não encontrada.",
+    "hitListActivityRequired": "Selecione a atividade da Hit List.",
+    "hitListActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "hitListAssessmentDateInvalid": "Informe uma data válida para a avaliação da Hit List.",
+    "hitListAnswersInvalid": "Algumas respostas da Hit List são inválidas. Revise os campos e tente novamente.",
+    "checklistActivityRequired": "Selecione a atividade da Coleta de Dados In Loco.",
+    "checklistActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "checklistNameRequired": "Informe o nome da Coleta de Dados In Loco.",
+    "checklistNameTooLong": "O nome da Coleta de Dados In Loco deve ter no máximo 255 caracteres.",
+    "checklistSectorRequired": "Informe o setor da Coleta de Dados In Loco.",
+    "checklistSectorTooLong": "O setor da Coleta de Dados In Loco deve ter no máximo 255 caracteres.",
+    "checklistDateInvalid": "Informe uma data válida para a Coleta de Dados In Loco.",
+    "checklistAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco são inválidas. Revise as perguntas e tente novamente."
   }
 }
