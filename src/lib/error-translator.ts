@@ -207,6 +207,9 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Matrix copy source has changed.': 'matrixCopySourceChanged',
   'Matrix not initialized.': 'matrixNotInitialized',
   'Matrix activity not found.': 'matrixActivityNotFound',
+  'Evaluation type not available.': 'evaluationTypeNotAvailable',
+  'Hit list not found.': 'hitListNotFound',
+  'Checklist not found.': 'checklistNotFound',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

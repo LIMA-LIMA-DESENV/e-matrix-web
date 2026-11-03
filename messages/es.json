@@ -113,6 +113,7 @@
     "projects": "Proyectos",
     "trainings": "Entrenamientos",
     "meetings": "Reuniones",
+    "evaluations": "Evaluaciones",
     "matrix": "Matriz",
     "periods": "Períodos",
     "activities": "Actividades",
@@ -280,7 +281,8 @@
     "linkedRecords": {
       "types": {
         "projects": "Proyectos de mejora",
-        "matrix": "Matriz"
+        "matrix": "Matriz",
+        "evaluations": "Evaluaciones"
       }
     },
     "delete": {
@@ -1265,6 +1267,205 @@
       "notInitialized": "Los gráficos aparecen después de que la Matriz se inicia, en la pestaña Resultados, por quien edita. Abrir los gráficos no registra ningún dato."
     }
   },
+  "evaluations": {
+    "title": "Evaluaciones",
+    "description": "Consulte las evaluaciones ergonómicas registradas para las actividades.",
+    "tabs": {
+      "label": "Tipos de evaluación",
+      "hit_list": "Hit List",
+      "checklist": "Recopilación de Datos In Loco"
+    },
+    "types": {
+      "hit_list": "Hit List",
+      "checklist": "Recopilación de Datos In Loco"
+    },
+    "columns": {
+      "code": "Código",
+      "type": "Tipo",
+      "name": "Nombre",
+      "activity": "Actividad",
+      "createdAt": "Registrada el",
+      "updatedAt": "Modificada el"
+    },
+    "list": {
+      "searchPlaceholder": "Buscar por código, tipo, nombre o actividad...",
+      "searchLabel": "Buscar evaluación",
+      "itemLabel": "{count, plural, one {evaluación} other {evaluaciones}}",
+      "loadErrorTitle": "No fue posible cargar las evaluaciones",
+      "loadErrorDescription": "Inténtelo de nuevo. Si el problema persiste, verifique su conexión.",
+      "emptyTitle": "Ninguna evaluación registrada",
+      "emptyDescription": "Las evaluaciones de este tipo registradas para las actividades aparecerán en esta lista.",
+      "noResultsTitle": "Ninguna evaluación encontrada para la búsqueda.",
+      "noResultsDescription": "Intente ajustar la búsqueda por código, tipo, nombre o actividad, o limpie los filtros."
+    },
+    "typesLoadErrorTitle": "No fue posible cargar los tipos de evaluación",
+    "pdf": {
+      "download": "Descargar PDF",
+      "downloadBlank": "Descargar PDF en blanco",
+      "generating": "Generando PDF...",
+      "error": "No fue posible generar el PDF. Inténtelo de nuevo.",
+      "hitList": {
+        "step": "Paso {n}",
+        "date": "Fecha:",
+        "steps": {
+          "activity": "Información completa de la actividad",
+          "tasks": "Liste las tareas observadas",
+          "items": "Identifique cada elemento de Hit List observado en la tarea listada en el Paso 2 y qué postura se observó",
+          "rootCauses": "Enumere todas las causas raíz asociadas a los elementos de Hit List observados en el Paso 3.",
+          "improvements": "Marque cada elemento de Hit List que usted observó en el Paso 3. Haga una lluvia de ideas y registre potenciales mejoras abajo. Para cada mejora marque el elemento Hit List vinculado.",
+          "feedback": "Comentarios del operador",
+          "engineer": "Ingeniero encargado"
+        },
+        "fields": {
+          "activity": "Nombre:",
+          "department": "Departamento:",
+          "site": "Sitio:",
+          "turn": "Turno:",
+          "station": "Estación:",
+          "product": "Producto:"
+        },
+        "task": "Tarea",
+        "rootCause": "Causa raíz",
+        "remember": "Recuerde",
+        "rememberItems": {
+          "toolTarget": "Tool/Target",
+          "comfortZone": "Comfort Zone",
+          "static": "Don't Give Me Static"
+        },
+        "hitListItems": "Elementos de Hit List",
+        "items": {
+          "washRag": "Wash Rag",
+          "elbowsOut": "Elbows Out",
+          "shoulderHighLow": "Shoulder Too High/Too Low",
+          "hungryHead": "Hungry Head",
+          "buttsUp": "Butts Up",
+          "twistAndShout": "Twist and Shout",
+          "horizontalDistance": "Horizontal Distance",
+          "sitStand": "Sit vs. Stand",
+          "badVibes": "Bad Vibes",
+          "contact": "Contact"
+        },
+        "yes": "Sí",
+        "no": "No",
+        "questions": {
+          "anotherWorkstationAffected": "¿Alguna otra estación de trabajo está afectada?",
+          "ifSoWhich": "Si es así, ¿cuáles?",
+          "createdOtherProblem": "¿La solución encontrada creó algún otro problema?",
+          "ifSoExplain": "Si es así, explique:",
+          "problemSolved": "¿La solución resolvió el problema?",
+          "engineeringAware": "¿Existe un ingeniero consciente de la solución y la pauta apropiada?",
+          "documentNeedUpdate": "¿El documento de operación estándar debe actualizarse?"
+        },
+        "engineerName": "Nombre del ingeniero:"
+      },
+      "checklist": {
+        "fields": {
+          "name": "NOMBRE",
+          "sector": "SECTOR",
+          "date": "FECHA",
+          "activity": "ACTIVIDAD"
+        },
+        "yes": "Sí ({points})",
+        "no": "No ({points})",
+        "pointsSum": "Suma de puntos",
+        "percentage": "Porcentaje",
+        "legendTitle": "En cada uno de los elementos investigados, y también para el total de elementos de este Check-list, considere",
+        "bands": {
+          "excellent": {
+            "range": "91-100% de los puntos",
+            "label": "Condición Ergonómica Excelente"
+          },
+          "good": {
+            "range": "71-90% de los puntos",
+            "label": "Buena Condición Ergonómica"
+          },
+          "reasonable": {
+            "range": "51-70% de los puntos",
+            "label": "Condición Ergonómica Razonable"
+          },
+          "bad": {
+            "range": "31-50% de los puntos",
+            "label": "Condición Ergonómica Mala"
+          },
+          "terrible": {
+            "range": "Menos del 31% de los puntos",
+            "label": "Condición Ergonómica Pésima"
+          }
+        },
+        "globalClassification": "Clasificación Global del Puesto de trabajo",
+        "blocks": {
+          "layout": "LAYOUT",
+          "physical_environment": "AMBIENTE FÍSICO",
+          "posture": "POSTURA",
+          "work_organization": "ORGANIZACIÓN DEL TRABAJO",
+          "chair": "SILLA",
+          "monitor": "MONITOR",
+          "desk": "MESA",
+          "keyboard": "TECLADO",
+          "cabinet_cpu": "GABINETE Y CPU",
+          "accessories": "ACCESORIOS",
+          "laptop": "LAPTOP"
+        },
+        "questions": {
+          "question1": "¿La distancia entre la parte trasera de un terminal y el operador más cercano es mayor que 1 m?",
+          "question2": "Cuando es necesario utilizar disquete, CD o pendrive, ¿el acceso a los respectivos dispositivos es fácil?",
+          "question3": "¿Hay equipos o materiales que perjudican el posicionamiento del cuerpo?",
+          "question4": "¿La temperatura es cómoda para el trabajador?",
+          "question5": "¿El puesto de trabajo está situado de lado a las ventanas? En caso contrario, ¿las ventanas tienen persianas y cortinas?",
+          "question6": "¿El brillo del piso molesta visualmente?",
+          "question7": "¿Hay lámparas quemadas cerca de su puesto de trabajo?",
+          "question8": "¿Hay ruidos que molesten o perjudiquen la concentración del trabajador?",
+          "question9": "¿El trabajador está en la posición correcta en relación al tipo de función? (sentado o de pie)",
+          "question10": "¿Es posible alternar la postura de modo que se ponga de pie ocasionalmente? (estar sentado o de pie de vez en cuando)",
+          "question11": "¿Ha obtenido orientación postural?",
+          "question12": "¿Hay algún factor que lleve a la necesidad de trabajar en contracción estática del tronco?",
+          "question13": "¿El trabajador refiere alguna incomodidad actualmente?",
+          "question14": "¿Hay pausas/descanso de 10 minutos cada 2 horas trabajadas?",
+          "question15": "Si el trabajo involucra solamente uso de computadora, ¿hay pausa de 10 minutos cada 50 minutos trabajados? (Digitación)",
+          "question16": "En el caso de digitación, ¿el número medio de pulsaciones es menor de 8.000 por hora?",
+          "question17": "¿El respaldo permite apoyo para la región dorso-lumbar?",
+          "question18": "¿El respaldo de la espalda y el asiento permiten un ángulo de 100°?",
+          "question19": "¿La altura del asiento de la silla permite un ángulo de 90° de las rodillas?",
+          "question20": "¿La altura del reposabrazos permite un ángulo de 90° para los codos?",
+          "question21": "¿Tiene reposabrazos tapizados, suaves y con regulación?",
+          "question22": "¿Está tapizada con tejido que permite la transpiración?",
+          "question23": "¿Tiene ruedas adecuadas?",
+          "question24": "¿El monitor está ubicado frente al trabajador?",
+          "question25": "¿Hay regulación de la altura del monitor?",
+          "question26": "¿Hay regulación de la inclinación del monitor?",
+          "question27": "¿La altura de la pantalla del monitor permite la mirada horizontal del trabajador?",
+          "question28": "¿La distancia de la pantalla del monitor hasta los ojos del trabajador se encuentra entre 50 y 70 cm?",
+          "question29": "¿El ángulo de lectura de la pantalla del monitor hasta los ojos se encuentra entre 33° y 44°?",
+          "question30": "¿Hay control de brillo y contraste de los caracteres?",
+          "question31": "En trabajos con hojas de cálculo, ¿utiliza zoom por debajo del 100%?",
+          "question32": "¿Hay temblores en la pantalla?",
+          "question33": "¿Hay reflejos de iluminación natural (de las ventanas) en la pantalla del monitor?",
+          "question34": "¿Hay reflejos de iluminación artificial (de las lámparas) en la pantalla del monitor?",
+          "question35": "¿La mesa tiene regulación de altura?",
+          "question36": "¿La altura de la mesa permite espacio suficiente para las piernas?",
+          "question37": "¿La altura de la mesa permite un ajuste adecuado del apoyo de los brazos/codos en la silla?",
+          "question38": "¿Tiene bordes redondeados?",
+          "question39": "¿La superficie de la mesa está hecha de material no reflectante?",
+          "question40": "¿Los tiradores de los cajones son de tipo asa?",
+          "question41": "¿Los objetos sobre la mesa usados frecuentemente (teclado, ratón, teléfono, calculadora, documentos) están en el área de alcance normal (semicírculos hechos con los codos flexionados)?",
+          "question42": "¿Los objetos sobre la mesa usados ocasionalmente están en el área de alcance máximo (semicírculos hechos con los codos extendidos)?",
+          "question43": "¿Es suave?",
+          "question44": "¿Está configurado correctamente? (acentuación, idioma, etc.)",
+          "question45": "¿Ocupa espacio excesivo en el puesto de trabajo?",
+          "question46": "¿Genera ruido excesivo?",
+          "question47": "¿Transmite calor radiante al cuerpo del trabajador?",
+          "question48": "¿Tiene soporte de teclado para el apoyo de las muñecas?",
+          "question49": "¿Tiene soporte de ratón para el apoyo de las muñecas?",
+          "question50": "¿Tiene auriculares? Si no es necesario, puntúe sí",
+          "question51": "¿Tiene apoyo para los pies? Si no es necesario, puntúe sí",
+          "question52": "Si lee documentos con frecuencia para digitar, ¿tiene soporte para documentos? Si no es necesario, puntúe sí",
+          "question53": "¿Tiene soporte para elevar la pantalla del equipo? ¿O tiene monitor?",
+          "question54": "¿Tiene un teclado suelto?",
+          "question55": "¿Tiene un ratón suelto?"
+        }
+      }
+    }
+  },
   "errors": {
     "invalidCredentials": "Correo electrónico o contraseña incorrectos.",
     "sessionExpired": "Su sesión expiró por inactividad. Inicie sesión de nuevo para continuar.",
@@ -1435,6 +1636,9 @@
     "matrixAlreadyInitialized": "La Matriz de este período ya fue iniciada.",
     "matrixCopySourceChanged": "El período de origen de la copia cambió. Revise el nuevo período antes de copiar.",
     "matrixNotInitialized": "La Matriz de este período aún no fue iniciada.",
-    "matrixActivityNotFound": "Actividad de la Matriz no encontrada."
+    "matrixActivityNotFound": "Actividad de la Matriz no encontrada.",
+    "evaluationTypeNotAvailable": "Este tipo de evaluación no está disponible en esta instalación.",
+    "hitListNotFound": "Hit List no encontrada.",
+    "checklistNotFound": "Recopilación de Datos In Loco no encontrada."
   }
 }

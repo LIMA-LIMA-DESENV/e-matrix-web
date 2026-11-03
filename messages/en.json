@@ -113,6 +113,7 @@
     "projects": "Projects",
     "trainings": "Trainings",
     "meetings": "Meetings",
+    "evaluations": "Evaluations",
     "matrix": "Matrix",
     "periods": "Periods",
     "activities": "Activities",
@@ -280,7 +281,8 @@
     "linkedRecords": {
       "types": {
         "projects": "Improvement projects",
-        "matrix": "Matrix"
+        "matrix": "Matrix",
+        "evaluations": "Evaluations"
       }
     },
     "delete": {
@@ -1265,6 +1267,205 @@
       "notInitialized": "The charts show up once the Matrix is started, on the Results tab, by someone who edits. Opening the charts records no data."
     }
   },
+  "evaluations": {
+    "title": "Evaluations",
+    "description": "Look up the ergonomic evaluations registered for the activities.",
+    "tabs": {
+      "label": "Evaluation types",
+      "hit_list": "Hit List",
+      "checklist": "In Loco Data Collection"
+    },
+    "types": {
+      "hit_list": "Hit List",
+      "checklist": "In Loco Data Collection"
+    },
+    "columns": {
+      "code": "Code",
+      "type": "Type",
+      "name": "Name",
+      "activity": "Activity",
+      "createdAt": "Registered at",
+      "updatedAt": "Changed at"
+    },
+    "list": {
+      "searchPlaceholder": "Search by code, type, name or activity...",
+      "searchLabel": "Search evaluation",
+      "itemLabel": "{count, plural, one {evaluation} other {evaluations}}",
+      "loadErrorTitle": "The evaluations could not be loaded",
+      "loadErrorDescription": "Try again. If the problem persists, check your connection.",
+      "emptyTitle": "No evaluation registered",
+      "emptyDescription": "The evaluations of this type registered for the activities will appear in this list.",
+      "noResultsTitle": "No evaluation matches the search.",
+      "noResultsDescription": "Try adjusting the search by code, type, name or activity, or clear the filters."
+    },
+    "typesLoadErrorTitle": "The evaluation types could not be loaded",
+    "pdf": {
+      "download": "Download PDF",
+      "downloadBlank": "Download blank PDF",
+      "generating": "Generating PDF...",
+      "error": "Could not generate the PDF. Please try again.",
+      "hitList": {
+        "step": "Step {n}",
+        "date": "Date:",
+        "steps": {
+          "activity": "Full Activity Information",
+          "tasks": "List the tasks observed",
+          "items": "Identify each Hit List Item observed in the task listed in Step 2 and which posture was observed",
+          "rootCauses": "List all root causes associated with the Hit List items observed in Step 3.",
+          "improvements": "Check each Hit List item you observed in Step 3. Brainstorm and record potential improvements below. For each improvement check the linked Hit List item.",
+          "feedback": "Operator Feedback",
+          "engineer": "Engineer in charge"
+        },
+        "fields": {
+          "activity": "Name:",
+          "department": "Department:",
+          "site": "Site:",
+          "turn": "Shift:",
+          "station": "Station:",
+          "product": "Product:"
+        },
+        "task": "Task",
+        "rootCause": "Root cause",
+        "remember": "Remember",
+        "rememberItems": {
+          "toolTarget": "Tool/Target",
+          "comfortZone": "Comfort Zone",
+          "static": "Don't Give Me Static"
+        },
+        "hitListItems": "Hit List Items",
+        "items": {
+          "washRag": "Wash Rag",
+          "elbowsOut": "Elbows Out",
+          "shoulderHighLow": "Shoulder Too High/Too Low",
+          "hungryHead": "Hungry Head",
+          "buttsUp": "Butts Up",
+          "twistAndShout": "Twist and Shout",
+          "horizontalDistance": "Horizontal Distance",
+          "sitStand": "Sit vs. Stand",
+          "badVibes": "Bad Vibes",
+          "contact": "Contact"
+        },
+        "yes": "Yes",
+        "no": "No",
+        "questions": {
+          "anotherWorkstationAffected": "Is any other workstation affected?",
+          "ifSoWhich": "If so, which ones?",
+          "createdOtherProblem": "Did the solution found create any other problems?",
+          "ifSoExplain": "If so, explain:",
+          "problemSolved": "Did the solution solve the problem?",
+          "engineeringAware": "Is there an engineer who is aware of the solution and the appropriate guideline?",
+          "documentNeedUpdate": "Does the standard operating document need to be updated?"
+        },
+        "engineerName": "Engineer's name:"
+      },
+      "checklist": {
+        "fields": {
+          "name": "NAME",
+          "sector": "SECTOR",
+          "date": "DATE",
+          "activity": "ACTIVITY"
+        },
+        "yes": "Yes ({points})",
+        "no": "No ({points})",
+        "pointsSum": "Sum of the points",
+        "percentage": "Percentage",
+        "legendTitle": "In each of the items surveyed, and also for the total items of this Check-list, consider",
+        "bands": {
+          "excellent": {
+            "range": "91-100% of the points",
+            "label": "Excellent Ergonomic Condition"
+          },
+          "good": {
+            "range": "71-90% of the points",
+            "label": "Good Ergonomic Condition"
+          },
+          "reasonable": {
+            "range": "51-70% of the points",
+            "label": "Reasonable Ergonomic Condition"
+          },
+          "bad": {
+            "range": "31-50% of the points",
+            "label": "Bad Ergonomic Condition"
+          },
+          "terrible": {
+            "range": "Less than 31% of the points",
+            "label": "Very Poor Ergonomic Condition"
+          }
+        },
+        "globalClassification": "Overall Classification of the Workstation",
+        "blocks": {
+          "layout": "LAYOUT",
+          "physical_environment": "PHYSICAL ENVIRONMENT",
+          "posture": "POSTURE",
+          "work_organization": "WORK ORGANIZATION",
+          "chair": "CHAIR",
+          "monitor": "MONITOR",
+          "desk": "DESK",
+          "keyboard": "KEYBOARD",
+          "cabinet_cpu": "CABINET AND CPU",
+          "accessories": "ACCESSORIES",
+          "laptop": "LAPTOP"
+        },
+        "questions": {
+          "question1": "Is the distance between the back of a terminal and the nearest operator more than 1 m?",
+          "question2": "When it is necessary to use a diskette, CD or USB drive, are the respective devices easy to access?",
+          "question3": "Is there any equipment or material that impairs body positioning?",
+          "question4": "Is the temperature comfortable for the worker?",
+          "question5": "Is the workstation positioned sideways to the windows? Otherwise, do the windows have blinds and curtains?",
+          "question6": "Does the floor glare bother the eyes?",
+          "question7": "Are there burned-out bulbs near the workstation?",
+          "question8": "Are there any noises that bother the worker or impair their concentration?",
+          "question9": "Is the worker in the correct position for the type of job? (sitting or standing)",
+          "question10": "Is it possible to alternate posture so as to stand occasionally? (sitting or standing occasionally)",
+          "question11": "Has the worker received postural guidance?",
+          "question12": "Is there any factor that makes it necessary to work with a static contraction of the trunk?",
+          "question13": "Does the worker currently report any discomfort?",
+          "question14": "Are there breaks/rest of 10 minutes every 2 hours worked?",
+          "question15": "If the work involves only computer use, is there a 10-minute break every 50 minutes worked? (Typing)",
+          "question16": "When typing, is the average number of keystrokes less than 8,000 per hour?",
+          "question17": "Does the backrest support the dorsal-lumbar region?",
+          "question18": "Do the backrest and the seat allow a 100° angle?",
+          "question19": "Does the height of the chair seat allow a 90° angle of the knees?",
+          "question20": "Does the height of the armrests allow a 90° angle of the elbows?",
+          "question21": "Does it have padded, soft and adjustable armrests?",
+          "question22": "Is the upholstery made of a fabric that allows perspiration?",
+          "question23": "Does it have suitable casters?",
+          "question24": "Is the monitor located in front of the worker?",
+          "question25": "Is there a height adjustment of the monitor?",
+          "question26": "Is there a tilt adjustment of the monitor?",
+          "question27": "Does the height of the monitor screen allow the worker's horizontal gaze?",
+          "question28": "Is the distance from the monitor screen to the worker's eyes between 50 and 70 cm?",
+          "question29": "Is the reading angle from the monitor screen to the eyes between 33° and 44°?",
+          "question30": "Is there brightness and character contrast control?",
+          "question31": "When working with spreadsheets, is the zoom below 100%?",
+          "question32": "Does the screen flicker?",
+          "question33": "Are there natural light reflections (from the windows) on the monitor screen?",
+          "question34": "Are there artificial light reflections (from the lamps) on the monitor screen?",
+          "question35": "Does the desk have height adjustment?",
+          "question36": "Does the desk height allow enough leg room?",
+          "question37": "Does the desk height allow proper adjustment of the arm/elbow support on the chair?",
+          "question38": "Does it have rounded edges?",
+          "question39": "Is the desk surface made of non-reflective material?",
+          "question40": "Are the drawer pulls handle-type?",
+          "question41": "Are the frequently used objects on the desk (keyboard, mouse, phone, calculator, documents) within the normal reach area (semicircles made with the elbows bent)?",
+          "question42": "Are the occasionally used objects on the desk within the maximum reach area (semicircles made with the elbows extended)?",
+          "question43": "Is it soft?",
+          "question44": "Is it properly configured? (accents, language, etc.)",
+          "question45": "Does it take up too much space at the workstation?",
+          "question46": "Does it generate excessive noise?",
+          "question47": "Does it radiate heat to the worker's body?",
+          "question48": "Is there a keyboard wrist rest?",
+          "question49": "Is there a mouse wrist rest?",
+          "question50": "Is there a headset? If it is not needed, score yes",
+          "question51": "Is there a footrest? If it is not needed, score yes",
+          "question52": "If documents are frequently read for typing, is there a document holder? If it is not needed, score yes",
+          "question53": "Is there a stand to raise the screen of the equipment? Or is there a monitor?",
+          "question54": "Is there a separate keyboard?",
+          "question55": "Is there a separate mouse?"
+        }
+      }
+    }
+  },
   "errors": {
     "invalidCredentials": "Wrong e-mail or password.",
     "sessionExpired": "Your session expired due to inactivity. Sign in again to continue.",
@@ -1435,6 +1636,9 @@
     "matrixAlreadyInitialized": "The Matrix of this period has already been started.",
     "matrixCopySourceChanged": "The copy source period has changed. Check the new period before copying.",
     "matrixNotInitialized": "The Matrix of this period has not been started yet.",
-    "matrixActivityNotFound": "Matrix activity not found."
+    "matrixActivityNotFound": "Matrix activity not found.",
+    "evaluationTypeNotAvailable": "This evaluation type is not available in this installation.",
+    "hitListNotFound": "Hit List not found.",
+    "checklistNotFound": "In Loco Data Collection not found."
   }
 }
