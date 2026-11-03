@@ -8,11 +8,8 @@ import { useState } from 'react'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LayoutSwitcher } from '@/components/layout-switcher'
 import { AccountMenu } from '@/components/shell/account-menu'
-import {
-  adminItems,
-  type NavItem,
-  navItems,
-} from '@/components/shell/nav-items'
+import { adminItems, type NavItem } from '@/components/shell/nav-items'
+import { useVisibleNavItems } from '@/components/shell/use-nav-items'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -91,6 +88,7 @@ export function ClassicShell() {
   const pathname = usePathname()
   const router = useRouter()
   const { isAdmin } = useAuth()
+  const navItems = useVisibleNavItems()
   const { isSidebarCollapsed, setSidebarCollapsed } = useLayoutPreference()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 

@@ -9,11 +9,8 @@ import { useState } from 'react'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { LayoutSwitcher } from '@/components/layout-switcher'
 import { AccountMenu } from '@/components/shell/account-menu'
-import {
-  adminItems,
-  type NavItem,
-  navItems,
-} from '@/components/shell/nav-items'
+import { adminItems, type NavItem } from '@/components/shell/nav-items'
+import { useVisibleNavItems } from '@/components/shell/use-nav-items'
 import { useAuth } from '@/contexts/AuthContext'
 
 const linkClasses = {
@@ -39,6 +36,7 @@ export function ModernShell() {
   const tc = useTranslations('common')
   const pathname = usePathname()
   const { isAdmin } = useAuth()
+  const navItems = useVisibleNavItems()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const visibleAdminItems = adminItems.filter(

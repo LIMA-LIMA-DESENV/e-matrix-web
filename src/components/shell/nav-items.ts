@@ -6,6 +6,7 @@ export type NavKey =
   | 'projects'
   | 'trainings'
   | 'meetings'
+  | 'evaluations'
   | 'matrix'
   | 'users'
   | 'parameters'
@@ -17,6 +18,11 @@ export interface NavItem {
   adminOnly?: boolean
   /** Legacy module not migrated yet: shown, but not navigable. */
   pending?: boolean
+  /**
+   * Optional module shown only when the API enables at least one evaluation
+   * type (`GET /evaluations/types`), never by a `NEXT_PUBLIC_*` variable.
+   */
+  requiresEvaluationTypes?: boolean
 }
 
 // Same order as the legacy sidebar; administration items come from the legacy
@@ -29,6 +35,12 @@ export const navItems: NavItem[] = [
   { key: 'projects', href: '/projetos', icon: 'list_alt' },
   { key: 'trainings', href: '/treinamentos', icon: 'directions_bike' },
   { key: 'meetings', href: '/reunioes', icon: 'calendar_month' },
+  {
+    key: 'evaluations',
+    href: '/avaliacoes',
+    icon: 'assignment',
+    requiresEvaluationTypes: true,
+  },
   { key: 'matrix', href: '/matriz', icon: 'grid_on' },
 ]
 
