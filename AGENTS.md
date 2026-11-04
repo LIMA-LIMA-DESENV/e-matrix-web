@@ -53,7 +53,7 @@ src/
 │   │   ├── projetos/     # redirects to producao/ keeping the query; producao/ (RGP) and escritorio/ (RGA and RA) tabs share ?period= (ProjectsTabs); RGP list sliced by period, detail modal with photo thumbnails (blob: URLs revoked on close), effectiveness verification form; escritorio/ merges the RGA and RA queries into one table (?type=all|rga|ra), RA detail with its receipt form, receiving materials form; PDF of each RGP/RGA (row and detail) and the blank one (card), generated in the browser (see PDFs), none for RA; every role reads; canEdit writes RGP/RGA through _form/ (ImprovementProjectForm by scope, rgp|rga/novo and [id]/editar, the other scope redirects) and RA (MaterialReceiptForm, ra/novo and ra/[id]/editar), deletes on the listing only (DeleteProjectModal), "Novo" on the card and the empty state, ?created=/?updated=/?beforePhotoRemoved=/?afterPhotoRemoved=/?fileRemoved=<code>
 │   │   ├── plano-de-gestao/ # one GET for every period: SVG chart, mini-grids and the full grid of ?period=<id> (default resolved on the page, no "all"); every role reads, canEdit clicks cells and edits the goal (saved at once, not optimistic, grid locked while saving)
 │   │   ├── matriz/       # two tabs, each a route sharing only ?period= (MatrixTabs, like ProjectsTabs); graficos/ is the Gráficos tab: the same GET and period slice as Resultados (shared cache, read only), the three maps of the whole Matrix (charts.ts without React: maps, count, percent; MatrixPieChart in SVG without a library, legend, tooltip, "N de M sem valor", "Sem dados"; colors --color-chart-*); `?view=groups` (chips "Toda a matriz"/"Por fábrica, área e função", router.replace keeping ?period=, any other value is the whole Matrix) breaks each map into MatrixChartMapView: the general pie plus the Fábricas, Áreas and Funções columns (lg side by side, stacked below), groupMatrixChart in charts.ts groups by normalizeText with the first spelling in rows order as label, sorted by localeCompare base; groups with no value have no pie and no filter item; each column has a DropdownMenu of checkboxes with "Todos" that only shows/hides pies, local state reset on a new period or view; a slice with a count, or its legend button (click, Enter or Space), opens the Resultados of exactly its activities: getMatrixChartSliceTarget in charts.ts builds `/matriz?period=<id>&f.<field>=<value>` plus, on a group pie, `&f.<fabric|area|function>="<label>"` (the exact text filter, so the rows equal the tooltip count) and the columns that revealMatrixColumns shows before a router.push (back returns to the tab and view); slices with 0 and "Sem dados" open nothing; MatrixEmptyState variant="charts" without actions; Resultados tab: one GET of the Matrix of ?period=<id> (sliced by period, no "all": isPeriodIdValue and PeriodFilter includeAll={false}); not initialized → empty state; else one row per activity, columns.ts with the 27 columns (key, help, type, default), the 8 default ones shown, the visible columns remembered in localStorage (`ematrix.matrix.columns`, use-matrix-columns.ts, every access in try/catch, defaults when missing or invalid; ColumnPicker; revealMatrixColumns adds columns to the stored choice, outside React, hiding none), search over all 27 with the list values translated, a filter per column in the header kept in the URL as `f.<key>` (lists: all/values/`empty`; text: contains, or equals between double quotes — `"Solda"` keeps "Solda" and not "Solda Ponto", normalizeText on both sides, `""` or a lone quote stay contains; exactMatrixTextFilter builds that value), hidden columns keep filtering, "limpar" back to the default columns without search and filters keeping ?period=, sort and pages in the client; "Exportar" (ExportMenu, use-matrix-export.ts) saves the visible columns and the filtered rows of every page as CSV or .xlsx (see Exports); the ⋮ menu of each row (MatrixRowProjectsMenu, also on a right click on the row outside fields) lists the RGP and RGA of the activity by code from a single `GET /improvement-projects` loaded with the screen (use-matrix-projects.ts) and opens `/projetos/producao?period=all&q=<code>` or `/projetos/escritorio?period=all&type=rga&q=<code>`, with its own loading, empty and error/retry states; every role reads; canEdit starts the Matrix of a period once from the empty state (MatrixEmptyState: "Copiar de <copy_source>" and "Começar em branco", each confirmed with ConfirmActionModal; the POST answer replaces the cached Matrix; 409 `Matrix already initialized.` reads it again and shows the table, 409 `Matrix copy source has changed.` reads it again and shows the new origin with the message) and edits the 21 fields in their cells (MatrixCell, one editor open at a time, in a portal over the cell: lists save on choosing, text saves with Salvar or Ctrl/Cmd+Enter, Esc/Cancelar/click outside/blur never save; the cell shows the save and takes no other edit, not optimistic; use-update-matrix-field.ts puts the row the PUT answers with into the cache with setQueryData, only the saved field while two writes of the row overlap; a failure keeps the previous value with the translated error in the cell); the viewer gets plain text cells and no actions
-│   │   ├── avaliacoes/   # optional module (see Optional Modules): redirects to the tab of the first enabled type, or is not found with none; hit-list/, coleta-de-dados/ (the checklist of the API) and avaliacao-de-mudancas/ (change_assessment, AMP) are one tab each, only for the enabled types, in the API order, a disabled one is not found (notFound()); one global list per type, never sliced by period (no usePeriodSlice): code badge, type, name (the translated type for the Hit List and the AMP, or the checklist name), activity, registered and changed at (date and time), search, sort and pages in the client, newest registered first; the Hit List, Coleta de Dados and AMP tabs have "PDF" in the ⋮ menu of each row and "PDF em branco" beside the search, shown in every state (see PDFs); every role reads and opens a record read only from "Visualizar" in the ⋮ menu; canEdit writes the three types through _form/ (form-parts.tsx holds the shared layout, fields, three-state radio groups, activity select and the submit guard; HitListForm in the six sections of the report, one react-hook-form instance without watch, the improvements' items as checkboxes sent in the order of HIT_LIST_ITEMS; ChecklistForm with the identification (activity, name, sector and date, all required) and the 11 blocks, each question yes/no/no answer labelled with its points, and the live score: each block's sum and percentage and the average at the foot, computed by computeChecklistScore from components/checklist-blocks.ts over useWatch of answers only, in aria-live="polite" regions; ChangeAssessmentForm with the identification (activity and date, both required) and the 8 questions of components/change-assessment-questions.ts, each a multiline text area labelled "N ) <question>" with the text of the PDF, optional, of up to 5,000 code points, a blank one sent as null; yes/no are three-state radio groups labelled by the question; readOnly disables every control through one disabled fieldset and hides "Salvar", the view still showing the score; schema.ts mirrors the API rules: activity, real calendar dates, texts of up to 5,000 code points, checklist name and sector not blank and of up to 255; use-evaluation-activity-options.ts reads GET /evaluations/<type>/activities; EvaluationTypeGuard calls notFound() for a disabled type before any request): <tab>/novo, <tab>/[id] (the view, with "Baixar PDF" and, for canEdit, "Alterar") and <tab>/[id]/editar for hit-list/, coleta-de-dados/ and avaliacao-de-mudancas/, the write routes sending a Viewer back to the tab; "Nova Hit List"/"Nova Coleta de Dados"/"Nova Avaliação de Mudanças" beside the search and on the empty state and "Alterar" in the ⋮ menu for canEdit; ?created=/?updated=<code> (use-evaluation-feedback.ts, list-href.ts); "Excluir" in the ⋮ menu for canEdit, only on the listing (never on the view): DeleteEvaluationModal (ConfirmActionModal citing the code, final deletion, confirm disabled while pending) over use-delete-evaluation.ts (the generated DELETE of the type; drops the detail from the cache and refreshes the listing, also on failure, so a record deleted in another tab shows the translated "not found" and leaves the list)
+│   │   ├── avaliacoes/   # optional module (see Optional Modules): redirects to the tab of the first enabled type, or is not found with none; hit-list/, coleta-de-dados/ (the checklist of the API) and avaliacao-de-mudancas/ (change_assessment, AMP) are one tab each, only for the enabled types, in the API order, a disabled one is not found (notFound()); one global list per type, never sliced by period (no usePeriodSlice): code badge, type, name (the translated type for the Hit List and the AMP, or the checklist name), activity, registered and changed at (date and time), search, sort and pages in the client, newest registered first; the Hit List, Coleta de Dados and AMP tabs have "PDF" in the ⋮ menu of each row and "PDF em branco" beside the search, shown in every state (see PDFs); every role reads and opens a record read only from "Visualizar" in the ⋮ menu; canEdit writes the three types through _form/ (form-parts.tsx holds the shared layout, fields, three-state radio groups, activity select and the submit guard; HitListForm in the six sections of the report, one react-hook-form instance without watch, the improvements' items as checkboxes sent in the order of HIT_LIST_ITEMS; ChecklistForm with the identification (activity, name, sector and date, all required) and the 11 blocks, each question yes/no/no answer labelled with its points, and the live score: each block's sum and percentage and the average at the foot, computed by computeChecklistScore from components/checklist-blocks.ts over useWatch of answers only, in aria-live="polite" regions; ChangeAssessmentForm with the identification (activity and date, both required) and the 8 questions of components/change-assessment-questions.ts, each a multiline text area labelled "N ) <question>" with the text of the PDF, optional, of up to 5,000 code points, a blank one sent as null; yes/no are three-state radio groups labelled by the question; readOnly disables every control through one disabled fieldset and hides "Salvar", the view still showing the score; schema.ts mirrors the API rules: activity, real calendar dates, texts of up to 5,000 code points, checklist name and sector not blank and of up to 255; use-evaluation-activity-options.ts reads GET /evaluations/<type>/activities; EvaluationTypeGuard calls notFound() for a disabled type before any request): <tab>/novo, <tab>/[id] (the view, with "Baixar PDF" and, for canEdit, "Alterar") and <tab>/[id]/editar for hit-list/, coleta-de-dados/ and avaliacao-de-mudancas/, each a thin route file over the generic _form/CreateEvaluation, ViewEvaluation and EditEvaluation (see Optional Modules), the write routes sending a Viewer back to the tab; "Nova Hit List"/"Nova Coleta de Dados"/"Nova Avaliação de Mudanças" beside the search and on the empty state and "Alterar" in the ⋮ menu for canEdit; ?created=/?updated=<code> (use-evaluation-feedback.ts, list-href.ts); "Excluir" in the ⋮ menu for canEdit, only on the listing (never on the view): DeleteEvaluationModal (ConfirmActionModal citing the code, final deletion, confirm disabled while pending) over use-delete-evaluation.ts (the generated DELETE of the type; drops the detail from the cache and refreshes the listing, also on failure, so a record deleted in another tab shows the translated "not found" and leaves the list)
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/); ParametersTabs carries the admin-only "reset program items" action of both tabs
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
@@ -135,6 +135,54 @@ and when the request fails, rather than offering a screen that would answer
 404. A route of a disabled type calls `notFound()` before requesting its
 listing. Changing `EVALUATION_TYPES` needs the API restarted, and the web
 shows it only after the page is reloaded.
+
+Every evaluation type runs on one generic core, driven by its **web
+definition** (`avaliacoes/definitions/`, typed by
+`EvaluationWebDefinition` in `definitions/types.ts`). A definition declares
+the type, its tab (`EVALUATION_TYPE_HREFS`), the translated type and "Nova
+…" labels, the row's name, the generated orval hooks adapted to common
+signatures (listing, detail, activities, `POST`, `PUT`, `DELETE` and the
+query keys), the form with its schema functions (`make…Schema`, default
+values, `to…FormValues`, `to…Input`), the PDF adapter and the file base
+name. `definitions/index.ts` holds the registry, which must cover every
+`EvaluationType` (`satisfies`), and `evaluationWebDefinition(type)`.
+
+What reads only the definition, and never names a type:
+
+- `components/EvaluationTypePage.tsx` (one listing component, mounted with
+  `key={type}`) and `components/use-delete-evaluation.ts`;
+- `_form/CreateEvaluation.tsx`, `ViewEvaluation.tsx` and
+  `EditEvaluation.tsx`: `EvaluationTypeGuard`, the skeleton, the load error,
+  the Viewer sent back from the write routes, the success param
+  (`?created=`/`?updated=<code>`) and the way back to the tab with its
+  search, sort and page; the form is mounted with a `key` of the type (and
+  the id), so no state survives a change of type or record;
+- `_form/use-evaluation-activity-options.ts` and
+  `components/use-evaluation-pdf.ts` (see PDFs).
+
+The form and the report stay per type (D-6): each reproduces a legacy
+layout. To add a type, after the API has its definition and routes:
+
+1. `yarn generate`, so `src/http/api.ts` has its hooks, and add the type to
+   `EVALUATION_TYPE_HREFS` in `src/lib/evaluation-types.ts`.
+2. The form, `_form/<Type>Form.tsx`, over `form-parts.tsx` and
+   `useGuardedSubmit`, taking the props of `EvaluationFormProps`.
+3. Its schema functions in `_form/schema.ts`: the zod schema mirroring the
+   API rules, the empty values, the stored record as form values and the
+   request body.
+4. The report module in `src/lib/pdf/<type>-pdf.ts` and its adapter,
+   `definitions/<type>-pdf-adapter.ts`.
+5. The definition, `definitions/<type>.ts`, added to the registry in
+   `definitions/index.ts`.
+6. The translations in `pt-BR.json`, `en.json` and `es.json` (the type, "Nova
+   …", the form and the PDF), checked by `yarn check:messages`.
+7. Four route files, each only passing the type: `<tab>/page.tsx`
+   (`EvaluationTypePage`), `<tab>/novo/page.tsx` (`CreateEvaluationPage`),
+   `<tab>/[id]/page.tsx` (`ViewEvaluationPage`) and
+   `<tab>/[id]/editar/page.tsx` (`EditEvaluationPage`).
+
+Nothing else changes: the listing, the deletion, the PDF hook and the three
+pages take the new definition as they are.
 
 ## Access Roles
 
@@ -245,31 +293,37 @@ it covers the accents of pt-BR and es, but not characters outside cp1252.
 
 `projetos/components/use-improvement-project-pdf.ts` is the screen side:
 it downloads the photos, generates one PDF at a time and reports a failure
-with `projects.pdf.error`. `avaliacoes/components/use-hit-list-pdf.ts` does
-the same for the Hit List: it fetches the detail (`GET
-/evaluations/hit-lists/{id}`) on the click, turns the answers into the
-report's texts (an empty or mistyped answer is blank, a yes/no not answered
-marks neither), saves `toExportFileName(code, 'hit-list', 'pdf')` or
-`hit-list.pdf`, and reports a failure with `evaluations.pdf.error`.
-`avaliacoes/components/use-checklist-pdf.ts` does the same for the Coleta de
-Dados (`GET /evaluations/checklists/{id}`). The 11 blocks and the questions
-whose expected answer is "no", which give the points of each option, live in
-`avaliacoes/components/checklist-blocks.ts`, the web's only copy, shared by
-the PDF and `ChecklistForm` (D-3). Its `computeChecklistScore` repeats the
-API's `presentChecklistScore` (same rule, same two-decimal rounding, `null`
-without any answer) only for the live score of the form; the PDF's sums and
-percentages still come from the API
-`score`, the percentages formatted with `useFormatter().number` (at most two
-decimals, then `%`: `96,36%` in pt-BR and es, `96.36%` in en; `null` is
-blank). It saves `toExportFileName(code, 'coleta-de-dados', 'pdf')` or
-`coleta-de-dados.pdf`.
-`avaliacoes/components/use-change-assessment-pdf.ts` does the same for the
-AMP (`GET /evaluations/change-assessments/{id}`): the date formatted with
-`useFormatDateOnly()`, an empty answer blank, saved as
-`toExportFileName(code, 'avaliacao-de-mudancas', 'pdf')` or
-`avaliacao-de-mudancas.pdf`. The 8 question keys, in the legacy order, live
-in `avaliacoes/components/change-assessment-questions.ts`, the web's only
-list, for the PDF and the form.
+with `projects.pdf.error`. For the evaluations, one hook serves every type:
+`avaliacoes/components/use-evaluation-pdf.ts` takes the type's definition,
+fetches the detail on the click (`GET /evaluations/<segment>/{id}`, nothing
+for the blank form) while the adapter loads the report, saves
+`toExportFileName(code, <file base name>, 'pdf')` or `<file base name>.pdf`,
+keeps one PDF at a time and reports a failure with `evaluations.pdf.error`.
+The adapter of each type, `avaliacoes/definitions/<type>-pdf-adapter.ts`,
+reads the translations and formatters it needs and imports its module of
+`src/lib/pdf` on demand:
+
+- `hit-list-pdf-adapter.ts` turns the answers into the report's texts (an
+  empty or mistyped answer is blank, a yes/no not answered marks neither)
+  and loads the 14 images through `loadPdfPhoto`; saved as
+  `HL-<n>-hit-list.pdf` or `hit-list.pdf`.
+- `checklist-pdf-adapter.ts` does the same for the Coleta de Dados. The 11
+  blocks and the questions whose expected answer is "no", which give the
+  points of each option, live in `avaliacoes/components/checklist-blocks.ts`,
+  the web's only copy, shared by the PDF and `ChecklistForm` (D-3). Its
+  `computeChecklistScore` repeats the API's `presentChecklistScore` (same
+  rule, same two-decimal rounding, `null` without any answer) only for the
+  live score of the form; the PDF's sums and percentages still come from the
+  API `score`, the percentages formatted with `useFormatter().number` (at
+  most two decimals, then `%`: `96,36%` in pt-BR and es, `96.36%` in en;
+  `null` is blank). Saved as `CDIA-<n>-coleta-de-dados.pdf` or
+  `coleta-de-dados.pdf`.
+- `change-assessment-pdf-adapter.ts` does the same for the AMP: the date
+  formatted with `useFormatDateOnly()`, an empty answer blank, saved as
+  `AMP-<n>-avaliacao-de-mudancas.pdf` or `avaliacao-de-mudancas.pdf`. The 8
+  question keys, in the legacy order, live in
+  `avaliacoes/components/change-assessment-questions.ts`, the web's only
+  list, for the PDF and the form.
 
 ## Exports
 
