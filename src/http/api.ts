@@ -415,6 +415,7 @@ export type EvaluationTypeItemType = typeof EvaluationTypeItemType[keyof typeof 
 export const EvaluationTypeItemType = {
   hit_list: 'hit_list',
   checklist: 'checklist',
+  change_assessment: 'change_assessment',
 } as const;
 
 /**
@@ -426,10 +427,11 @@ export type EvaluationTypeItemCode = typeof EvaluationTypeItemCode[keyof typeof 
 export const EvaluationTypeItemCode = {
   HL: 'HL',
   CDIA: 'CDIA',
+  AMP: 'AMP',
 } as const;
 
 /**
- * An evaluation type enabled in this installation. checklist is the 'Coleta de Dados In Loco' of the screens.
+ * An evaluation type enabled in this installation. checklist is the 'Coleta de Dados In Loco' of the screens and change_assessment the 'Avaliação de Mudanças / Projetos'.
  */
 export interface EvaluationTypeItem {
   type: EvaluationTypeItemType;
@@ -2824,6 +2826,130 @@ export interface HitListInput {
   answers?: HitListAnswersInput | null;
 }
 
+/**
+ * An item of the change assessments listing (the Avaliação de Mudanças / Projetos of the Diversos tab). The activity is the one shown for projects: as it is now.
+ */
+export interface ChangeAssessmentItem {
+  id: string;
+  /**
+     * Sequential number of the change assessments, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AMP-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The eight open questions of the legacy form, in order, always present: plain text (line breaks kept, no markup interpreted) or null when unanswered. Keys outside question1..question8 are never answered.
+ */
+export type ChangeAssessmentAnswers = {
+  /** @nullable */
+  question1: string | null;
+  /** @nullable */
+  question2: string | null;
+  /** @nullable */
+  question3: string | null;
+  /** @nullable */
+  question4: string | null;
+  /** @nullable */
+  question5: string | null;
+  /** @nullable */
+  question6: string | null;
+  /** @nullable */
+  question7: string | null;
+  /** @nullable */
+  question8: string | null;
+};
+
+/**
+ * A change assessment with its answers.
+ */
+export interface ChangeAssessment {
+  id: string;
+  /**
+     * Sequential number of the change assessments, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AMP-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  created_at: string;
+  updated_at: string;
+  /** The eight open questions of the legacy form, in order, always present: plain text (line breaks kept, no markup interpreted) or null when unanswered. Keys outside question1..question8 are never answered. */
+  answers: ChangeAssessmentAnswers;
+}
+
+/**
+ * Absent or null is the same as {}: no answer at all. Each text is trimmed, keeping its inner line breaks, and must have at most 5000 characters (code points); an empty or null answer is stored as absent. A key outside question1..question8 is refused
+ * @nullable
+ */
+export type ChangeAssessmentInputAnswers = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question5?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question6?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question7?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question8?: string | null;
+} | null;
+
+/**
+ * The fields of a change assessment creation or update, as JSON. Any other top-level field (id, number, code, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface ChangeAssessmentInput {
+  /** An existing activity (see GET /evaluations/change-assessments/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  assessment_date: string;
+  /**
+     * Absent or null is the same as {}: no answer at all. Each text is trimmed, keeping its inner line breaks, and must have at most 5000 characters (code points); an empty or null answer is stored as absent. A key outside question1..question8 is refused
+     * @nullable
+     */
+  answers?: ChangeAssessmentInputAnswers;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -5095,7 +5221,7 @@ export const getGetActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its improvement projects, its filled matrix items and its evaluations). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. The Hit Lists and the Coletas de Dados In Loco of the activity count together under evaluations, whatever types EVALUATION_TYPES enables. Requires admin role.
+ * Returns an activity with the summary of its linked records: the records of other modules that belong to the activity (its improvement projects, its filled matrix items and its evaluations). Only modules already migrated are counted and only types with at least one record are listed, so linked_records is { total: 0, items: [] } until those modules exist. A matrix item counts under matrix only when it is filled (any of its 21 fields not null), summed over every period. The Hit Lists, the Coletas de Dados In Loco and the Avaliações de Mudanças / Projetos of the activity count together under evaluations, whatever types EVALUATION_TYPES enables. Requires admin role.
  * @summary Get activity
  */
 export const getActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getActivitiesIdResponse> => {
@@ -5360,7 +5486,7 @@ export const getDeleteActivitiesIdUrl = (id: string,) => {
 }
 
 /**
- * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction: an activity with a filled matrix item in any period is not deleted, and its blank matrix items are removed together with it. An activity with a Hit List or a Coleta de Dados In Loco is not deleted either, even when that evaluation type is disabled in EVALUATION_TYPES. Deleting the same activity again responds 404. The request has no body. Requires admin role.
+ * Deletes an activity permanently, only when it has no linked records (see GET /activities/{id}); there is no cascade and no soft delete. The activity is locked while its linked records are counted and the records a source deliberately leaves out of that count are removed, all in the same transaction: an activity with a filled matrix item in any period is not deleted, and its blank matrix items are removed together with it. An activity with a Hit List, a Coleta de Dados In Loco or an Avaliação de Mudanças / Projetos is not deleted either, even when that evaluation type is disabled in EVALUATION_TYPES. Deleting the same activity again responds 404. The request has no body. Requires admin role.
  * @summary Delete activity
  */
 export const deleteActivitiesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteActivitiesIdResponse> => {
@@ -12282,7 +12408,7 @@ export const getGetEvaluationsTypesUrl = () => {
 }
 
 /**
- * Answers the evaluation types enabled by the EVALUATION_TYPES variable of the deployment, read once when the server starts, always in the canonical order hit_list, checklist (never the order of the variable). Empty when no type is enabled. The only route under /evaluations that does not depend on an enabled type: every route of a type answers 404 'Evaluation type not available.' while that type is disabled. Requires only an authenticated user, so any role; nothing in the API changes the configuration.
+ * Answers the evaluation types enabled by the EVALUATION_TYPES variable of the deployment, read once when the server starts, always in the canonical order hit_list, checklist, change_assessment (never the order of the variable). Empty when no type is enabled. The only route under /evaluations that does not depend on an enabled type: every route of a type answers 404 'Evaluation type not available.' while that type is disabled. Requires only an authenticated user, so any role; nothing in the API changes the configuration.
  * @summary List the evaluation types this installation enables
  */
 export const getEvaluationsTypes = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsTypesResponse> => {
@@ -13831,4 +13957,733 @@ export const useDeleteEvaluationsChecklistsId = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getDeleteEvaluationsChecklistsIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsChangeAssessmentsResponse200 = {
+  data: ChangeAssessmentItem[]
+  status: 200
+}
+
+export type getEvaluationsChangeAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChangeAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChangeAssessmentsResponseSuccess = (getEvaluationsChangeAssessmentsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChangeAssessmentsResponseError = (getEvaluationsChangeAssessmentsResponse401 | getEvaluationsChangeAssessmentsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChangeAssessmentsResponse = (getEvaluationsChangeAssessmentsResponseSuccess | getEvaluationsChangeAssessmentsResponseError)
+
+export const getGetEvaluationsChangeAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/change-assessments`
+}
+
+/**
+ * Every change assessment of the installation (the Avaliação de Mudanças / Projetos of the Diversos tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now. The answers are only in the detail. Requires only an authenticated user, so any role, and change_assessment enabled by EVALUATION_TYPES.
+ * @summary List change assessments
+ */
+export const getEvaluationsChangeAssessments = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChangeAssessmentsResponse> => {
+
+  return customFetch<getEvaluationsChangeAssessmentsResponse>(getGetEvaluationsChangeAssessmentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChangeAssessmentsQueryKey = () => {
+    return [
+    `/evaluations/change-assessments`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChangeAssessmentsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChangeAssessmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>> = ({ signal }) => getEvaluationsChangeAssessments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChangeAssessmentsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>>
+export type GetEvaluationsChangeAssessmentsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChangeAssessments<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessments<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessments<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List change assessments
+ */
+
+export function useGetEvaluationsChangeAssessments<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChangeAssessmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsChangeAssessmentsResponse201 = {
+  data: ChangeAssessment
+  status: 201
+}
+
+export type postEvaluationsChangeAssessmentsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsChangeAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsChangeAssessmentsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsChangeAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsChangeAssessmentsResponseSuccess = (postEvaluationsChangeAssessmentsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsChangeAssessmentsResponseError = (postEvaluationsChangeAssessmentsResponse400 | postEvaluationsChangeAssessmentsResponse401 | postEvaluationsChangeAssessmentsResponse403 | postEvaluationsChangeAssessmentsResponse404) & {
+  headers: Headers;
+};
+
+export type postEvaluationsChangeAssessmentsResponse = (postEvaluationsChangeAssessmentsResponseSuccess | postEvaluationsChangeAssessmentsResponseError)
+
+export const getPostEvaluationsChangeAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/change-assessments`
+}
+
+/**
+ * Creates a Change Assessment from a JSON body. The number is the next one of the change assessments sequence, taken inside the INSERT, and is never handed out again, not even after the change assessment is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new change assessment (409 there) or finished first (400 here), never a foreign key violation. Answers the same body as GET /evaluations/change-assessments/{id}. Not idempotent: sending it again creates another change assessment. Requires the user or admin role and change_assessment enabled by EVALUATION_TYPES.
+ * @summary Create change assessment
+ */
+export const postEvaluationsChangeAssessments = async (changeAssessmentInput: ChangeAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsChangeAssessmentsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsChangeAssessmentsResponse>(getPostEvaluationsChangeAssessmentsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsChangeAssessmentsMutationKey = () => ['postEvaluationsChangeAssessments'] as const;
+
+export const getPostEvaluationsChangeAssessmentsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>, TError,PostEvaluationsChangeAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>, TError,PostEvaluationsChangeAssessmentsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsChangeAssessmentsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>, PostEvaluationsChangeAssessmentsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsChangeAssessments(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsChangeAssessmentsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>>
+    export type PostEvaluationsChangeAssessmentsMutationBody = ChangeAssessmentInput
+    export type PostEvaluationsChangeAssessmentsMutationError = ErrorResponse
+    export type PostEvaluationsChangeAssessmentsMutationVariables = {data: ChangeAssessmentInput}
+
+    /**
+ * @summary Create change assessment
+ */
+export const usePostEvaluationsChangeAssessments = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>, TError,PostEvaluationsChangeAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsChangeAssessments>>,
+        TError,
+        PostEvaluationsChangeAssessmentsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsChangeAssessmentsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsChangeAssessmentsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsChangeAssessmentsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChangeAssessmentsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChangeAssessmentsActivitiesResponseSuccess = (getEvaluationsChangeAssessmentsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChangeAssessmentsActivitiesResponseError = (getEvaluationsChangeAssessmentsActivitiesResponse401 | getEvaluationsChangeAssessmentsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChangeAssessmentsActivitiesResponse = (getEvaluationsChangeAssessmentsActivitiesResponseSuccess | getEvaluationsChangeAssessmentsActivitiesResponseError)
+
+export const getGetEvaluationsChangeAssessmentsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/change-assessments/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Avaliação de Mudanças / Projetos form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and change_assessment enabled by EVALUATION_TYPES.
+ * @summary List the activities a change assessment can belong to
+ */
+export const getEvaluationsChangeAssessmentsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChangeAssessmentsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsChangeAssessmentsActivitiesResponse>(getGetEvaluationsChangeAssessmentsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChangeAssessmentsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/change-assessments/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChangeAssessmentsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChangeAssessmentsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>> = ({ signal }) => getEvaluationsChangeAssessmentsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChangeAssessmentsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>>
+export type GetEvaluationsChangeAssessmentsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChangeAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a change assessment can belong to
+ */
+
+export function useGetEvaluationsChangeAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChangeAssessmentsActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsChangeAssessmentsIdResponse200 = {
+  data: ChangeAssessment
+  status: 200
+}
+
+export type getEvaluationsChangeAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsChangeAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsChangeAssessmentsIdResponseSuccess = (getEvaluationsChangeAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsChangeAssessmentsIdResponseError = (getEvaluationsChangeAssessmentsIdResponse401 | getEvaluationsChangeAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsChangeAssessmentsIdResponse = (getEvaluationsChangeAssessmentsIdResponseSuccess | getEvaluationsChangeAssessmentsIdResponseError)
+
+export const getGetEvaluationsChangeAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/change-assessments/${id}`
+}
+
+/**
+ * One change assessment: the item of the listing plus its answers, with the eight answers question1..question8. An absent key, or a value stored with the wrong type, is null; a stored key outside the catalog is never answered. Texts are answered as stored. Requires only an authenticated user, so any role, and change_assessment enabled by EVALUATION_TYPES.
+ * @summary Get change assessment
+ */
+export const getEvaluationsChangeAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsChangeAssessmentsIdResponse> => {
+
+  return customFetch<getEvaluationsChangeAssessmentsIdResponse>(getGetEvaluationsChangeAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsChangeAssessmentsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/change-assessments/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsChangeAssessmentsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsChangeAssessmentsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>> = ({ signal }) => getEvaluationsChangeAssessmentsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsChangeAssessmentsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>>
+export type GetEvaluationsChangeAssessmentsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsChangeAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsChangeAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get change assessment
+ */
+
+export function useGetEvaluationsChangeAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsChangeAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsChangeAssessmentsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsChangeAssessmentsIdResponse200 = {
+  data: ChangeAssessment
+  status: 200
+}
+
+export type putEvaluationsChangeAssessmentsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsChangeAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsChangeAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsChangeAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsChangeAssessmentsIdResponseSuccess = (putEvaluationsChangeAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsChangeAssessmentsIdResponseError = (putEvaluationsChangeAssessmentsIdResponse400 | putEvaluationsChangeAssessmentsIdResponse401 | putEvaluationsChangeAssessmentsIdResponse403 | putEvaluationsChangeAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type putEvaluationsChangeAssessmentsIdResponse = (putEvaluationsChangeAssessmentsIdResponseSuccess | putEvaluationsChangeAssessmentsIdResponseError)
+
+export const getPutEvaluationsChangeAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/change-assessments/${id}`
+}
+
+/**
+ * Replaces every field of a Change Assessment with the JSON body: the activity may change, and an answer left out of answers loses its value (absent answers empties them all). number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the change assessment will point at is locked (shared) and then the change assessment's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/change-assessments/{id}. Requires the user or admin role and change_assessment enabled by EVALUATION_TYPES.
+ * @summary Update change assessment
+ */
+export const putEvaluationsChangeAssessmentsId = async (id: string,
+    changeAssessmentInput: ChangeAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsChangeAssessmentsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsChangeAssessmentsIdResponse>(getPutEvaluationsChangeAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changeAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsChangeAssessmentsIdMutationKey = () => ['putEvaluationsChangeAssessmentsId'] as const;
+
+export const getPutEvaluationsChangeAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>, TError,PutEvaluationsChangeAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>, TError,PutEvaluationsChangeAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsChangeAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>, PutEvaluationsChangeAssessmentsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsChangeAssessmentsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsChangeAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>>
+    export type PutEvaluationsChangeAssessmentsIdMutationBody = ChangeAssessmentInput
+    export type PutEvaluationsChangeAssessmentsIdMutationError = ErrorResponse
+    export type PutEvaluationsChangeAssessmentsIdMutationVariables = {id: string;data: ChangeAssessmentInput}
+
+    /**
+ * @summary Update change assessment
+ */
+export const usePutEvaluationsChangeAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>, TError,PutEvaluationsChangeAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsChangeAssessmentsId>>,
+        TError,
+        PutEvaluationsChangeAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsChangeAssessmentsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsChangeAssessmentsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsChangeAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsChangeAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsChangeAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsChangeAssessmentsIdResponseSuccess = (deleteEvaluationsChangeAssessmentsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsChangeAssessmentsIdResponseError = (deleteEvaluationsChangeAssessmentsIdResponse401 | deleteEvaluationsChangeAssessmentsIdResponse403 | deleteEvaluationsChangeAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsChangeAssessmentsIdResponse = (deleteEvaluationsChangeAssessmentsIdResponseSuccess | deleteEvaluationsChangeAssessmentsIdResponseError)
+
+export const getDeleteEvaluationsChangeAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/change-assessments/${id}`
+}
+
+/**
+ * Deletes a Change Assessment permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same change assessment again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and change_assessment enabled by EVALUATION_TYPES.
+ * @summary Delete change assessment
+ */
+export const deleteEvaluationsChangeAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsChangeAssessmentsIdResponse> => {
+
+  return customFetch<deleteEvaluationsChangeAssessmentsIdResponse>(getDeleteEvaluationsChangeAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsChangeAssessmentsIdMutationKey = () => ['deleteEvaluationsChangeAssessmentsId'] as const;
+
+export const getDeleteEvaluationsChangeAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>, TError,DeleteEvaluationsChangeAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>, TError,DeleteEvaluationsChangeAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsChangeAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>, DeleteEvaluationsChangeAssessmentsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsChangeAssessmentsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsChangeAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>>
+
+    export type DeleteEvaluationsChangeAssessmentsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsChangeAssessmentsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete change assessment
+ */
+export const useDeleteEvaluationsChangeAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>, TError,DeleteEvaluationsChangeAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsChangeAssessmentsId>>,
+        TError,
+        DeleteEvaluationsChangeAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsChangeAssessmentsIdMutationOptions(options), queryClient);
     }
