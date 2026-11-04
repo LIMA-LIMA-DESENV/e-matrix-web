@@ -1,8 +1,8 @@
 'use client'
 
-import { CreateChecklistPage } from '../../_form/CreateChecklist'
+import { CreateEvaluationPage } from '../../_form/CreateEvaluation'
 
 /** Creates a Coleta de Dados In Loco (J1). */
-export default function NewChecklistPage() {
-  return <CreateChecklistPage />
+export default function NewEvaluationRoutePage() {
+  return <CreateEvaluationPage type="checklist" />
 }

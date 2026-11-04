@@ -1,0 +1,27 @@
+import type { EvaluationType } from '@/lib/evaluation-types'
+
+import { changeAssessmentDefinition } from './change-assessment'
+import { checklistDefinition } from './checklist'
+import { hitListDefinition } from './hit-list'
+import type { EvaluationWebDefinition } from './types'
+
+export { changeAssessmentDefinition } from './change-assessment'
+export { checklistDefinition } from './checklist'
+export { hitListDefinition } from './hit-list'
+export type { EvaluationWebDefinition } from './types'
+
+/**
+ * The web definition of each evaluation type (FR-009). A type of the API
+ * without a definition does not compile.
+ */
+const EVALUATION_WEB_DEFINITIONS = {
+  hit_list: hitListDefinition,
+  checklist: checklistDefinition,
+  change_assessment: changeAssessmentDefinition,
+} as const satisfies Record<EvaluationType, EvaluationWebDefinition>
+
+export function evaluationWebDefinition(
+  type: EvaluationType
+): EvaluationWebDefinition {
+  return EVALUATION_WEB_DEFINITIONS[type]
+}

@@ -25,17 +25,13 @@ import {
 } from '@/components/list'
 import { Button, Input } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
-import {
-  type ChangeAssessmentItem,
-  type ChecklistItem,
-  type HitListItem,
-  useGetEvaluationsChangeAssessments,
-  useGetEvaluationsChecklists,
-  useGetEvaluationsHitLists,
-} from '@/http/api'
 import { type EvaluationType, useEvaluationTypes } from '@/lib/evaluation-types'
 
 import { evaluationFormHref, evaluationFormPath } from '../_form/list-href'
+import {
+  type EvaluationWebDefinition,
+  evaluationWebDefinition,
+} from '../definitions'
 import { DeleteEvaluationModal } from './DeleteEvaluationModal'
 import { EvaluationsTable, useEvaluationTableColumns } from './EvaluationsTable'
 import { EvaluationsTabs } from './EvaluationsTabs'
@@ -45,11 +41,9 @@ import {
   matchesEvaluationSearch,
 } from './listing'
 import type { EvaluationRow } from './types'
-import { useChangeAssessmentPdf } from './use-change-assessment-pdf'
-import { useChecklistPdf } from './use-checklist-pdf'
 import { useDeleteEvaluation } from './use-delete-evaluation'
 import { useEvaluationFeedback } from './use-evaluation-feedback'
-import { useHitListPdf } from './use-hit-list-pdf'
+import { useEvaluationPdf } from './use-evaluation-pdf'
 
 /**
  * The tab of one evaluation type (J-1), for every role. A type
@@ -87,9 +81,10 @@ function EnabledEvaluationType({ type }: { type: EvaluationType }) {
   return (
     <div>
       <EvaluationsTabs active={type} types={types} />
-      {type === 'hit_list' && <HitListList />}
-      {type === 'checklist' && <ChecklistList />}
-      {type === 'change_assessment' && <ChangeAssessmentList />}
+      <EvaluationTypeList
+        key={type}
+        definition={evaluationWebDefinition(type)}
+      />
     </div>
   )
 }
@@ -102,7 +97,7 @@ function EnabledEvaluationType({ type }: { type: EvaluationType }) {
  * confirmation and reports the result on the tab's feedback strip (FR-016).
  */
 function useEvaluationRecordActions(
-  type: EvaluationType,
+  definition: EvaluationWebDefinition,
   newLabel: string,
   onDownloadPdf: (row: EvaluationRow) => void,
   setFeedback: (message: ListFeedbackMessage | null) => void
@@ -112,12 +107,15 @@ function useEvaluationRecordActions(
   const router = useRouter()
   const searchParams = useSearchParams()
   const { canEdit } = useAuth()
-  const deleteEvaluation = useDeleteEvaluation(type)
+  const deleteEvaluation = useDeleteEvaluation(definition)
   const [pendingDelete, setPendingDelete] = useState<EvaluationRow | null>(null)
 
   function open(target: Parameters<typeof evaluationFormPath>[1]) {
     router.push(
-      evaluationFormHref(evaluationFormPath(type, target), searchParams)
+      evaluationFormHref(
+        evaluationFormPath(definition.type, target),
+        searchParams
+      )
     )
   }
 
@@ -187,17 +185,24 @@ function useEvaluationRecordActions(
 }
 
 /**
- * The Hit List has no name of its own: the name is the translated type. Each
- * row has "Visualizar" and "PDF" for every role and "Alterar" and "Excluir"
- * for who may edit; the top of the tab has the blank form and, for who may edit, "Nova
- * Hit List" (FR-015, J1 to J3).
+ * The listing of a type, driven by its definition (FR-010): each row has
+ * "Visualizar" and "PDF" for every role and "Alterar" and "Excluir" for who
+ * may edit; the top of the tab has the blank form and, for who may edit,
+ * "Nova …" (FR-015, J1 to J5). Mounted once per type (`key`), as the
+ * definition's queries are hooks.
  */
-function HitListList() {
+function EvaluationTypeList({
+  definition,
+}: {
+  definition: EvaluationWebDefinition
+}) {
   const t = useTranslations('evaluations')
-  const query = useGetEvaluationsHitLists()
-  const name = t('types.hit_list')
+  const list = definition.useList()
+  const typeLabel = definition.typeLabel(t)
   const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
-  const pdf = useHitListPdf((text) => setFeedback({ tone: 'error', text }))
+  const pdf = useEvaluationPdf(definition, (text) =>
+    setFeedback({ tone: 'error', text })
+  )
 
   useEvaluationFeedback(setFeedback)
 
@@ -216,35 +221,33 @@ function HitListList() {
   }
 
   const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
-    'hit_list',
-    t('newHitList'),
+    definition,
+    definition.newLabel(t),
     handleDownloadPdf,
     setFeedback
   )
 
   const rows = useMemo<EvaluationRow[] | undefined>(
     () =>
-      query.data?.status === 200
-        ? query.data.data.map((item: HitListItem) => ({
-            id: item.id,
-            number: item.number,
-            code: item.code,
-            type: 'hit_list',
-            name,
-            activity: item.activity,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-          }))
-        : undefined,
-    [query.data, name]
+      list.items?.map((item) => ({
+        id: item.id,
+        number: item.number,
+        code: item.code,
+        type: definition.type,
+        name: definition.rowName(item, typeLabel),
+        activity: item.activity,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      })),
+    [list.items, definition, typeLabel]
   )
 
   return (
     <EvaluationList
-      type="hit_list"
+      typeLabel={typeLabel}
       rows={rows}
-      isError={query.isError}
-      onRetry={() => void query.refetch()}
+      isError={list.isError}
+      onRetry={list.refetch}
       getRowActions={getRowActions}
       actions={
         <>
@@ -286,158 +289,6 @@ function NewEvaluationButton({
   )
 }
 
-/**
- * The Coleta de Dados In Loco shows the `name` of each record. Like the Hit
- * List, each row has "Visualizar" and "PDF" for every role and "Alterar" and
- * "Excluir" for who may edit; the top of the tab has the blank form and, for who may edit,
- * "Nova Coleta de Dados" (FR-015, J1 to J3).
- */
-function ChecklistList() {
-  const t = useTranslations('evaluations')
-  const query = useGetEvaluationsChecklists()
-  const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
-  const pdf = useChecklistPdf((text) => setFeedback({ tone: 'error', text }))
-
-  useEvaluationFeedback(setFeedback)
-
-  function handleDownloadPdf(row: EvaluationRow) {
-    if (pdf.isGenerating) return
-
-    setFeedback(null)
-    void pdf.downloadPdf(row.id)
-  }
-
-  function handleDownloadBlankPdf() {
-    if (pdf.isGenerating) return
-
-    setFeedback(null)
-    void pdf.downloadBlankPdf()
-  }
-
-  const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
-    'checklist',
-    t('newChecklist'),
-    handleDownloadPdf,
-    setFeedback
-  )
-
-  const rows = useMemo<EvaluationRow[] | undefined>(
-    () =>
-      query.data?.status === 200
-        ? query.data.data.map((item: ChecklistItem) => ({
-            id: item.id,
-            number: item.number,
-            code: item.code,
-            type: 'checklist',
-            name: item.name,
-            activity: item.activity,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-          }))
-        : undefined,
-    [query.data]
-  )
-
-  return (
-    <EvaluationList
-      type="checklist"
-      rows={rows}
-      isError={query.isError}
-      onRetry={() => void query.refetch()}
-      getRowActions={getRowActions}
-      actions={
-        <>
-          <BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />
-          {newButton}
-        </>
-      }
-      emptyAction={newButton}
-      feedback={
-        <ListFeedback message={feedback} onDismiss={() => setFeedback(null)} />
-      }
-      dialogs={deleteModal}
-    />
-  )
-}
-
-/**
- * The Avaliação de Mudanças / Projetos has no name of its own: like the Hit
- * List, the name is the translated type (FR-014). Each row has "Visualizar"
- * and "PDF" for every role and "Alterar" and "Excluir" for who may edit; the
- * top of the tab has the blank form and, for who may edit, "Nova Avaliação de
- * Mudanças" (J1 to J5).
- */
-function ChangeAssessmentList() {
-  const t = useTranslations('evaluations')
-  const query = useGetEvaluationsChangeAssessments()
-  const name = t('types.change_assessment')
-  const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
-  const pdf = useChangeAssessmentPdf((text) =>
-    setFeedback({ tone: 'error', text })
-  )
-
-  useEvaluationFeedback(setFeedback)
-
-  function handleDownloadPdf(row: EvaluationRow) {
-    if (pdf.isGenerating) return
-
-    setFeedback(null)
-    void pdf.downloadPdf(row.id)
-  }
-
-  function handleDownloadBlankPdf() {
-    if (pdf.isGenerating) return
-
-    setFeedback(null)
-    void pdf.downloadBlankPdf()
-  }
-
-  const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
-    'change_assessment',
-    t('newChangeAssessment'),
-    handleDownloadPdf,
-    setFeedback
-  )
-
-  const rows = useMemo<EvaluationRow[] | undefined>(
-    () =>
-      query.data?.status === 200
-        ? query.data.data.map((item: ChangeAssessmentItem) => ({
-            id: item.id,
-            number: item.number,
-            code: item.code,
-            type: 'change_assessment',
-            name,
-            activity: item.activity,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-          }))
-        : undefined,
-    [query.data, name]
-  )
-
-  return (
-    <EvaluationList
-      type="change_assessment"
-      rows={rows}
-      isError={query.isError}
-      onRetry={() => void query.refetch()}
-      getRowActions={getRowActions}
-      actions={
-        <>
-          <BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />
-          {newButton}
-        </>
-      }
-      emptyAction={newButton}
-      feedback={
-        <ListFeedback message={feedback} onDismiss={() => setFeedback(null)} />
-      }
-      dialogs={deleteModal}
-    />
-  )
-}
-
 /** "PDF em branco" beside the search, disabled while any PDF is generated. */
 function BlankPdfButton({
   pdf,
@@ -465,7 +316,8 @@ function BlankPdfButton({
 }
 
 interface EvaluationListProps {
-  type: EvaluationType
+  /** The translated type, searched and sorted as the type column. */
+  typeLabel: string
   /** `undefined` while loading or after an error. */
   rows: EvaluationRow[] | undefined
   isError: boolean
@@ -488,7 +340,7 @@ interface EvaluationListProps {
  * never changes it.
  */
 function EvaluationList({
-  type,
+  typeLabel,
   rows,
   isError,
   onRetry,
@@ -504,7 +356,6 @@ function EvaluationList({
   const pathname = usePathname()
   const list = useListState(EVALUATION_LIST_CONFIG)
   const { q: search, sortState } = list
-  const typeLabel = t(`types.${type}`)
 
   const visibleRows = useMemo(
     () =>

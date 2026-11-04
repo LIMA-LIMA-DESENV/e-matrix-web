@@ -7,53 +7,60 @@ import { Suspense, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
-import { useGetEvaluationsHitListsId } from '@/http/api'
 import { useTranslateError } from '@/lib/error-translator'
+import type { EvaluationType } from '@/lib/evaluation-types'
 
-import { useHitListPdf } from '../components/use-hit-list-pdf'
+import { useEvaluationPdf } from '../components/use-evaluation-pdf'
+import {
+  type EvaluationWebDefinition,
+  evaluationWebDefinition,
+} from '../definitions'
 import { EvaluationFormSkeleton } from './EvaluationFormSkeleton'
 import { EvaluationLoadError, EvaluationTypeGuard } from './EvaluationTypeGuard'
-import { HitListForm } from './HitListForm'
 import {
   evaluationFormHref,
   evaluationFormPath,
   evaluationsListHref,
 } from './list-href'
-import { type HitListFormData, toHitListFormValues } from './schema'
 import type { EvaluationActivityOptionsState } from './use-evaluation-activity-options'
 
-export function ViewHitListPage() {
+/** `<tab>/[id]` of any evaluation type (FR-010, D-5). */
+export function ViewEvaluationPage({ type }: { type: EvaluationType }) {
   return (
     <Suspense fallback={<EvaluationFormSkeleton />}>
-      <EvaluationTypeGuard type="hit_list">
-        <ViewHitList />
+      <EvaluationTypeGuard type={type}>
+        <ViewEvaluation key={type} definition={evaluationWebDefinition(type)} />
       </EvaluationTypeGuard>
     </Suspense>
   )
 }
 
 /**
- * Shows a Hit List to every role (J2, FR-014, H-2): the same form, filled and
- * with every control disabled, without "Salvar". The header has the PDF of
- * the record and, for who may edit, "Alterar". The deletion is on the
- * listing only (D-7).
+ * Shows a record of the type to every role (J2): the type's form, filled
+ * and with every control disabled, without "Salvar". The header has the PDF
+ * of the record and, for who may edit, "Alterar". The deletion is on the
+ * listing only.
  */
-function ViewHitList() {
+function ViewEvaluation({
+  definition,
+}: {
+  definition: EvaluationWebDefinition
+}) {
   const t = useTranslations('evaluations')
   const searchParams = useSearchParams()
   const { id } = useParams<{ id: string }>()
   const translateError = useTranslateError()
   const { canEdit } = useAuth()
   const [pdfError, setPdfError] = useState<string | null>(null)
-  const pdf = useHitListPdf(setPdfError)
-  const listHref = evaluationsListHref('hit_list', searchParams)
+  const pdf = useEvaluationPdf(definition, setPdfError)
+  const listHref = evaluationsListHref(definition.type, searchParams)
 
-  const detail = useGetEvaluationsHitListsId(id, { query: { enabled: !!id } })
-  const record = detail.data?.status === 200 ? detail.data.data : undefined
+  const detail = definition.useDetail(id, !!id)
+  const record = detail.data
 
-  const initialValues = useMemo<HitListFormData | undefined>(
-    () => (record ? toHitListFormValues(record) : undefined),
-    [record]
+  const initialValues = useMemo(
+    () => (record ? definition.form.toFormValues(record) : undefined),
+    [definition, record]
   )
 
   // The select only needs the record's own activity, as the detail carries
@@ -73,10 +80,10 @@ function ViewHitList() {
   if (!record || !initialValues) {
     return (
       <EvaluationLoadError
-        type="hit_list"
-        description={translateError(detail.error ?? detail.data)}
+        type={definition.type}
+        description={translateError(detail.failure)}
         listHref={listHref}
-        onRetry={() => void detail.refetch()}
+        onRetry={detail.refetch}
       />
     )
   }
@@ -88,8 +95,11 @@ function ViewHitList() {
     void pdf.downloadPdf(record.id)
   }
 
+  const Form = definition.form.Component
+
   return (
-    <HitListForm
+    <Form
+      key={`${definition.type}:${record.id}`}
       readOnly
       code={record.code}
       initialValues={initialValues}
@@ -113,7 +123,10 @@ function ViewHitList() {
           {canEdit && (
             <Link
               href={evaluationFormHref(
-                evaluationFormPath('hit_list', { id: record.id, edit: true }),
+                evaluationFormPath(definition.type, {
+                  id: record.id,
+                  edit: true,
+                }),
                 searchParams
               )}
               className="inline-flex items-center gap-2 rounded-lg bg-primary-container px-4 py-2 text-sm font-medium text-on-primary-container shadow-lg shadow-primary-container/20 hover:opacity-90"

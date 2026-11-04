@@ -1,8 +1,8 @@
 'use client'
 
-import { EditChecklistPage } from '../../../_form/EditChecklist'
+import { EditEvaluationPage } from '../../../_form/EditEvaluation'
 
 /** Edits a Coleta de Dados In Loco (J3). */
-export default function EditChecklistRoutePage() {
-  return <EditChecklistPage />
+export default function EditEvaluationRoutePage() {
+  return <EditEvaluationPage type="checklist" />
 }

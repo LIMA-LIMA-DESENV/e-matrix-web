@@ -5,48 +5,46 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect, useMemo } from 'react'
 
 import { useAuth } from '@/contexts/AuthContext'
-import {
-  getGetEvaluationsHitListsIdQueryKey,
-  getGetEvaluationsHitListsQueryKey,
-  useGetEvaluationsHitListsId,
-  usePutEvaluationsHitListsId,
-} from '@/http/api'
 import { useTranslateError } from '@/lib/error-translator'
+import type { EvaluationType } from '@/lib/evaluation-types'
 
+import {
+  type EvaluationWebDefinition,
+  evaluationWebDefinition,
+} from '../definitions'
 import { EvaluationFormSkeleton } from './EvaluationFormSkeleton'
 import { EvaluationLoadError, EvaluationTypeGuard } from './EvaluationTypeGuard'
-import { HitListForm } from './HitListForm'
 import { evaluationsListHref } from './list-href'
-import {
-  type HitListFormData,
-  toHitListFormValues,
-  toHitListInput,
-} from './schema'
 import { useEvaluationActivityOptions } from './use-evaluation-activity-options'
 
-export function EditHitListPage() {
+/** `<tab>/[id]/editar` of any evaluation type (FR-010, D-5). */
+export function EditEvaluationPage({ type }: { type: EvaluationType }) {
   return (
     <Suspense fallback={<EvaluationFormSkeleton />}>
-      <EvaluationTypeGuard type="hit_list">
-        <EditHitList />
+      <EvaluationTypeGuard type={type}>
+        <EditEvaluation key={type} definition={evaluationWebDefinition(type)} />
       </EvaluationTypeGuard>
     </Suspense>
   )
 }
 
 /**
- * Edits a Hit List (J3), titled with its code. Every field may change,
- * including the activity (R-7); the `PUT` replaces all of them, so what is
- * emptied is cleared. Saved, it goes back to the tab with the message.
+ * Edits a record of the type (J3), titled with its code. Every field may
+ * change, including the activity; the `PUT` replaces all of them, so what
+ * is emptied is cleared. Saved, it goes back to the tab with the message.
  */
-function EditHitList() {
+function EditEvaluation({
+  definition,
+}: {
+  definition: EvaluationWebDefinition
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
   const translateError = useTranslateError()
   const { canEdit } = useAuth()
-  const listHref = evaluationsListHref('hit_list', searchParams)
+  const listHref = evaluationsListHref(definition.type, searchParams)
 
   // A Viewer reaching this URL directly goes back to the tab, before any
   // write request is even possible (FR-002). The real guard is the API.
@@ -54,29 +52,27 @@ function EditHitList() {
     if (!canEdit) router.replace(listHref)
   }, [canEdit, listHref, router])
 
-  const detail = useGetEvaluationsHitListsId(id, {
-    query: { enabled: canEdit && !!id },
-  })
-  const activities = useEvaluationActivityOptions('hit_list', canEdit)
+  const detail = definition.useDetail(id, canEdit && !!id)
+  const activities = useEvaluationActivityOptions(definition, canEdit)
   const {
-    mutateAsync,
+    update,
     isPending,
     isError: isUpdateError,
     error: updateError,
-  } = usePutEvaluationsHitListsId()
+  } = definition.useUpdate()
 
-  const record = detail.data?.status === 200 ? detail.data.data : undefined
+  const record = detail.data
 
-  const initialValues = useMemo<HitListFormData | undefined>(
-    () => (record ? toHitListFormValues(record) : undefined),
-    [record]
+  const initialValues = useMemo(
+    () => (record ? definition.form.toFormValues(record) : undefined),
+    [definition, record]
   )
 
-  async function handleSubmit(data: HitListFormData) {
+  async function handleSubmit(data: unknown) {
     if (!record) return false
 
     try {
-      await mutateAsync({ id: record.id, data: toHitListInput(data) })
+      await update(record.id, definition.form.toInput(data))
     } catch {
       // Shown from the mutation state, translated — a 404 when the record
       // was deleted meanwhile (§12).
@@ -84,13 +80,13 @@ function EditHitList() {
     }
 
     await queryClient.invalidateQueries({
-      queryKey: getGetEvaluationsHitListsIdQueryKey(record.id),
+      queryKey: definition.detailQueryKey(record.id),
     })
     await queryClient.invalidateQueries({
-      queryKey: getGetEvaluationsHitListsQueryKey(),
+      queryKey: definition.listQueryKey(),
     })
     router.push(
-      evaluationsListHref('hit_list', searchParams, {
+      evaluationsListHref(definition.type, searchParams, {
         param: 'updated',
         code: record.code,
       })
@@ -105,16 +101,19 @@ function EditHitList() {
   if (!record || !initialValues) {
     return (
       <EvaluationLoadError
-        type="hit_list"
-        description={translateError(detail.error ?? detail.data)}
+        type={definition.type}
+        description={translateError(detail.failure)}
         listHref={listHref}
-        onRetry={() => void detail.refetch()}
+        onRetry={detail.refetch}
       />
     )
   }
 
+  const Form = definition.form.Component
+
   return (
-    <HitListForm
+    <Form
+      key={`${definition.type}:${record.id}`}
       code={record.code}
       initialValues={initialValues}
       activities={activities}

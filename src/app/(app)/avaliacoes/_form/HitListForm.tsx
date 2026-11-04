@@ -6,7 +6,7 @@ import { type ReactNode, useEffect, useMemo } from 'react'
 import { type UseFormRegister, useForm } from 'react-hook-form'
 
 import { Input } from '@/components/ui'
-import { HIT_LIST_ITEMS } from '../components/use-hit-list-pdf'
+import { HIT_LIST_ITEMS } from '../components/hit-list-items'
 import {
   ActivityField,
   answerId,

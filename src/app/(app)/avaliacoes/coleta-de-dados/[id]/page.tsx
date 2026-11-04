@@ -1,8 +1,8 @@
 'use client'
 
-import { ViewChecklistPage } from '../../_form/ViewChecklist'
+import { ViewEvaluationPage } from '../../_form/ViewEvaluation'
 
 /** Shows a Coleta de Dados In Loco, read only, to every role (J2). */
-export default function ChecklistDetailPage() {
-  return <ViewChecklistPage />
+export default function EvaluationDetailRoutePage() {
+  return <ViewEvaluationPage type="checklist" />
 }

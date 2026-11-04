@@ -19,7 +19,7 @@ import {
   CHECKLIST_QUESTION_KEYS,
   type ChecklistQuestionKey,
 } from '../components/checklist-blocks'
-import { HIT_LIST_ITEMS } from '../components/use-hit-list-pdf'
+import { HIT_LIST_ITEMS } from '../components/hit-list-items'
 
 /**
  * The longest text answer the API accepts, in code points after the trim:

@@ -1,8 +1,8 @@
 'use client'
 
-import { CreateChangeAssessmentPage } from '../../_form/CreateChangeAssessment'
+import { CreateEvaluationPage } from '../../_form/CreateEvaluation'
 
 /** Creates an Avaliação de Mudanças / Projetos (J1). */
-export default function NewChangeAssessmentPage() {
-  return <CreateChangeAssessmentPage />
+export default function NewEvaluationRoutePage() {
+  return <CreateEvaluationPage type="change_assessment" />
 }

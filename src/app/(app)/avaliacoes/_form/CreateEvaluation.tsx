@@ -5,40 +5,48 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense, useEffect } from 'react'
 
 import { useAuth } from '@/contexts/AuthContext'
-import {
-  getGetEvaluationsHitListsQueryKey,
-  usePostEvaluationsHitLists,
-} from '@/http/api'
 import { useTranslateError } from '@/lib/error-translator'
+import type { EvaluationType } from '@/lib/evaluation-types'
 
+import {
+  type EvaluationWebDefinition,
+  evaluationWebDefinition,
+} from '../definitions'
 import { EvaluationFormSkeleton } from './EvaluationFormSkeleton'
 import { EvaluationTypeGuard } from './EvaluationTypeGuard'
-import { HitListForm } from './HitListForm'
 import { evaluationsListHref } from './list-href'
-import { type HitListFormData, toHitListInput } from './schema'
 import { useEvaluationActivityOptions } from './use-evaluation-activity-options'
 
-export function CreateHitListPage() {
+/** `<tab>/novo` of any evaluation type (FR-010, D-5). */
+export function CreateEvaluationPage({ type }: { type: EvaluationType }) {
   return (
     <Suspense fallback={<EvaluationFormSkeleton />}>
-      <EvaluationTypeGuard type="hit_list">
-        <CreateHitList />
+      <EvaluationTypeGuard type={type}>
+        <CreateEvaluation
+          key={type}
+          definition={evaluationWebDefinition(type)}
+        />
       </EvaluationTypeGuard>
     </Suspense>
   )
 }
 
 /**
- * Creates a Hit List (J1). Saved, it goes back to the tab with a message
- * citing the code the API assigned (`HL-<n>`).
+ * Creates a record of the type (J1), in the type's own form. Saved, it goes
+ * back to the tab with a message citing the code the API assigned
+ * (`<prefix>-<n>`).
  */
-function CreateHitList() {
+function CreateEvaluation({
+  definition,
+}: {
+  definition: EvaluationWebDefinition
+}) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const translateError = useTranslateError()
   const { canEdit } = useAuth()
-  const listHref = evaluationsListHref('hit_list', searchParams)
+  const listHref = evaluationsListHref(definition.type, searchParams)
 
   // A Viewer reaching this URL directly goes back to the tab, as on every
   // form of the web (FR-002). The real guard is the API, which answers 403.
@@ -46,16 +54,14 @@ function CreateHitList() {
     if (!canEdit) router.replace(listHref)
   }, [canEdit, listHref, router])
 
-  const activities = useEvaluationActivityOptions('hit_list', canEdit)
-  const { mutateAsync, isPending, isError, error } =
-    usePostEvaluationsHitLists()
+  const activities = useEvaluationActivityOptions(definition, canEdit)
+  const { create, isPending, isError, error } = definition.useCreate()
 
-  async function handleSubmit(data: HitListFormData) {
+  async function handleSubmit(data: unknown) {
     let createdCode: string | null = null
 
     try {
-      const response = await mutateAsync({ data: toHitListInput(data) })
-      if (response.status === 201) createdCode = response.data.code
+      createdCode = await create(definition.form.toInput(data))
     } catch {
       // Shown from the mutation state, translated, with the form kept —
       // including an activity deleted after this screen loaded (§12).
@@ -63,11 +69,11 @@ function CreateHitList() {
     }
 
     await queryClient.invalidateQueries({
-      queryKey: getGetEvaluationsHitListsQueryKey(),
+      queryKey: definition.listQueryKey(),
     })
     router.push(
       createdCode
-        ? evaluationsListHref('hit_list', searchParams, {
+        ? evaluationsListHref(definition.type, searchParams, {
             param: 'created',
             code: createdCode,
           })
@@ -78,8 +84,11 @@ function CreateHitList() {
 
   if (!canEdit) return null
 
+  const Form = definition.form.Component
+
   return (
-    <HitListForm
+    <Form
+      key={definition.type}
       activities={activities}
       listHref={listHref}
       isSubmitting={isPending}
