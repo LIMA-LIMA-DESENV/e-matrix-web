@@ -26,8 +26,10 @@ import {
 import { Button, Input } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 import {
+  type ChangeAssessmentItem,
   type ChecklistItem,
   type HitListItem,
+  useGetEvaluationsChangeAssessments,
   useGetEvaluationsChecklists,
   useGetEvaluationsHitLists,
 } from '@/http/api'
@@ -43,6 +45,7 @@ import {
   matchesEvaluationSearch,
 } from './listing'
 import type { EvaluationRow } from './types'
+import { useChangeAssessmentPdf } from './use-change-assessment-pdf'
 import { useChecklistPdf } from './use-checklist-pdf'
 import { useDeleteEvaluation } from './use-delete-evaluation'
 import { useEvaluationFeedback } from './use-evaluation-feedback'
@@ -84,7 +87,9 @@ function EnabledEvaluationType({ type }: { type: EvaluationType }) {
   return (
     <div>
       <EvaluationsTabs active={type} types={types} />
-      {type === 'hit_list' ? <HitListList /> : <ChecklistList />}
+      {type === 'hit_list' && <HitListList />}
+      {type === 'checklist' && <ChecklistList />}
+      {type === 'change_assessment' && <ChangeAssessmentList />}
     </div>
   )
 }
@@ -336,6 +341,84 @@ function ChecklistList() {
   return (
     <EvaluationList
       type="checklist"
+      rows={rows}
+      isError={query.isError}
+      onRetry={() => void query.refetch()}
+      getRowActions={getRowActions}
+      actions={
+        <>
+          <BlankPdfButton pdf={pdf} onClick={handleDownloadBlankPdf} />
+          {newButton}
+        </>
+      }
+      emptyAction={newButton}
+      feedback={
+        <ListFeedback message={feedback} onDismiss={() => setFeedback(null)} />
+      }
+      dialogs={deleteModal}
+    />
+  )
+}
+
+/**
+ * The Avaliação de Mudanças / Projetos has no name of its own: like the Hit
+ * List, the name is the translated type (FR-014). Each row has "Visualizar"
+ * and "PDF" for every role and "Alterar" and "Excluir" for who may edit; the
+ * top of the tab has the blank form and, for who may edit, "Nova Avaliação de
+ * Mudanças" (J1 to J5).
+ */
+function ChangeAssessmentList() {
+  const t = useTranslations('evaluations')
+  const query = useGetEvaluationsChangeAssessments()
+  const name = t('types.change_assessment')
+  const [feedback, setFeedback] = useState<ListFeedbackMessage | null>(null)
+  const pdf = useChangeAssessmentPdf((text) =>
+    setFeedback({ tone: 'error', text })
+  )
+
+  useEvaluationFeedback(setFeedback)
+
+  function handleDownloadPdf(row: EvaluationRow) {
+    if (pdf.isGenerating) return
+
+    setFeedback(null)
+    void pdf.downloadPdf(row.id)
+  }
+
+  function handleDownloadBlankPdf() {
+    if (pdf.isGenerating) return
+
+    setFeedback(null)
+    void pdf.downloadBlankPdf()
+  }
+
+  const { getRowActions, newButton, deleteModal } = useEvaluationRecordActions(
+    'change_assessment',
+    t('newChangeAssessment'),
+    handleDownloadPdf,
+    setFeedback
+  )
+
+  const rows = useMemo<EvaluationRow[] | undefined>(
+    () =>
+      query.data?.status === 200
+        ? query.data.data.map((item: ChangeAssessmentItem) => ({
+            id: item.id,
+            number: item.number,
+            code: item.code,
+            type: 'change_assessment',
+            name,
+            activity: item.activity,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+          }))
+        : undefined,
+    [query.data, name]
+  )
+
+  return (
+    <EvaluationList
+      type="change_assessment"
       rows={rows}
       isError={query.isError}
       onRetry={() => void query.refetch()}

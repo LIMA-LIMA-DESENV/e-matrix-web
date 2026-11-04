@@ -6,11 +6,13 @@ export type EvaluationType = EvaluationTypeItemType
 
 /**
  * The route of each evaluation type, in the order the API lists the enabled
- * ones (`hit_list`, `checklist`): `/avaliacoes` opens on the first enabled.
+ * ones (`hit_list`, `checklist`, `change_assessment`): `/avaliacoes` opens on
+ * the first enabled.
  */
 export const EVALUATION_TYPE_HREFS = {
   hit_list: '/avaliacoes/hit-list',
   checklist: '/avaliacoes/coleta-de-dados',
+  change_assessment: '/avaliacoes/avaliacao-de-mudancas',
 } as const satisfies Record<EvaluationType, string>
 
 const EMPTY_TYPES: readonly EvaluationType[] = []

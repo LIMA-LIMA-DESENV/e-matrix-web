@@ -3,10 +3,13 @@
 import { useQueryClient } from '@tanstack/react-query'
 
 import {
+  getGetEvaluationsChangeAssessmentsIdQueryKey,
+  getGetEvaluationsChangeAssessmentsQueryKey,
   getGetEvaluationsChecklistsIdQueryKey,
   getGetEvaluationsChecklistsQueryKey,
   getGetEvaluationsHitListsIdQueryKey,
   getGetEvaluationsHitListsQueryKey,
+  useDeleteEvaluationsChangeAssessmentsId,
   useDeleteEvaluationsChecklistsId,
   useDeleteEvaluationsHitListsId,
 } from '@/http/api'
@@ -22,12 +25,25 @@ export function useDeleteEvaluation(type: EvaluationType) {
   const queryClient = useQueryClient()
   const hitList = useDeleteEvaluationsHitListsId()
   const checklist = useDeleteEvaluationsChecklistsId()
+  const changeAssessment = useDeleteEvaluationsChangeAssessmentsId()
 
-  const isHitList = type === 'hit_list'
-  const mutateAsync = isHitList ? hitList.mutateAsync : checklist.mutateAsync
-  const listKey = isHitList
-    ? getGetEvaluationsHitListsQueryKey()
-    : getGetEvaluationsChecklistsQueryKey()
+  const { mutateAsync, listKey, detailKey } = {
+    hit_list: {
+      mutateAsync: hitList.mutateAsync,
+      listKey: getGetEvaluationsHitListsQueryKey(),
+      detailKey: getGetEvaluationsHitListsIdQueryKey,
+    },
+    checklist: {
+      mutateAsync: checklist.mutateAsync,
+      listKey: getGetEvaluationsChecklistsQueryKey(),
+      detailKey: getGetEvaluationsChecklistsIdQueryKey,
+    },
+    change_assessment: {
+      mutateAsync: changeAssessment.mutateAsync,
+      listKey: getGetEvaluationsChangeAssessmentsQueryKey(),
+      detailKey: getGetEvaluationsChangeAssessmentsIdQueryKey,
+    },
+  }[type]
 
   return async function deleteEvaluation({ id }: { id: string }) {
     try {
@@ -37,11 +53,7 @@ export function useDeleteEvaluation(type: EvaluationType) {
       throw error
     }
 
-    queryClient.removeQueries({
-      queryKey: isHitList
-        ? getGetEvaluationsHitListsIdQueryKey(id)
-        : getGetEvaluationsChecklistsIdQueryKey(id),
-    })
+    queryClient.removeQueries({ queryKey: detailKey(id) })
     await queryClient.invalidateQueries({ queryKey: listKey })
   }
 }

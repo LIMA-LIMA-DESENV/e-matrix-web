@@ -2,6 +2,7 @@ import { useMemo } from 'react'
 
 import {
   type ImprovementProjectActivity,
+  useGetEvaluationsChangeAssessmentsActivities,
   useGetEvaluationsChecklistsActivities,
   useGetEvaluationsHitListsActivities,
 } from '@/http/api'
@@ -32,8 +33,15 @@ export function useEvaluationActivityOptions(
   const checklist = useGetEvaluationsChecklistsActivities({
     query: { enabled: enabled && type === 'checklist' },
   })
+  const changeAssessment = useGetEvaluationsChangeAssessmentsActivities({
+    query: { enabled: enabled && type === 'change_assessment' },
+  })
   const { data, isLoading, isError, refetch } =
-    type === 'hit_list' ? hitList : checklist
+    type === 'hit_list'
+      ? hitList
+      : type === 'checklist'
+        ? checklist
+        : changeAssessment
 
   const options = useMemo<ImprovementProjectActivity[]>(
     () => (data?.status === 200 ? data.data : []),

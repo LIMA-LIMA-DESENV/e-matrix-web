@@ -1,6 +1,8 @@
 import { z } from 'zod'
 
 import type {
+  ChangeAssessment,
+  ChangeAssessmentInput,
   Checklist,
   ChecklistAnswersInput,
   ChecklistInput,
@@ -9,6 +11,10 @@ import type {
   HitListInput,
 } from '@/http/api'
 
+import {
+  CHANGE_ASSESSMENT_QUESTIONS,
+  type ChangeAssessmentQuestion,
+} from '../components/change-assessment-questions'
 import {
   CHECKLIST_QUESTION_KEYS,
   type ChecklistQuestionKey,
@@ -333,5 +339,89 @@ export function toChecklistInput(data: ChecklistFormData): ChecklistInput {
     // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
     date: data.date,
     answers: toChecklistAnswers(data.answers) as ChecklistAnswersInput,
+  }
+}
+
+/**
+ * Mirrors the API rules of an Avaliação de Mudanças / Projetos write
+ * (FR-004, FR-015): the activity chosen among the listed ones, a real
+ * assessment date, not compared with the periods, and each of the 8 answers
+ * optional, of at most 5,000 code points after the trim. The API stays the
+ * authority, including whether the activity still exists.
+ */
+export function makeChangeAssessmentSchema(tv: Translate) {
+  const text = z
+    .string()
+    .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+      message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+    })
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    assessment_date: z
+      .string()
+      .refine(isCalendarDay, tv('assessmentDateRequired')),
+    answers: z.object(shapeOf(CHANGE_ASSESSMENT_QUESTIONS, text)),
+  })
+}
+
+export type ChangeAssessmentFormInput = z.input<
+  ReturnType<typeof makeChangeAssessmentSchema>
+>
+export type ChangeAssessmentFormData = z.output<
+  ReturnType<typeof makeChangeAssessmentSchema>
+>
+
+/** An empty Avaliação de Mudanças / Projetos: no identification, no answer. */
+export function changeAssessmentFormDefaultValues(): ChangeAssessmentFormData {
+  return {
+    activity_id: '',
+    assessment_date: '',
+    answers: shapeOf(CHANGE_ASSESSMENT_QUESTIONS, ''),
+  }
+}
+
+/**
+ * A stored Avaliação de Mudanças / Projetos as the form holds it: an absent
+ * answer (`null`) is a blank text area.
+ */
+export function toChangeAssessmentFormValues(
+  changeAssessment: ChangeAssessment
+): ChangeAssessmentFormData {
+  return {
+    activity_id: changeAssessment.activity.id,
+    assessment_date: changeAssessment.assessment_date,
+    answers: Object.fromEntries(
+      CHANGE_ASSESSMENT_QUESTIONS.map((key) => [
+        key,
+        changeAssessment.answers[key] ?? '',
+      ])
+    ),
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/change-assessments` (FR-005, FR-006):
+ * the date as typed and the 8 answers trimmed, keeping their inner line
+ * breaks; a blank one goes as `null`, which the API stores as absent, so the
+ * `PUT` clears an answer that was emptied.
+ */
+export function toChangeAssessmentInput(
+  data: ChangeAssessmentFormData
+): ChangeAssessmentInput {
+  const answers = Object.fromEntries(
+    CHANGE_ASSESSMENT_QUESTIONS.map(
+      (key): [ChangeAssessmentQuestion, string | null] => [
+        key,
+        data.answers[key]?.trim() || null,
+      ]
+    )
+  )
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    assessment_date: data.assessment_date,
+    answers,
   }
 }

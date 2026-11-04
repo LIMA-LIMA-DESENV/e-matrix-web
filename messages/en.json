@@ -1273,11 +1273,13 @@
     "tabs": {
       "label": "Evaluation types",
       "hit_list": "Hit List",
-      "checklist": "In Loco Data Collection"
+      "checklist": "In Loco Data Collection",
+      "change_assessment": "Evaluation of Changes / Projects"
     },
     "types": {
       "hit_list": "Hit List",
-      "checklist": "In Loco Data Collection"
+      "checklist": "In Loco Data Collection",
+      "change_assessment": "Evaluation of Changes / Projects"
     },
     "columns": {
       "code": "Code",
@@ -1463,10 +1465,26 @@
           "question54": "Is there a separate keyboard?",
           "question55": "Is there a separate mouse?"
         }
+      },
+      "changeAssessment": {
+        "title": "Evaluation of Changes / Projects",
+        "activity": "Activity",
+        "date": "Date",
+        "questions": {
+          "question1": "Does the new design / modification generate manual handling of parts and / or equipment weighing more than 20 kg? If so, how? Are ergonomic devices and accessories available for items weighing > 20.0 kg or for parts whose handling is hampered by large dimensions or few handles?",
+          "question2": "Are ergonomic devices available to perform tasks that require effort to push or pull parts / equipment, regardless of distance? Which ones?",
+          "question3": "Does the work area / workplace offer functional space allowing alternation of posture? (the functional area should avoid prolonged forced postures of the trunk and / or body segments)",
+          "question4": "For work in the standing position, is the height of the bench(es) / table(s) compatible with the characteristics below, and are there seats for alternating posture? Heavy work: 73 to 95 cm; Light work: 86.5 to 107 cm; Precision work: 98 to 119 cm.",
+          "question5": "Does this design / modification pose an ergonomic repetitiveness risk for any body segment (identical movements in cycles shorter than 30 seconds)?",
+          "question6": "Are tools (approved by EHS) available to carry out the activities, and do they allow the correct grip for the work surface, thus avoiding manual and vibration ergonomic risks?",
+          "question7": "Does this project / modification have a computer workstation (desktop or laptop) with chairs and tables that meet the ergonomic specifications? Have the ergonomic accessories been provided?",
+          "question8": "Does the workplace with tasks requiring high-precision inspection have fluorescent or incandescent lighting with good color rendering in addition to general lighting?"
+        }
       }
     },
     "newHitList": "New Hit List",
     "newChecklist": "New Data Collection",
+    "newChangeAssessment": "New Evaluation of Changes",
     "actions": {
       "edit": "Edit"
     },
@@ -1536,6 +1554,16 @@
         "name": "Name",
         "sector": "Sector",
         "date": "Date"
+      }
+    },
+    "changeAssessmentForm": {
+      "questionsDescription": "Answer the questions that apply to the change or project. All of them are optional and accept several lines.",
+      "sections": {
+        "identification": "Identification",
+        "questions": "Questions"
+      },
+      "fields": {
+        "assessmentDate": "Assessment date"
       }
     },
     "delete": {
@@ -1732,6 +1760,11 @@
     "checklistSectorRequired": "Enter the sector of the In Loco Data Collection.",
     "checklistSectorTooLong": "The sector of the In Loco Data Collection must have at most 255 characters.",
     "checklistDateInvalid": "Enter a valid date for the In Loco Data Collection.",
-    "checklistAnswersInvalid": "Some answers of the In Loco Data Collection are invalid. Review the questions and try again."
+    "checklistAnswersInvalid": "Some answers of the In Loco Data Collection are invalid. Review the questions and try again.",
+    "changeAssessmentNotFound": "Evaluation of Changes / Projects not found.",
+    "changeAssessmentActivityRequired": "Select the activity of the Evaluation of Changes / Projects.",
+    "changeAssessmentActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "changeAssessmentDateInvalid": "Enter a valid date for the Evaluation of Changes / Projects.",
+    "changeAssessmentAnswersInvalid": "Some answers of the Evaluation of Changes / Projects are invalid. Review the questions and try again."
   }
 }

@@ -1273,11 +1273,13 @@
     "tabs": {
       "label": "Tipos de evaluación",
       "hit_list": "Hit List",
-      "checklist": "Recopilación de Datos In Loco"
+      "checklist": "Recopilación de Datos In Loco",
+      "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "types": {
       "hit_list": "Hit List",
-      "checklist": "Recopilación de Datos In Loco"
+      "checklist": "Recopilación de Datos In Loco",
+      "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "columns": {
       "code": "Código",
@@ -1463,10 +1465,26 @@
           "question54": "¿Tiene un teclado suelto?",
           "question55": "¿Tiene un ratón suelto?"
         }
+      },
+      "changeAssessment": {
+        "title": "Evaluación de Cambios / Proyectos",
+        "activity": "Actividad",
+        "date": "Fecha",
+        "questions": {
+          "question1": "¿El nuevo proyecto / modificación genera movimiento manual de piezas y / o equipos con peso mayor que 20 kg? Si es así, ¿cómo? ¿Hay accesorios y dispositivos ergonómicos disponibles para artículos que pesan > 20,0 kg o para piezas cuya manipulación se dificulta debido a grandes dimensiones o pocas asas?",
+          "question2": "¿Se dispone de dispositivos ergonómicos para realizar las tareas que requieran esfuerzos para empujar o tirar de piezas / equipos, independientemente de las distancias? ¿Cuáles?",
+          "question3": "¿El área / lugar de trabajo presenta espacio funcional que permite la alternancia de postura? (el área funcional debe evitar la permanencia de posturas forzadas del tronco y / o segmentos corporales)",
+          "question4": "Para situaciones de trabajo en posición de pie, ¿la altura de la(s) mesa(s) de trabajo es compatible con las características abajo y tiene bancos para alternancia de postura? Trabajo pesado: 73 a 95 cm; Trabajo ligero: 86,5 a 107 cm; Trabajo de precisión: 98 a 119 cm.",
+          "question5": "¿Este proyecto / modificación ofrece riesgo ergonómico de repetitividad para algún segmento corporal (movimientos iguales en ciclos menores de 30 segundos)?",
+          "question6": "¿Se dispone de herramientas (aprobadas por EHS) para la realización de las actividades, y estas respetan la empuñadura correcta conforme a la superficie de trabajo, evitando así riesgos ergonómicos manuales y vibratorios?",
+          "question7": "¿Este proyecto / modificación posee un puesto de utilización de ordenador (desktop o laptop) con sillas y mesas que atiendan las especificaciones ergonómicas? ¿Los accesorios ergonómicos están disponibles?",
+          "question8": "¿El lugar de trabajo con tareas con necesidad de inspección de gran precisión está con iluminación fluorescente o incandescente con buena disponibilidad de colores además de la iluminación general?"
+        }
       }
     },
     "newHitList": "Nueva Hit List",
     "newChecklist": "Nueva Recopilación de Datos",
+    "newChangeAssessment": "Nueva Evaluación de Cambios",
     "actions": {
       "edit": "Modificar"
     },
@@ -1536,6 +1554,16 @@
         "name": "Nombre",
         "sector": "Sector",
         "date": "Fecha"
+      }
+    },
+    "changeAssessmentForm": {
+      "questionsDescription": "Responda las preguntas que se aplican al cambio o al proyecto. Todas son opcionales y admiten varias líneas.",
+      "sections": {
+        "identification": "Identificación",
+        "questions": "Preguntas"
+      },
+      "fields": {
+        "assessmentDate": "Fecha de la evaluación"
       }
     },
     "delete": {
@@ -1732,6 +1760,11 @@
     "checklistSectorRequired": "Ingrese el sector de la Recopilación de Datos In Loco.",
     "checklistSectorTooLong": "El sector de la Recopilación de Datos In Loco debe tener como máximo 255 caracteres.",
     "checklistDateInvalid": "Ingrese una fecha válida para la Recopilación de Datos In Loco.",
-    "checklistAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco no son válidas. Revise las preguntas e intente nuevamente."
+    "checklistAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco no son válidas. Revise las preguntas e intente nuevamente.",
+    "changeAssessmentNotFound": "Evaluación de Cambios / Proyectos no encontrada.",
+    "changeAssessmentActivityRequired": "Seleccione la actividad de la Evaluación de Cambios / Proyectos.",
+    "changeAssessmentActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "changeAssessmentDateInvalid": "Ingrese una fecha válida para la Evaluación de Cambios / Proyectos.",
+    "changeAssessmentAnswersInvalid": "Algunas respuestas de la Evaluación de Cambios / Proyectos no son válidas. Revise las preguntas e intente nuevamente."
   }
 }

@@ -222,6 +222,11 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Checklist sector is too long.': 'checklistSectorTooLong',
   'Invalid checklist date.': 'checklistDateInvalid',
   'Invalid checklist answers.': 'checklistAnswersInvalid',
+  'Change assessment not found.': 'changeAssessmentNotFound',
+  'Change assessment activity is required.': 'changeAssessmentActivityRequired',
+  'Change assessment activity not found.': 'changeAssessmentActivityNotFound',
+  'Invalid change assessment date.': 'changeAssessmentDateInvalid',
+  'Invalid change assessment answers.': 'changeAssessmentAnswersInvalid',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {
