@@ -413,6 +413,7 @@ export type EvaluationTypeItemType = typeof EvaluationTypeItemType[keyof typeof 
 
 
 export const EvaluationTypeItemType = {
+  ergonomic_analysis_in_loco: 'ergonomic_analysis_in_loco',
   hit_list: 'hit_list',
   checklist: 'checklist',
   change_assessment: 'change_assessment',
@@ -425,13 +426,14 @@ export type EvaluationTypeItemCode = typeof EvaluationTypeItemCode[keyof typeof 
 
 
 export const EvaluationTypeItemCode = {
+  CDIP: 'CDIP',
   HL: 'HL',
   CDIA: 'CDIA',
   AMP: 'AMP',
 } as const;
 
 /**
- * An evaluation type enabled in this installation. checklist is the 'Coleta de Dados In Loco' of the screens and change_assessment the 'Avaliação de Mudanças / Projetos'.
+ * An evaluation type enabled in this installation. ergonomic_analysis_in_loco is the 'Coleta de Dados In Loco — Produção' of the screens, checklist is the 'Coleta de Dados In Loco' of the screens and change_assessment the 'Avaliação de Mudanças / Projetos'.
  */
 export interface EvaluationTypeItem {
   type: EvaluationTypeItemType;
@@ -2948,6 +2950,254 @@ export interface ChangeAssessmentInput {
      * @nullable
      */
   answers?: ChangeAssessmentInputAnswers;
+}
+
+/**
+ * The activity of an evaluation detail whose type answers its location (today only the CDIP): the activity as it is now, with its current area and fabric, never a stored copy.
+ */
+export interface EvaluationActivityLocation {
+  id: string;
+  code: string;
+  name: string;
+  area: string;
+  fabric: string;
+}
+
+/**
+ * An item of the CDIP listing (the Coleta de Dados In Loco — Produção, the Produção tab of the legacy evaluations). The activity is the one shown for projects: as it is now, without area nor fabric.
+ */
+export interface ErgonomicAnalysisInLocoItem {
+  id: string;
+  /**
+     * Sequential number of the CDIPs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** CDIP-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  date: string;
+  /**
+     * The shift schedules ('Horário dos turnos')
+     * @maxLength 255
+     */
+  shift_schedules: string;
+  /** @maxLength 255 */
+  sector: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The 20 questions of the legacy form, in order and with the legacy keys (misspellings included), always present: plain text (line breaks kept, no markup interpreted), or for timesPerShift a number at least zero, or null when unanswered or stored with the wrong type. A key outside the catalog is never answered.
+ */
+export interface ErgonomicAnalysisInLocoAnswers {
+  /** @nullable */
+  numberOfStaff: string | null;
+  /** @nullable */
+  scheduleOfWork: string | null;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
+  descriptionRelatedActivities: string | null;
+  /**
+     * How many times the activity is done in the shift: a number at least zero, decimals allowed
+     * @minimum 0
+     * @nullable
+     */
+  timesPerShift: number | null;
+  /** @nullable */
+  totalTime: string | null;
+  /** @nullable */
+  descriptionCompensatoryMechanisms: string | null;
+  /** @nullable */
+  descriptionProcessSteps: string | null;
+  /** @nullable */
+  repeatability: string | null;
+  /** @nullable */
+  riskFactor: string | null;
+  /** @nullable */
+  dimensions: string | null;
+  /** @nullable */
+  videoMonitor: string | null;
+  /** @nullable */
+  monotonous: string | null;
+  /** @nullable */
+  stress: string | null;
+  /** @nullable */
+  productivityControl: string | null;
+  /** @nullable */
+  dificulties: string | null;
+  /** @nullable */
+  ilumination: string | null;
+  /** @nullable */
+  sugestions: string | null;
+  /** @nullable */
+  improvementsAlreadyMade: string | null;
+  /** @nullable */
+  measuresForErgonomicToolApplication: string | null;
+}
+
+/**
+ * A CDIP with its answers. The activity also answers its current area and fabric.
+ */
+export interface ErgonomicAnalysisInLoco {
+  id: string;
+  /**
+     * Sequential number of the CDIPs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** CDIP-<number>, derived and never stored */
+  code: string;
+  activity: EvaluationActivityLocation;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  date: string;
+  /**
+     * The shift schedules ('Horário dos turnos')
+     * @maxLength 255
+     */
+  shift_schedules: string;
+  /** @maxLength 255 */
+  sector: string;
+  created_at: string;
+  updated_at: string;
+  answers: ErgonomicAnalysisInLocoAnswers;
+}
+
+/**
+ * Absent or null is the same as {}: no answer at all. Each text is trimmed, keeping its inner line breaks, and must have at most 5000 characters (code points); an empty or null answer is stored as absent. timesPerShift is a JSON number at least zero, decimals allowed; a string (even "2,5" or "3"), a negative or a boolean is refused. A key outside the 20 of the catalog is refused
+ * @nullable
+ */
+export type ErgonomicAnalysisInLocoInputAnswers = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  numberOfStaff?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  scheduleOfWork?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  description?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  descriptionRelatedActivities?: string | null;
+  /**
+     * @minimum 0
+     * @nullable
+     */
+  timesPerShift?: number | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  totalTime?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  descriptionCompensatoryMechanisms?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  descriptionProcessSteps?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  repeatability?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  riskFactor?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  dimensions?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  videoMonitor?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  monotonous?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  stress?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  productivityControl?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  dificulties?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  ilumination?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  sugestions?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  improvementsAlreadyMade?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  measuresForErgonomicToolApplication?: string | null;
+} | null;
+
+/**
+ * The fields of a CDIP creation or update, as JSON. Any other top-level field (id, number, code, area, fabric, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface ErgonomicAnalysisInLocoInput {
+  /** An existing activity (see GET /evaluations/ergonomic-analyses-in-loco/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  date: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  shift_schedules: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * Absent or null is the same as {}: no answer at all. Each text is trimmed, keeping its inner line breaks, and must have at most 5000 characters (code points); an empty or null answer is stored as absent. timesPerShift is a JSON number at least zero, decimals allowed; a string (even "2,5" or "3"), a negative or a boolean is refused. A key outside the 20 of the catalog is refused
+     * @nullable
+     */
+  answers?: ErgonomicAnalysisInLocoInputAnswers;
 }
 
 export type PostSessionsBody = {
@@ -12408,7 +12658,7 @@ export const getGetEvaluationsTypesUrl = () => {
 }
 
 /**
- * Answers the evaluation types enabled by the EVALUATION_TYPES variable of the deployment, read once when the server starts, always in the canonical order hit_list, checklist, change_assessment (never the order of the variable). Empty when no type is enabled. The only route under /evaluations that does not depend on an enabled type: every route of a type answers 404 'Evaluation type not available.' while that type is disabled. Requires only an authenticated user, so any role; nothing in the API changes the configuration.
+ * Answers the evaluation types enabled by the EVALUATION_TYPES variable of the deployment, read once when the server starts, always in the canonical order ergonomic_analysis_in_loco, hit_list, checklist, change_assessment (never the order of the variable). Empty when no type is enabled. The only route under /evaluations that does not depend on an enabled type: every route of a type answers 404 'Evaluation type not available.' while that type is disabled. Requires only an authenticated user, so any role; nothing in the API changes the configuration.
  * @summary List the evaluation types this installation enables
  */
 export const getEvaluationsTypes = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsTypesResponse> => {
@@ -14686,4 +14936,733 @@ export const useDeleteEvaluationsChangeAssessmentsId = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getDeleteEvaluationsChangeAssessmentsIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsErgonomicAnalysesInLocoResponse200 = {
+  data: ErgonomicAnalysisInLocoItem[]
+  status: 200
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoResponseSuccess = (getEvaluationsErgonomicAnalysesInLocoResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicAnalysesInLocoResponseError = (getEvaluationsErgonomicAnalysesInLocoResponse401 | getEvaluationsErgonomicAnalysesInLocoResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicAnalysesInLocoResponse = (getEvaluationsErgonomicAnalysesInLocoResponseSuccess | getEvaluationsErgonomicAnalysesInLocoResponseError)
+
+export const getGetEvaluationsErgonomicAnalysesInLocoUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco`
+}
+
+/**
+ * Every CDIP of the installation (the Coleta de Dados In Loco — Produção of the Produção tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The answers are only in the detail. Requires only an authenticated user, so any role, and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary List ergonomic analyses in loco (CDIP)
+ */
+export const getEvaluationsErgonomicAnalysesInLoco = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicAnalysesInLocoResponse> => {
+
+  return customFetch<getEvaluationsErgonomicAnalysesInLocoResponse>(getGetEvaluationsErgonomicAnalysesInLocoUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoQueryKey = () => {
+    return [
+    `/evaluations/ergonomic-analyses-in-loco`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicAnalysesInLocoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>> = ({ signal }) => getEvaluationsErgonomicAnalysesInLoco({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicAnalysesInLocoQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>>
+export type GetEvaluationsErgonomicAnalysesInLocoQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicAnalysesInLoco<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLoco<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLoco<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List ergonomic analyses in loco (CDIP)
+ */
+
+export function useGetEvaluationsErgonomicAnalysesInLoco<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLoco>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicAnalysesInLocoQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse201 = {
+  data: ErgonomicAnalysisInLoco
+  status: 201
+}
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsErgonomicAnalysesInLocoResponseSuccess = (postEvaluationsErgonomicAnalysesInLocoResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsErgonomicAnalysesInLocoResponseError = (postEvaluationsErgonomicAnalysesInLocoResponse400 | postEvaluationsErgonomicAnalysesInLocoResponse401 | postEvaluationsErgonomicAnalysesInLocoResponse403 | postEvaluationsErgonomicAnalysesInLocoResponse404) & {
+  headers: Headers;
+};
+
+export type postEvaluationsErgonomicAnalysesInLocoResponse = (postEvaluationsErgonomicAnalysesInLocoResponseSuccess | postEvaluationsErgonomicAnalysesInLocoResponseError)
+
+export const getPostEvaluationsErgonomicAnalysesInLocoUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco`
+}
+
+/**
+ * Creates a CDIP from a JSON body. The number is the next one of the CDIP sequence, taken inside the INSERT, and is never handed out again, not even after the CDIP is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new CDIP (409 there) or finished first (400 here), never a foreign key violation. Answers the same body as GET /evaluations/ergonomic-analyses-in-loco/{id}. Not idempotent: sending it again creates another CDIP. Requires the user or admin role and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary Create ergonomic analysis in loco (CDIP)
+ */
+export const postEvaluationsErgonomicAnalysesInLoco = async (ergonomicAnalysisInLocoInput: ErgonomicAnalysisInLocoInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsErgonomicAnalysesInLocoResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsErgonomicAnalysesInLocoResponse>(getPostEvaluationsErgonomicAnalysesInLocoUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(ergonomicAnalysisInLocoInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsErgonomicAnalysesInLocoMutationKey = () => ['postEvaluationsErgonomicAnalysesInLoco'] as const;
+
+export const getPostEvaluationsErgonomicAnalysesInLocoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>, TError,PostEvaluationsErgonomicAnalysesInLocoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>, TError,PostEvaluationsErgonomicAnalysesInLocoMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsErgonomicAnalysesInLocoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>, PostEvaluationsErgonomicAnalysesInLocoMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsErgonomicAnalysesInLoco(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsErgonomicAnalysesInLocoMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>>
+    export type PostEvaluationsErgonomicAnalysesInLocoMutationBody = ErgonomicAnalysisInLocoInput
+    export type PostEvaluationsErgonomicAnalysesInLocoMutationError = ErrorResponse
+    export type PostEvaluationsErgonomicAnalysesInLocoMutationVariables = {data: ErgonomicAnalysisInLocoInput}
+
+    /**
+ * @summary Create ergonomic analysis in loco (CDIP)
+ */
+export const usePostEvaluationsErgonomicAnalysesInLoco = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>, TError,PostEvaluationsErgonomicAnalysesInLocoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsErgonomicAnalysesInLoco>>,
+        TError,
+        PostEvaluationsErgonomicAnalysesInLocoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsErgonomicAnalysesInLocoMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponseSuccess = (getEvaluationsErgonomicAnalysesInLocoActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponseError = (getEvaluationsErgonomicAnalysesInLocoActivitiesResponse401 | getEvaluationsErgonomicAnalysesInLocoActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicAnalysesInLocoActivitiesResponse = (getEvaluationsErgonomicAnalysesInLocoActivitiesResponseSuccess | getEvaluationsErgonomicAnalysesInLocoActivitiesResponseError)
+
+export const getGetEvaluationsErgonomicAnalysesInLocoActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Coleta de Dados In Loco — Produção form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary List the activities a CDIP can belong to
+ */
+export const getEvaluationsErgonomicAnalysesInLocoActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicAnalysesInLocoActivitiesResponse> => {
+
+  return customFetch<getEvaluationsErgonomicAnalysesInLocoActivitiesResponse>(getGetEvaluationsErgonomicAnalysesInLocoActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoActivitiesQueryKey = () => {
+    return [
+    `/evaluations/ergonomic-analyses-in-loco/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicAnalysesInLocoActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>> = ({ signal }) => getEvaluationsErgonomicAnalysesInLocoActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicAnalysesInLocoActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>>
+export type GetEvaluationsErgonomicAnalysesInLocoActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicAnalysesInLocoActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLocoActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLocoActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a CDIP can belong to
+ */
+
+export function useGetEvaluationsErgonomicAnalysesInLocoActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicAnalysesInLocoActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsErgonomicAnalysesInLocoIdResponse200 = {
+  data: ErgonomicAnalysisInLoco
+  status: 200
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicAnalysesInLocoIdResponseSuccess = (getEvaluationsErgonomicAnalysesInLocoIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicAnalysesInLocoIdResponseError = (getEvaluationsErgonomicAnalysesInLocoIdResponse401 | getEvaluationsErgonomicAnalysesInLocoIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicAnalysesInLocoIdResponse = (getEvaluationsErgonomicAnalysesInLocoIdResponseSuccess | getEvaluationsErgonomicAnalysesInLocoIdResponseError)
+
+export const getGetEvaluationsErgonomicAnalysesInLocoIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco/${id}`
+}
+
+/**
+ * One CDIP: the item of the listing plus its answers, with the 20 answers of the catalog, and the activity with its current area and fabric, read in the same query as its code and name. An absent key, or a value stored with the wrong type, is null; a stored key outside the catalog is never answered. Texts are answered as stored; timesPerShift is answered as a number. Requires only an authenticated user, so any role, and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary Get ergonomic analysis in loco (CDIP)
+ */
+export const getEvaluationsErgonomicAnalysesInLocoId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicAnalysesInLocoIdResponse> => {
+
+  return customFetch<getEvaluationsErgonomicAnalysesInLocoIdResponse>(getGetEvaluationsErgonomicAnalysesInLocoIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/ergonomic-analyses-in-loco/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicAnalysesInLocoIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicAnalysesInLocoIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>> = ({ signal }) => getEvaluationsErgonomicAnalysesInLocoId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicAnalysesInLocoIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>>
+export type GetEvaluationsErgonomicAnalysesInLocoIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicAnalysesInLocoId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLocoId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicAnalysesInLocoId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get ergonomic analysis in loco (CDIP)
+ */
+
+export function useGetEvaluationsErgonomicAnalysesInLocoId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicAnalysesInLocoId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicAnalysesInLocoIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse200 = {
+  data: ErgonomicAnalysisInLoco
+  status: 200
+}
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponseSuccess = (putEvaluationsErgonomicAnalysesInLocoIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsErgonomicAnalysesInLocoIdResponseError = (putEvaluationsErgonomicAnalysesInLocoIdResponse400 | putEvaluationsErgonomicAnalysesInLocoIdResponse401 | putEvaluationsErgonomicAnalysesInLocoIdResponse403 | putEvaluationsErgonomicAnalysesInLocoIdResponse404) & {
+  headers: Headers;
+};
+
+export type putEvaluationsErgonomicAnalysesInLocoIdResponse = (putEvaluationsErgonomicAnalysesInLocoIdResponseSuccess | putEvaluationsErgonomicAnalysesInLocoIdResponseError)
+
+export const getPutEvaluationsErgonomicAnalysesInLocoIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco/${id}`
+}
+
+/**
+ * Replaces every field of a CDIP with the JSON body: the activity may change, and an answer left out of answers loses its value (absent answers empties them all). number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the CDIP will point at is locked (shared) and then the CDIP's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/ergonomic-analyses-in-loco/{id}. Requires the user or admin role and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary Update ergonomic analysis in loco (CDIP)
+ */
+export const putEvaluationsErgonomicAnalysesInLocoId = async (id: string,
+    ergonomicAnalysisInLocoInput: ErgonomicAnalysisInLocoInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsErgonomicAnalysesInLocoIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsErgonomicAnalysesInLocoIdResponse>(getPutEvaluationsErgonomicAnalysesInLocoIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(ergonomicAnalysisInLocoInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsErgonomicAnalysesInLocoIdMutationKey = () => ['putEvaluationsErgonomicAnalysesInLocoId'] as const;
+
+export const getPutEvaluationsErgonomicAnalysesInLocoIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>, TError,PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>, TError,PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsErgonomicAnalysesInLocoIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>, PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsErgonomicAnalysesInLocoId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsErgonomicAnalysesInLocoIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>>
+    export type PutEvaluationsErgonomicAnalysesInLocoIdMutationBody = ErgonomicAnalysisInLocoInput
+    export type PutEvaluationsErgonomicAnalysesInLocoIdMutationError = ErrorResponse
+    export type PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables = {id: string;data: ErgonomicAnalysisInLocoInput}
+
+    /**
+ * @summary Update ergonomic analysis in loco (CDIP)
+ */
+export const usePutEvaluationsErgonomicAnalysesInLocoId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>, TError,PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsErgonomicAnalysesInLocoId>>,
+        TError,
+        PutEvaluationsErgonomicAnalysesInLocoIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsErgonomicAnalysesInLocoIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponseSuccess = (deleteEvaluationsErgonomicAnalysesInLocoIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponseError = (deleteEvaluationsErgonomicAnalysesInLocoIdResponse401 | deleteEvaluationsErgonomicAnalysesInLocoIdResponse403 | deleteEvaluationsErgonomicAnalysesInLocoIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsErgonomicAnalysesInLocoIdResponse = (deleteEvaluationsErgonomicAnalysesInLocoIdResponseSuccess | deleteEvaluationsErgonomicAnalysesInLocoIdResponseError)
+
+export const getDeleteEvaluationsErgonomicAnalysesInLocoIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-analyses-in-loco/${id}`
+}
+
+/**
+ * Deletes a CDIP permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same CDIP again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and ergonomic_analysis_in_loco enabled by EVALUATION_TYPES.
+ * @summary Delete ergonomic analysis in loco (CDIP)
+ */
+export const deleteEvaluationsErgonomicAnalysesInLocoId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsErgonomicAnalysesInLocoIdResponse> => {
+
+  return customFetch<deleteEvaluationsErgonomicAnalysesInLocoIdResponse>(getDeleteEvaluationsErgonomicAnalysesInLocoIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsErgonomicAnalysesInLocoIdMutationKey = () => ['deleteEvaluationsErgonomicAnalysesInLocoId'] as const;
+
+export const getDeleteEvaluationsErgonomicAnalysesInLocoIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>, TError,DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>, TError,DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsErgonomicAnalysesInLocoIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>, DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsErgonomicAnalysesInLocoId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsErgonomicAnalysesInLocoIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>>
+
+    export type DeleteEvaluationsErgonomicAnalysesInLocoIdMutationError = ErrorResponse
+    export type DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete ergonomic analysis in loco (CDIP)
+ */
+export const useDeleteEvaluationsErgonomicAnalysesInLocoId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>, TError,DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsErgonomicAnalysesInLocoId>>,
+        TError,
+        DeleteEvaluationsErgonomicAnalysesInLocoIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsErgonomicAnalysesInLocoIdMutationOptions(options), queryClient);
     }
