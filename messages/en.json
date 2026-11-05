@@ -1272,13 +1272,15 @@
     "description": "Look up the ergonomic evaluations registered for the activities.",
     "tabs": {
       "label": "Evaluation types",
+      "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
       "hit_list": "Hit List",
-      "checklist": "In Loco Data Collection",
+      "checklist": "In Loco Data Collection — Office",
       "change_assessment": "Evaluation of Changes / Projects"
     },
     "types": {
+      "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
       "hit_list": "Hit List",
-      "checklist": "In Loco Data Collection",
+      "checklist": "In Loco Data Collection — Office",
       "change_assessment": "Evaluation of Changes / Projects"
     },
     "columns": {
@@ -1480,10 +1482,52 @@
           "question7": "Does this project / modification have a computer workstation (desktop or laptop) with chairs and tables that meet the ergonomic specifications? Have the ergonomic accessories been provided?",
           "question8": "Does the workplace with tasks requiring high-precision inspection have fluorescent or incandescent lighting with good color rendering in addition to general lighting?"
         }
+      },
+      "ergonomicAnalysisInLoco": {
+        "title": "In Loco Data Collection — Production",
+        "fields": {
+          "date": "Date",
+          "shiftSchedules": "Shift schedule",
+          "activity": "Activity / Assessed workstation",
+          "area": "Area",
+          "fabric": "Fabric",
+          "sector": "Sector"
+        },
+        "timesAndCycles": "Times and cycles",
+        "questions": {
+          "numberOfStaff": "How many employees perform this activity/workstation on each shift?",
+          "scheduleOfWork": "What are the working hours? What is the shift regime of the activity? (roster, on-call, etc.)",
+          "description": "What is the general description of the activity/workstation?",
+          "descriptionRelatedActivities": "How many tasks does the same employee perform on the shift, besides the assessed task? List them.",
+          "timesPerShift": "How many times is the activity performed on the shift?",
+          "totalTime": "Total task time.",
+          "descriptionCompensatoryMechanisms": "Are there compensatory mechanisms (breaks, job rotation, workplace exercise, others)? How much time is spent on each?",
+          "descriptionProcessSteps": "Describe the process steps.",
+          "repeatability": "Repetitiveness: of the steps that repeat, in which is the cycle shorter than 30 seconds?",
+          "riskFactor": "Is there any other risk factor in the activity/workstation (inadequate posture, excessive force, contact stress, cold, vibration)? What is the main body segment involved?",
+          "dimensions": "Anthropometric dimensions of the workstation (weights, heights, reaches, etc.)",
+          "videoMonitor": "Is there work with exposure to video monitors? If so, how often and for how long? Is it at the right height?",
+          "monotonous": "Is the activity monotonous? (little attention required, few stimulus variations, prolonged supervision in a calm environment, fatigue on the night shift)",
+          "stress": "Are there stressful situations? (excessive workload, pressure, operational changes, etc.)",
+          "productivityControl": "How is productivity controlled (per month, daily target, etc.)? Is this control strict?",
+          "dificulties": "Difficulties and complaints reported by the employee.",
+          "ilumination": "Is the lighting comfortable?",
+          "sugestions": "Suggestions for improvement.",
+          "improvementsAlreadyMade": "Improvements already made to the activity/workstation.",
+          "measuresForErgonomicToolApplication": "Data and measurements for applying the ergonomic tool."
+        },
+        "processSteps": {
+          "description": "1. Description of the step",
+          "duration": "2. Duration of each step.\nDoes this step repeat? What is the cycle time?",
+          "rhythm": "3. Pace of the activity",
+          "physicalEffort": "4a. Physical effort (low, medium, high)\n4b. Borg scale (0 to 10)",
+          "manualHandling": "5a. Is there manual lifting of weight? If so, what weight?\n5b. Is there pulling or pushing?"
+        }
       }
     },
+    "newErgonomicAnalysisInLoco": "New Data Collection — Production",
     "newHitList": "New Hit List",
-    "newChecklist": "New Data Collection",
+    "newChecklist": "New Data Collection — Office",
     "newChangeAssessment": "New Evaluation of Changes",
     "actions": {
       "edit": "Edit"
@@ -1515,7 +1559,9 @@
       "textTooLong": "This field must have at most {max} characters.",
       "nameRequired": "Enter the name.",
       "sectorRequired": "Enter the sector.",
-      "checklistDateRequired": "Enter a valid date."
+      "checklistDateRequired": "Enter a valid date.",
+      "shiftSchedulesRequired": "Enter the shift schedule.",
+      "timesPerShiftInvalid": "Enter a number greater than or equal to zero."
     },
     "hitListForm": {
       "sections": {
@@ -1565,6 +1611,16 @@
       "fields": {
         "assessmentDate": "Assessment date"
       }
+    },
+    "ergonomicAnalysisInLocoForm": {
+      "newDescription": "{type}: choose the activity and enter the date, the shift schedule and the sector. Questions may be left unanswered.",
+      "questionsDescription": "Answer the questions that apply to the activity or workstation. All of them are optional; question 5 accepts only a number, and the others accept several lines.",
+      "sections": {
+        "identification": "Identification",
+        "questions": "Questions"
+      },
+      "processStepsLabel": "Guide",
+      "timesPerShiftHint": "A number greater than or equal to zero; decimals with a point or a comma."
     },
     "delete": {
       "action": "Delete",
@@ -1748,23 +1804,32 @@
     "matrixActivityNotFound": "Matrix activity not found.",
     "evaluationTypeNotAvailable": "This evaluation type is not available in this installation.",
     "hitListNotFound": "Hit List not found.",
-    "checklistNotFound": "In Loco Data Collection not found.",
+    "checklistNotFound": "In Loco Data Collection — Office not found.",
     "hitListActivityRequired": "Select the activity of the Hit List.",
     "hitListActivityNotFound": "The chosen activity no longer exists. Select another activity.",
     "hitListAssessmentDateInvalid": "Enter a valid assessment date for the Hit List.",
     "hitListAnswersInvalid": "Some answers of the Hit List are invalid. Review the fields and try again.",
-    "checklistActivityRequired": "Select the activity of the In Loco Data Collection.",
+    "checklistActivityRequired": "Select the activity of the In Loco Data Collection — Office.",
     "checklistActivityNotFound": "The chosen activity no longer exists. Select another activity.",
-    "checklistNameRequired": "Enter the name of the In Loco Data Collection.",
-    "checklistNameTooLong": "The name of the In Loco Data Collection must have at most 255 characters.",
-    "checklistSectorRequired": "Enter the sector of the In Loco Data Collection.",
-    "checklistSectorTooLong": "The sector of the In Loco Data Collection must have at most 255 characters.",
-    "checklistDateInvalid": "Enter a valid date for the In Loco Data Collection.",
-    "checklistAnswersInvalid": "Some answers of the In Loco Data Collection are invalid. Review the questions and try again.",
+    "checklistNameRequired": "Enter the name of the In Loco Data Collection — Office.",
+    "checklistNameTooLong": "The name of the In Loco Data Collection — Office must have at most 255 characters.",
+    "checklistSectorRequired": "Enter the sector of the In Loco Data Collection — Office.",
+    "checklistSectorTooLong": "The sector of the In Loco Data Collection — Office must have at most 255 characters.",
+    "checklistDateInvalid": "Enter a valid date for the In Loco Data Collection — Office.",
+    "checklistAnswersInvalid": "Some answers of the In Loco Data Collection — Office are invalid. Review the questions and try again.",
     "changeAssessmentNotFound": "Evaluation of Changes / Projects not found.",
     "changeAssessmentActivityRequired": "Select the activity of the Evaluation of Changes / Projects.",
     "changeAssessmentActivityNotFound": "The chosen activity no longer exists. Select another activity.",
     "changeAssessmentDateInvalid": "Enter a valid date for the Evaluation of Changes / Projects.",
-    "changeAssessmentAnswersInvalid": "Some answers of the Evaluation of Changes / Projects are invalid. Review the questions and try again."
+    "changeAssessmentAnswersInvalid": "Some answers of the Evaluation of Changes / Projects are invalid. Review the questions and try again.",
+    "ergonomicAnalysisInLocoNotFound": "In Loco Data Collection — Production not found.",
+    "ergonomicAnalysisInLocoActivityRequired": "Select the activity of the In Loco Data Collection — Production.",
+    "ergonomicAnalysisInLocoActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "ergonomicAnalysisInLocoDateInvalid": "Enter a valid date for the In Loco Data Collection — Production.",
+    "ergonomicAnalysisInLocoShiftSchedulesRequired": "Enter the shift schedule of the In Loco Data Collection — Production.",
+    "ergonomicAnalysisInLocoShiftSchedulesTooLong": "The shift schedule of the In Loco Data Collection — Production must have at most 255 characters.",
+    "ergonomicAnalysisInLocoSectorRequired": "Enter the sector of the In Loco Data Collection — Production.",
+    "ergonomicAnalysisInLocoSectorTooLong": "The sector of the In Loco Data Collection — Production must have at most 255 characters.",
+    "ergonomicAnalysisInLocoAnswersInvalid": "Some answers of the In Loco Data Collection — Production are invalid. Review the questions and try again."
   }
 }

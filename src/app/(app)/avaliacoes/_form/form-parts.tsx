@@ -25,7 +25,7 @@ import type { EvaluationActivityOptionsState } from './use-evaluation-activity-o
 export const inputClasses =
   'h-12 rounded-xl border-none bg-surface-container-high px-4 font-medium focus:ring-2 focus:ring-primary/20'
 
-const textareaClasses =
+export const textareaClasses =
   'h-auto resize-y rounded-xl border-none bg-surface-container-high px-4 py-3 font-medium focus:ring-2 focus:ring-primary/20'
 
 export const fieldsetResetClasses = 'm-0 min-w-0 border-0 p-0'

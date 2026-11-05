@@ -35,7 +35,9 @@ export function EvaluationsTabs({ active, types }: EvaluationsTabsProps) {
         </p>
       </div>
 
-      <TabList aria-label={t('tabs.label')}>
+      {/* With four long type names the tabs wrap on a narrow screen instead
+          of widening the page. */}
+      <TabList aria-label={t('tabs.label')} className="max-w-full flex-wrap">
         {types.map((type) => (
           <Tab
             key={type}

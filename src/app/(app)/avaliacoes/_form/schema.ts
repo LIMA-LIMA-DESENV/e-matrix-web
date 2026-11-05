@@ -6,10 +6,14 @@ import type {
   Checklist,
   ChecklistAnswersInput,
   ChecklistInput,
+  ErgonomicAnalysisInLoco,
+  ErgonomicAnalysisInLocoInput,
+  ErgonomicAnalysisInLocoInputAnswers,
   HitList,
   HitListAnswersInput,
   HitListInput,
 } from '@/http/api'
+import { defaultLocale } from '@/i18n/config'
 
 import {
   CHANGE_ASSESSMENT_QUESTIONS,
@@ -19,6 +23,10 @@ import {
   CHECKLIST_QUESTION_KEYS,
   type ChecklistQuestionKey,
 } from '../components/checklist-blocks'
+import {
+  ERGONOMIC_ANALYSIS_IN_LOCO_QUESTIONS,
+  type ErgonomicAnalysisInLocoQuestion,
+} from '../components/ergonomic-analysis-in-loco-questions'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
 
 /**
@@ -422,6 +430,209 @@ export function toChangeAssessmentInput(
     activity_id: data.activity_id,
     // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
     assessment_date: data.assessment_date,
+    answers,
+  }
+}
+
+/**
+ * The longest shift schedule and sector of a Coleta de Dados In Loco —
+ * Produção, in code points after the trim: the `varchar(255)` of the columns
+ * (FR-005).
+ */
+export const MAX_ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_LENGTH = 255
+
+/** The numeric question 5, "Quantas vezes a atividade é realizada no turno?". */
+export const ERGONOMIC_ANALYSIS_IN_LOCO_NUMBER_QUESTION = 'timesPerShift'
+
+type ErgonomicAnalysisInLocoTextQuestion = Exclude<
+  ErgonomicAnalysisInLocoQuestion,
+  typeof ERGONOMIC_ANALYSIS_IN_LOCO_NUMBER_QUESTION
+>
+
+/** The 19 text questions, plain multiline text (R-9), in the order of R-7. */
+export const ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_QUESTIONS =
+  ERGONOMIC_ANALYSIS_IN_LOCO_QUESTIONS.filter(
+    (key): key is ErgonomicAnalysisInLocoTextQuestion =>
+      key !== ERGONOMIC_ANALYSIS_IN_LOCO_NUMBER_QUESTION
+  )
+
+function escapeRegExp(value: string) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * A number typed in the user's locale (FR-015, RK-4): `null` when blank,
+ * `NaN` when it is not a plain number. Spaces are ignored. A value grouped
+ * the locale's way, with its decimal separator or none, is read the locale's
+ * way: "1.000" is a thousand in pt-BR and es, "1,000" in en. Anything else
+ * takes a comma or a point as the decimal separator, so "2,5" and "2.5" are
+ * both 2.5 in every locale. A sign, an exponent or a second separator, as in
+ * "-1", "1e3" or "2,5,1", is not a plain number.
+ */
+export function parseLocaleDecimal(raw: string, locale: string) {
+  const value = raw.replace(/[\s  ]/g, '')
+  if (!value) return null
+
+  const parts = new Intl.NumberFormat(locale).formatToParts(1234567.5)
+  const group = parts.find((part) => part.type === 'group')?.value ?? ''
+  const decimal = parts.find((part) => part.type === 'decimal')?.value ?? '.'
+
+  if (group.trim()) {
+    const grouped = new RegExp(
+      `^\\d{1,3}(?:${escapeRegExp(group)}\\d{3})+(?:${escapeRegExp(decimal)}\\d+)?$`
+    )
+    if (grouped.test(value)) {
+      return Number(value.split(group).join('').replace(decimal, '.'))
+    }
+  }
+
+  if (/^(?:\d+(?:[.,]\d*)?|[.,]\d+)$/.test(value)) {
+    return Number(value.replace(',', '.'))
+  }
+
+  return Number.NaN
+}
+
+/**
+ * Mirrors the API rules of a Coleta de Dados In Loco — Produção write
+ * (FR-005, FR-015): the activity chosen among the listed ones, a real date,
+ * not compared with the periods, the shift schedule and the sector not blank
+ * after the trim and of at most 255 code points, question 5 blank or a
+ * number of at least zero typed in the user's `locale`, which it becomes
+ * (H-5), and the 19 texts optional, of at most 5,000 code points. Area and
+ * fabric are shown by the view only: kept as they come, never sent. The API
+ * stays the authority, including whether the activity still exists.
+ */
+export function makeErgonomicAnalysisInLocoSchema(
+  tv: Translate,
+  locale: string = defaultLocale
+) {
+  const requiredText = (requiredMessage: string) =>
+    z
+      .string()
+      .refine((value) => value.trim().length > 0, { message: requiredMessage })
+      .refine(
+        (value) =>
+          answerLength(value) <= MAX_ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_LENGTH,
+        {
+          message: tv('textTooLong', {
+            max: MAX_ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_LENGTH,
+          }),
+        }
+      )
+  const text = z
+    .string()
+    .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+      message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+    })
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    date: z.string().refine(isCalendarDay, tv('checklistDateRequired')),
+    shift_schedules: requiredText(tv('shiftSchedulesRequired')),
+    sector: requiredText(tv('sectorRequired')),
+    location: z.object({ area: z.string(), fabric: z.string() }),
+    timesPerShift: z.string().transform((value, ctx) => {
+      const parsed = parseLocaleDecimal(value, locale)
+      if (parsed === null) return null
+      if (!Number.isFinite(parsed) || parsed < 0) {
+        ctx.addIssue({ code: 'custom', message: tv('timesPerShiftInvalid') })
+        return z.NEVER
+      }
+      return parsed
+    }),
+    texts: z.object(shapeOf(ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_QUESTIONS, text)),
+  })
+}
+
+/** The form as its controls hold it: question 5 as typed. */
+export type ErgonomicAnalysisInLocoFormInput = z.input<
+  ReturnType<typeof makeErgonomicAnalysisInLocoSchema>
+>
+/** The form once valid: question 5 as a number, or `null` when blank. */
+export type ErgonomicAnalysisInLocoFormData = z.output<
+  ReturnType<typeof makeErgonomicAnalysisInLocoSchema>
+>
+
+/** An empty Coleta de Dados In Loco — Produção: no field and no answer. */
+export function ergonomicAnalysisInLocoFormDefaultValues(): ErgonomicAnalysisInLocoFormData {
+  return {
+    activity_id: '',
+    date: '',
+    shift_schedules: '',
+    sector: '',
+    location: { area: '', fabric: '' },
+    timesPerShift: null,
+    texts: shapeOf(ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_QUESTIONS, ''),
+  }
+}
+
+/**
+ * A stored Coleta de Dados In Loco — Produção as the form holds it, with the
+ * current area and fabric of its activity for the view (R-6). An absent
+ * answer (`null`) is blank.
+ */
+export function toErgonomicAnalysisInLocoFormValues(
+  record: ErgonomicAnalysisInLoco
+): ErgonomicAnalysisInLocoFormData {
+  const timesPerShift = record.answers.timesPerShift
+
+  return {
+    activity_id: record.activity.id,
+    date: record.date,
+    shift_schedules: record.shift_schedules,
+    sector: record.sector,
+    location: { area: record.activity.area, fabric: record.activity.fabric },
+    timesPerShift: typeof timesPerShift === 'number' ? timesPerShift : null,
+    texts: Object.fromEntries(
+      ERGONOMIC_ANALYSIS_IN_LOCO_TEXT_QUESTIONS.map((key) => [
+        key,
+        record.answers[key] ?? '',
+      ])
+    ),
+  }
+}
+
+/**
+ * The values of the controls: question 5 written in the user's number format
+ * (`formatNumber`), so "2,5" in pt-BR and "2.5" in en (FR-015).
+ */
+export function toErgonomicAnalysisInLocoFormInput(
+  data: ErgonomicAnalysisInLocoFormData,
+  formatNumber: (value: number) => string
+): ErgonomicAnalysisInLocoFormInput {
+  return {
+    ...data,
+    timesPerShift:
+      data.timesPerShift === null ? '' : formatNumber(data.timesPerShift),
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/ergonomic-analyses-in-loco` (FR-005,
+ * FR-008): the date as typed, the shift schedule and the sector trimmed, and
+ * the 20 answers in the order of R-7, the texts trimmed keeping their inner
+ * line breaks and question 5 as a number; a blank answer goes as `null`, so
+ * the `PUT` clears it. Area and fabric are never sent.
+ */
+export function toErgonomicAnalysisInLocoInput(
+  data: ErgonomicAnalysisInLocoFormData
+): ErgonomicAnalysisInLocoInput {
+  const answers = Object.fromEntries(
+    ERGONOMIC_ANALYSIS_IN_LOCO_QUESTIONS.map((key) => [
+      key,
+      key === ERGONOMIC_ANALYSIS_IN_LOCO_NUMBER_QUESTION
+        ? data.timesPerShift
+        : data.texts[key]?.trim() || null,
+    ])
+  ) as ErgonomicAnalysisInLocoInputAnswers
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    date: data.date,
+    shift_schedules: data.shift_schedules.trim(),
+    sector: data.sector.trim(),
     answers,
   }
 }

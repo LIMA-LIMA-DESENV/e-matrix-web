@@ -2,11 +2,13 @@ import type { EvaluationType } from '@/lib/evaluation-types'
 
 import { changeAssessmentDefinition } from './change-assessment'
 import { checklistDefinition } from './checklist'
+import { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
 import { hitListDefinition } from './hit-list'
 import type { EvaluationWebDefinition } from './types'
 
 export { changeAssessmentDefinition } from './change-assessment'
 export { checklistDefinition } from './checklist'
+export { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
 export { hitListDefinition } from './hit-list'
 export type { EvaluationWebDefinition } from './types'
 
@@ -15,6 +17,7 @@ export type { EvaluationWebDefinition } from './types'
  * without a definition does not compile.
  */
 const EVALUATION_WEB_DEFINITIONS = {
+  ergonomic_analysis_in_loco: ergonomicAnalysisInLocoDefinition,
   hit_list: hitListDefinition,
   checklist: checklistDefinition,
   change_assessment: changeAssessmentDefinition,

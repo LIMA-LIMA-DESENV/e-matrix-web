@@ -1272,13 +1272,15 @@
     "description": "Consulte as avaliações ergonômicas registradas para as atividades.",
     "tabs": {
       "label": "Tipos de avaliação",
+      "ergonomic_analysis_in_loco": "Coleta de Dados In Loco — Produção",
       "hit_list": "Hit List",
-      "checklist": "Coleta de Dados In Loco",
+      "checklist": "Coleta de Dados In Loco — Escritório",
       "change_assessment": "Avaliação de Mudanças / Projetos"
     },
     "types": {
+      "ergonomic_analysis_in_loco": "Coleta de Dados In Loco — Produção",
       "hit_list": "Hit List",
-      "checklist": "Coleta de Dados In Loco",
+      "checklist": "Coleta de Dados In Loco — Escritório",
       "change_assessment": "Avaliação de Mudanças / Projetos"
     },
     "columns": {
@@ -1480,10 +1482,52 @@
           "question7": "Este projeto/Modificação possui um posto de utilização de computador ( desktop ou Laptop) com cadeiras e mesas que atendas as especificações ergonômicas? Os acessórios ergonômicos foram disponibilizados?",
           "question8": "O local de trabalho com tarefas com necessidade de inspeção de grande precisão, está com iluminação fluorescente ou incandescente com boa disponibilização de cores além da iluminação geral?"
         }
+      },
+      "ergonomicAnalysisInLoco": {
+        "title": "Coleta de Dados In Loco — Produção",
+        "fields": {
+          "date": "Data",
+          "shiftSchedules": "Horário dos turnos",
+          "activity": "Atividade / Posto avaliado",
+          "area": "Área",
+          "fabric": "Fábrica",
+          "sector": "Setor"
+        },
+        "timesAndCycles": "Tempos e ciclos",
+        "questions": {
+          "numberOfStaff": "Quantos funcionários realizam esta atividade/posto em cada turno?",
+          "scheduleOfWork": "Quais horários de trabalho? Qual regime de turno na atividade? (escala, plantão, etc.)",
+          "description": "Qual é a descrição geral da Atividade/Posto?",
+          "descriptionRelatedActivities": "Quantas tarefas são realizadas pelo mesmo funcionário no turno, além da tarefa avaliada? Cite-as.",
+          "timesPerShift": "Quantas vezes a atividade é realizada no turno?",
+          "totalTime": "Tempo total da tarefa.",
+          "descriptionCompensatoryMechanisms": "Há mecanismos compensatórios (pausas, rodízios, GL, outros)? Quanto tempo é gasto em cada um?",
+          "descriptionProcessSteps": "Descrever as etapas do processo.",
+          "repeatability": "Repetitividade: das etapas que se repetem, em quais o ciclo é menor que 30 segundos?",
+          "riskFactor": "Há algum outro fator de risco na atividade/posto (postura inadequada, força excessiva, estresse de contato, frio, vibração)? Qual é o principal segmento corporal envolvido?",
+          "dimensions": "Dimensões antropométricas do posto (pesos, alturas, alcances, etc.)",
+          "videoMonitor": "Há trabalho com exposição a monitores de vídeo? Se sim, com que frequência e por quanto tempo? Está na altura adequada?",
+          "monotonous": "A atividade é monótona? (pouca atenção exigida, poucas variações de estímulo, supervisão prolongada em ambiente calmo, fadiga no turno noturno)",
+          "stress": "Há situações de estresse? (carga de trabalho excessiva, pressão, mudanças operacionais, etc.)",
+          "productivityControl": "Como é feito o controle de produtividade (por mês, meta diária, etc.)? Esse controle é rígido?",
+          "dificulties": "Dificuldades e queixas relatadas pelo funcionário.",
+          "ilumination": "A iluminação está confortável?",
+          "sugestions": "Sugestões de melhorias.",
+          "improvementsAlreadyMade": "Melhorias já realizadas na atividade/posto.",
+          "measuresForErgonomicToolApplication": "Dados e medidas para aplicar a ferramenta ergonômica."
+        },
+        "processSteps": {
+          "description": "1. Descrição da etapa",
+          "duration": "2. Tempo de duração de cada etapa.\nEsta etapa se repete? Qual o tempo de ciclo?",
+          "rhythm": "3. Ritmo da atividade",
+          "physicalEffort": "4a. Esforço físico (baixo, médio, alto)\n4b. Escala de Borg (0 a 10)",
+          "manualHandling": "5a. Há levantamento manual de peso? Se sim, qual peso?\n5b. Há tração ou impulsão (puxar ou empurrar)?"
+        }
       }
     },
+    "newErgonomicAnalysisInLoco": "Nova Coleta de Dados — Produção",
     "newHitList": "Nova Hit List",
-    "newChecklist": "Nova Coleta de Dados",
+    "newChecklist": "Nova Coleta de Dados — Escritório",
     "newChangeAssessment": "Nova Avaliação de Mudanças",
     "actions": {
       "edit": "Alterar"
@@ -1515,7 +1559,9 @@
       "textTooLong": "Este campo deve ter no máximo {max} caracteres.",
       "nameRequired": "Informe o nome.",
       "sectorRequired": "Informe o setor.",
-      "checklistDateRequired": "Informe uma data válida."
+      "checklistDateRequired": "Informe uma data válida.",
+      "shiftSchedulesRequired": "Informe o horário dos turnos.",
+      "timesPerShiftInvalid": "Informe um número maior ou igual a zero."
     },
     "hitListForm": {
       "sections": {
@@ -1565,6 +1611,16 @@
       "fields": {
         "assessmentDate": "Data da avaliação"
       }
+    },
+    "ergonomicAnalysisInLocoForm": {
+      "newDescription": "{type}: escolha a atividade e informe a data, o horário dos turnos e o setor. As perguntas podem ficar sem resposta.",
+      "questionsDescription": "Responda às perguntas que se aplicam à atividade ou ao posto. Todas são opcionais; a pergunta 5 aceita só um número, e as demais aceitam várias linhas.",
+      "sections": {
+        "identification": "Identificação",
+        "questions": "Perguntas"
+      },
+      "processStepsLabel": "Roteiro",
+      "timesPerShiftHint": "Um número maior ou igual a zero; decimais com vírgula ou ponto."
     },
     "delete": {
       "action": "Excluir",
@@ -1748,23 +1804,32 @@
     "matrixActivityNotFound": "Atividade da Matriz não encontrada.",
     "evaluationTypeNotAvailable": "Este tipo de avaliação não está disponível nesta instalação.",
     "hitListNotFound": "Hit List não encontrada.",
-    "checklistNotFound": "Coleta de Dados In Loco não encontrada.",
+    "checklistNotFound": "Coleta de Dados In Loco — Escritório não encontrada.",
     "hitListActivityRequired": "Selecione a atividade da Hit List.",
     "hitListActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
     "hitListAssessmentDateInvalid": "Informe uma data válida para a avaliação da Hit List.",
     "hitListAnswersInvalid": "Algumas respostas da Hit List são inválidas. Revise os campos e tente novamente.",
-    "checklistActivityRequired": "Selecione a atividade da Coleta de Dados In Loco.",
+    "checklistActivityRequired": "Selecione a atividade da Coleta de Dados In Loco — Escritório.",
     "checklistActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
-    "checklistNameRequired": "Informe o nome da Coleta de Dados In Loco.",
-    "checklistNameTooLong": "O nome da Coleta de Dados In Loco deve ter no máximo 255 caracteres.",
-    "checklistSectorRequired": "Informe o setor da Coleta de Dados In Loco.",
-    "checklistSectorTooLong": "O setor da Coleta de Dados In Loco deve ter no máximo 255 caracteres.",
-    "checklistDateInvalid": "Informe uma data válida para a Coleta de Dados In Loco.",
-    "checklistAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco são inválidas. Revise as perguntas e tente novamente.",
+    "checklistNameRequired": "Informe o nome da Coleta de Dados In Loco — Escritório.",
+    "checklistNameTooLong": "O nome da Coleta de Dados In Loco — Escritório deve ter no máximo 255 caracteres.",
+    "checklistSectorRequired": "Informe o setor da Coleta de Dados In Loco — Escritório.",
+    "checklistSectorTooLong": "O setor da Coleta de Dados In Loco — Escritório deve ter no máximo 255 caracteres.",
+    "checklistDateInvalid": "Informe uma data válida para a Coleta de Dados In Loco — Escritório.",
+    "checklistAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco — Escritório são inválidas. Revise as perguntas e tente novamente.",
     "changeAssessmentNotFound": "Avaliação de Mudanças / Projetos não encontrada.",
     "changeAssessmentActivityRequired": "Selecione a atividade da Avaliação de Mudanças / Projetos.",
     "changeAssessmentActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
     "changeAssessmentDateInvalid": "Informe uma data válida para a Avaliação de Mudanças / Projetos.",
-    "changeAssessmentAnswersInvalid": "Algumas respostas da Avaliação de Mudanças / Projetos são inválidas. Revise as perguntas e tente novamente."
+    "changeAssessmentAnswersInvalid": "Algumas respostas da Avaliação de Mudanças / Projetos são inválidas. Revise as perguntas e tente novamente.",
+    "ergonomicAnalysisInLocoNotFound": "Coleta de Dados In Loco — Produção não encontrada.",
+    "ergonomicAnalysisInLocoActivityRequired": "Selecione a atividade da Coleta de Dados In Loco — Produção.",
+    "ergonomicAnalysisInLocoActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "ergonomicAnalysisInLocoDateInvalid": "Informe uma data válida para a Coleta de Dados In Loco — Produção.",
+    "ergonomicAnalysisInLocoShiftSchedulesRequired": "Informe o horário dos turnos da Coleta de Dados In Loco — Produção.",
+    "ergonomicAnalysisInLocoShiftSchedulesTooLong": "O horário dos turnos da Coleta de Dados In Loco — Produção deve ter no máximo 255 caracteres.",
+    "ergonomicAnalysisInLocoSectorRequired": "Informe o setor da Coleta de Dados In Loco — Produção.",
+    "ergonomicAnalysisInLocoSectorTooLong": "O setor da Coleta de Dados In Loco — Produção deve ter no máximo 255 caracteres.",
+    "ergonomicAnalysisInLocoAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco — Produção são inválidas. Revise as perguntas e tente novamente."
   }
 }

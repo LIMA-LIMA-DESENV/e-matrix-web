@@ -227,6 +227,23 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Change assessment activity not found.': 'changeAssessmentActivityNotFound',
   'Invalid change assessment date.': 'changeAssessmentDateInvalid',
   'Invalid change assessment answers.': 'changeAssessmentAnswersInvalid',
+  'Ergonomic analysis in loco not found.': 'ergonomicAnalysisInLocoNotFound',
+  'Ergonomic analysis in loco activity is required.':
+    'ergonomicAnalysisInLocoActivityRequired',
+  'Ergonomic analysis in loco activity not found.':
+    'ergonomicAnalysisInLocoActivityNotFound',
+  'Invalid ergonomic analysis in loco date.':
+    'ergonomicAnalysisInLocoDateInvalid',
+  'Ergonomic analysis in loco shift schedules is required.':
+    'ergonomicAnalysisInLocoShiftSchedulesRequired',
+  'Ergonomic analysis in loco shift schedules is too long.':
+    'ergonomicAnalysisInLocoShiftSchedulesTooLong',
+  'Ergonomic analysis in loco sector is required.':
+    'ergonomicAnalysisInLocoSectorRequired',
+  'Ergonomic analysis in loco sector is too long.':
+    'ergonomicAnalysisInLocoSectorTooLong',
+  'Invalid ergonomic analysis in loco answers.':
+    'ergonomicAnalysisInLocoAnswersInvalid',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

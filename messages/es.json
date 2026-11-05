@@ -1272,13 +1272,15 @@
     "description": "Consulte las evaluaciones ergonómicas registradas para las actividades.",
     "tabs": {
       "label": "Tipos de evaluación",
+      "ergonomic_analysis_in_loco": "Recopilación de Datos In Loco — Producción",
       "hit_list": "Hit List",
-      "checklist": "Recopilación de Datos In Loco",
+      "checklist": "Recopilación de Datos In Loco — Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "types": {
+      "ergonomic_analysis_in_loco": "Recopilación de Datos In Loco — Producción",
       "hit_list": "Hit List",
-      "checklist": "Recopilación de Datos In Loco",
+      "checklist": "Recopilación de Datos In Loco — Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "columns": {
@@ -1480,10 +1482,52 @@
           "question7": "¿Este proyecto / modificación posee un puesto de utilización de ordenador (desktop o laptop) con sillas y mesas que atiendan las especificaciones ergonómicas? ¿Los accesorios ergonómicos están disponibles?",
           "question8": "¿El lugar de trabajo con tareas con necesidad de inspección de gran precisión está con iluminación fluorescente o incandescente con buena disponibilidad de colores además de la iluminación general?"
         }
+      },
+      "ergonomicAnalysisInLoco": {
+        "title": "Recopilación de Datos In Loco — Producción",
+        "fields": {
+          "date": "Fecha",
+          "shiftSchedules": "Horario de los turnos",
+          "activity": "Actividad / Puesto evaluado",
+          "area": "Área",
+          "fabric": "Fábrica",
+          "sector": "Sector"
+        },
+        "timesAndCycles": "Tiempos y ciclos",
+        "questions": {
+          "numberOfStaff": "¿Cuántos empleados realizan esta actividad/puesto en cada turno?",
+          "scheduleOfWork": "¿Cuáles son los horarios de trabajo? ¿Cuál es el régimen de turnos de la actividad? (escala, guardia, etc.)",
+          "description": "¿Cuál es la descripción general de la actividad/puesto?",
+          "descriptionRelatedActivities": "¿Cuántas tareas realiza el mismo empleado en el turno, además de la tarea evaluada? Cítelas.",
+          "timesPerShift": "¿Cuántas veces se realiza la actividad en el turno?",
+          "totalTime": "Tiempo total de la tarea.",
+          "descriptionCompensatoryMechanisms": "¿Hay mecanismos compensatorios (pausas, rotaciones, gimnasia laboral, otros)? ¿Cuánto tiempo se dedica a cada uno?",
+          "descriptionProcessSteps": "Describir las etapas del proceso.",
+          "repeatability": "Repetitividad: de las etapas que se repiten, ¿en cuáles el ciclo es menor de 30 segundos?",
+          "riskFactor": "¿Hay algún otro factor de riesgo en la actividad/puesto (postura inadecuada, fuerza excesiva, estrés de contacto, frío, vibración)? ¿Cuál es el principal segmento corporal involucrado?",
+          "dimensions": "Dimensiones antropométricas del puesto (pesos, alturas, alcances, etc.)",
+          "videoMonitor": "¿Hay trabajo con exposición a monitores de vídeo? Si es así, ¿con qué frecuencia y durante cuánto tiempo? ¿Está a la altura adecuada?",
+          "monotonous": "¿La actividad es monótona? (poca atención exigida, pocas variaciones de estímulos, supervisión prolongada en un ambiente tranquilo, fatiga en el turno nocturno)",
+          "stress": "¿Hay situaciones de estrés? (carga de trabajo excesiva, presión, cambios operativos, etc.)",
+          "productivityControl": "¿Cómo se realiza el control de productividad (por mes, meta diaria, etc.)? ¿Ese control es rígido?",
+          "dificulties": "Dificultades y quejas relatadas por el empleado.",
+          "ilumination": "¿La iluminación es cómoda?",
+          "sugestions": "Sugerencias de mejora.",
+          "improvementsAlreadyMade": "Mejoras ya realizadas en la actividad/puesto.",
+          "measuresForErgonomicToolApplication": "Datos y medidas para aplicar la herramienta ergonómica."
+        },
+        "processSteps": {
+          "description": "1. Descripción de la etapa",
+          "duration": "2. Tiempo de duración de cada etapa.\n¿Esta etapa se repite? ¿Cuál es el tiempo de ciclo?",
+          "rhythm": "3. Ritmo de la actividad",
+          "physicalEffort": "4a. Esfuerzo físico (bajo, medio, alto)\n4b. Escala de Borg (0 a 10)",
+          "manualHandling": "5a. ¿Hay levantamiento manual de peso? Si es así, ¿qué peso?\n5b. ¿Hay tracción o empuje (tirar o empujar)?"
+        }
       }
     },
+    "newErgonomicAnalysisInLoco": "Nueva Recopilación de Datos — Producción",
     "newHitList": "Nueva Hit List",
-    "newChecklist": "Nueva Recopilación de Datos",
+    "newChecklist": "Nueva Recopilación de Datos — Oficina",
     "newChangeAssessment": "Nueva Evaluación de Cambios",
     "actions": {
       "edit": "Modificar"
@@ -1515,7 +1559,9 @@
       "textTooLong": "Este campo debe tener como máximo {max} caracteres.",
       "nameRequired": "Ingrese el nombre.",
       "sectorRequired": "Ingrese el sector.",
-      "checklistDateRequired": "Ingrese una fecha válida."
+      "checklistDateRequired": "Ingrese una fecha válida.",
+      "shiftSchedulesRequired": "Ingrese el horario de los turnos.",
+      "timesPerShiftInvalid": "Ingrese un número mayor o igual a cero."
     },
     "hitListForm": {
       "sections": {
@@ -1565,6 +1611,16 @@
       "fields": {
         "assessmentDate": "Fecha de la evaluación"
       }
+    },
+    "ergonomicAnalysisInLocoForm": {
+      "newDescription": "{type}: elija la actividad e ingrese la fecha, el horario de los turnos y el sector. Las preguntas pueden quedar sin respuesta.",
+      "questionsDescription": "Responda las preguntas que se aplican a la actividad o al puesto. Todas son opcionales; la pregunta 5 admite solo un número, y las demás admiten varias líneas.",
+      "sections": {
+        "identification": "Identificación",
+        "questions": "Preguntas"
+      },
+      "processStepsLabel": "Guía",
+      "timesPerShiftHint": "Un número mayor o igual a cero; decimales con coma o punto."
     },
     "delete": {
       "action": "Eliminar",
@@ -1748,23 +1804,32 @@
     "matrixActivityNotFound": "Actividad de la Matriz no encontrada.",
     "evaluationTypeNotAvailable": "Este tipo de evaluación no está disponible en esta instalación.",
     "hitListNotFound": "Hit List no encontrada.",
-    "checklistNotFound": "Recopilación de Datos In Loco no encontrada.",
+    "checklistNotFound": "Recopilación de Datos In Loco — Oficina no encontrada.",
     "hitListActivityRequired": "Seleccione la actividad de la Hit List.",
     "hitListActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
     "hitListAssessmentDateInvalid": "Ingrese una fecha válida para la evaluación de la Hit List.",
     "hitListAnswersInvalid": "Algunas respuestas de la Hit List no son válidas. Revise los campos e intente nuevamente.",
-    "checklistActivityRequired": "Seleccione la actividad de la Recopilación de Datos In Loco.",
+    "checklistActivityRequired": "Seleccione la actividad de la Recopilación de Datos In Loco — Oficina.",
     "checklistActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
-    "checklistNameRequired": "Ingrese el nombre de la Recopilación de Datos In Loco.",
-    "checklistNameTooLong": "El nombre de la Recopilación de Datos In Loco debe tener como máximo 255 caracteres.",
-    "checklistSectorRequired": "Ingrese el sector de la Recopilación de Datos In Loco.",
-    "checklistSectorTooLong": "El sector de la Recopilación de Datos In Loco debe tener como máximo 255 caracteres.",
-    "checklistDateInvalid": "Ingrese una fecha válida para la Recopilación de Datos In Loco.",
-    "checklistAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco no son válidas. Revise las preguntas e intente nuevamente.",
+    "checklistNameRequired": "Ingrese el nombre de la Recopilación de Datos In Loco — Oficina.",
+    "checklistNameTooLong": "El nombre de la Recopilación de Datos In Loco — Oficina debe tener como máximo 255 caracteres.",
+    "checklistSectorRequired": "Ingrese el sector de la Recopilación de Datos In Loco — Oficina.",
+    "checklistSectorTooLong": "El sector de la Recopilación de Datos In Loco — Oficina debe tener como máximo 255 caracteres.",
+    "checklistDateInvalid": "Ingrese una fecha válida para la Recopilación de Datos In Loco — Oficina.",
+    "checklistAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco — Oficina no son válidas. Revise las preguntas e intente nuevamente.",
     "changeAssessmentNotFound": "Evaluación de Cambios / Proyectos no encontrada.",
     "changeAssessmentActivityRequired": "Seleccione la actividad de la Evaluación de Cambios / Proyectos.",
     "changeAssessmentActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
     "changeAssessmentDateInvalid": "Ingrese una fecha válida para la Evaluación de Cambios / Proyectos.",
-    "changeAssessmentAnswersInvalid": "Algunas respuestas de la Evaluación de Cambios / Proyectos no son válidas. Revise las preguntas e intente nuevamente."
+    "changeAssessmentAnswersInvalid": "Algunas respuestas de la Evaluación de Cambios / Proyectos no son válidas. Revise las preguntas e intente nuevamente.",
+    "ergonomicAnalysisInLocoNotFound": "Recopilación de Datos In Loco — Producción no encontrada.",
+    "ergonomicAnalysisInLocoActivityRequired": "Seleccione la actividad de la Recopilación de Datos In Loco — Producción.",
+    "ergonomicAnalysisInLocoActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "ergonomicAnalysisInLocoDateInvalid": "Ingrese una fecha válida para la Recopilación de Datos In Loco — Producción.",
+    "ergonomicAnalysisInLocoShiftSchedulesRequired": "Ingrese el horario de los turnos de la Recopilación de Datos In Loco — Producción.",
+    "ergonomicAnalysisInLocoShiftSchedulesTooLong": "El horario de los turnos de la Recopilación de Datos In Loco — Producción debe tener como máximo 255 caracteres.",
+    "ergonomicAnalysisInLocoSectorRequired": "Ingrese el sector de la Recopilación de Datos In Loco — Producción.",
+    "ergonomicAnalysisInLocoSectorTooLong": "El sector de la Recopilación de Datos In Loco — Producción debe tener como máximo 255 caracteres.",
+    "ergonomicAnalysisInLocoAnswersInvalid": "Algunas respuestas de la Recopilación de Datos In Loco — Producción no son válidas. Revise las preguntas e intente nuevamente."
   }
 }
