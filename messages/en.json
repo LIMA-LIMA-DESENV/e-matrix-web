@@ -1277,12 +1277,16 @@
     "tabs": {
       "label": "Evaluation types",
       "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
+      "risk_factor": "Risk Identification",
+      "ergonomic_work_analysis_advanced": "Ergonomic Work Analysis – Production",
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
       "change_assessment": "Evaluation of Changes / Projects"
     },
     "types": {
       "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
+      "risk_factor": "Risk Identification",
+      "ergonomic_work_analysis_advanced": "Ergonomic Work Analysis – Production",
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
       "change_assessment": "Evaluation of Changes / Projects"
@@ -1527,9 +1531,52 @@
           "physicalEffort": "4a. Physical effort (low, medium, high)\n4b. Borg scale (0 to 10)",
           "manualHandling": "5a. Is there manual lifting of weight? If so, what weight?\n5b. Is there pulling or pushing?"
         }
+      },
+      "riskFactor": {
+        "title": "Risk Identification",
+        "fields": {
+          "date": "Date",
+          "activity": "Activity",
+          "area": "Area",
+          "fabric": "Fabric",
+          "valuer": "Assessor",
+          "notes": "Notes",
+          "total": "Total risk factors"
+        }
+      },
+      "ergonomicWorkAnalysisAdvanced": {
+        "title": "Ergonomic Work Analysis – Production",
+        "activity": "Activity",
+        "date": "Date",
+        "photo": "SECTOR IMAGE",
+        "description": "TASK DESCRIPTION",
+        "tables": {
+          "steps": {
+            "title": "Activity Data",
+            "columns": {
+              "step": "PROCESS STEPS",
+              "posture": "WORK POSTURE",
+              "biomechanicalFactors": "BIOMECHANICAL FACTORS"
+            }
+          },
+          "analyzedActivities": {
+            "title": "Advanced Ergonomic Analysis Table",
+            "columns": {
+              "analyzedActivity": "ANALYZED ACTIVITY",
+              "workedTime": "TIME (IN THE WORKING DAY)",
+              "ergonomicTool": "ERGONOMIC TOOL",
+              "result": "RESULT"
+            }
+          }
+        },
+        "complementaryData": "COMPLEMENTARY DATA",
+        "resultsAndConclusions": "RESULTS AND CONCLUSIONS",
+        "recomendations": "RECOMMENDATIONS"
       }
     },
     "newErgonomicAnalysisInLoco": "New Data Collection — Production",
+    "newRiskFactor": "New Risk Identification",
+    "newErgonomicWorkAnalysisAdvanced": "New Ergonomic Work Analysis – Production",
     "newHitList": "New Hit List",
     "newChecklist": "New Data Collection — Office",
     "newChangeAssessment": "New Evaluation of Changes",
@@ -1539,7 +1586,8 @@
     "feedback": {
       "created": "Evaluation {code} created successfully.",
       "updated": "Evaluation {code} updated successfully.",
-      "deleted": "Evaluation {code} deleted successfully."
+      "deleted": "Evaluation {code} deleted successfully.",
+      "photoRemoved": "Photo of evaluation {code} removed successfully."
     },
     "form": {
       "newDescription": "{type}: choose the activity and the assessment date. The other fields are optional.",
@@ -1565,7 +1613,11 @@
       "sectorRequired": "Enter the sector.",
       "checklistDateRequired": "Enter a valid date.",
       "shiftSchedulesRequired": "Enter the shift schedule.",
-      "timesPerShiftInvalid": "Enter a number greater than or equal to zero."
+      "timesPerShiftInvalid": "Enter a number greater than or equal to zero.",
+      "valuerRequired": "Enter the valuer.",
+      "notesRequired": "Enter the notes.",
+      "riskFactorTotalInvalid": "Enter a number greater than or equal to zero.",
+      "tooManyRows": "The table must have at most {max} rows."
     },
     "hitListForm": {
       "sections": {
@@ -1626,6 +1678,122 @@
       "processStepsLabel": "Guide",
       "timesPerShiftHint": "A number greater than or equal to zero; decimals with a point or a comma."
     },
+    "riskFactorForm": {
+      "newDescription": "{type}: choose the activity, enter the date and the valuer, mark the risk factors observed on the board and finish with the notes and the total.",
+      "editDescription": "{type}: change the fields and the marks of the evaluation, including the activity.",
+      "sections": {
+        "identification": "Identification",
+        "riskFactors": "Risk factors",
+        "conclusion": "Conclusion"
+      },
+      "riskFactorsDescription": "Click a figure or a label to mark the risk factor; click it again to unmark it. No mark is required.",
+      "totalHint": "A number greater than or equal to zero, typed by the valuer; decimals with a point or a comma."
+    },
+    "riskFactorBoard": {
+      "columns": {
+        "bodyPart": "Body parts",
+        "posture": "Posture",
+        "static": "Static",
+        "repetition": "Repetition",
+        "force": "Force"
+      },
+      "bodyParts": {
+        "hands": "Hands / Wrists",
+        "elbows": "Elbows",
+        "shoulders": "Shoulders",
+        "back": "Back",
+        "neck": "Neck",
+        "legs": "Legs",
+        "other": "Others"
+      },
+      "items": {
+        "handsFlexion": "Flexion",
+        "radialDeviation": "Radial deviation",
+        "handsExtension": "Extension",
+        "ulnarDeviation": "Ulnar deviation",
+        "handsStatic": "Static > 10 s",
+        "handsRapid": "Rapid, many times",
+        "pinch": "Pinch",
+        "grip": "Grip",
+        "hammer": "Hammer",
+        "supinationPronation": "Supination / Pronation",
+        "elbowsStatic": "Static > 10 s",
+        "elbowsRapid": "Rapid, many times",
+        "forearmTwist": "Forearm twist / Torque",
+        "reachForward": "Reach forward",
+        "overShoulder": "Over the shoulder",
+        "abduction": "Abduction",
+        "shouldersStatic": "Static > 10 s",
+        "shouldersRapid": "Rapid, many times",
+        "push": "Push",
+        "pull": "Pull",
+        "backFlexion": "Flexion",
+        "backTwist": "Twist",
+        "backExtension": "Extension",
+        "backStatic": "Static > 10 s",
+        "backRapid": "Rapid, many times",
+        "lift": "Lift",
+        "pushPull": "Push / Pull",
+        "neckFlexion": "Flexion",
+        "neckTwist": "Twist",
+        "neckExtension": "Extension",
+        "neckStatic": "Static > 10 s",
+        "neckRapid": "Rapid, many times",
+        "squat": "Squat",
+        "kneel": "Kneel",
+        "legsStatic": "Static > 10 s",
+        "legsRapid": "Rapid, many times",
+        "vibration": "Vibration",
+        "extremeColdTemperature": "Extremely cold temperature",
+        "contactStress": "Contact stress"
+      },
+      "itemName": "{bodyPart} — {item}"
+    },
+    "ergonomicWorkAnalysisAdvancedForm": {
+      "sections": {
+        "identification": "Identification",
+        "sectorAndTask": "Sector image and task description",
+        "complementaryData": "Complementary data",
+        "results": "Results and recommendations"
+      },
+      "fields": {
+        "date": "Date",
+        "photo": "Sector image"
+      }
+    },
+    "ergonomicWorkAnalysisAdvancedFields": {
+      "answers": {
+        "description": "Task description",
+        "complementaryData1": "Lifting, carrying and individual handling of materials",
+        "complementaryData2": "Workstation furniture and equipment (dimensions)",
+        "complementaryData3": "Activity time",
+        "complementaryData4": "Working hours",
+        "complementaryData5": "Job rotation",
+        "complementaryData6": "Breaks",
+        "complementaryData7": "Improvements already made",
+        "resultsAndConclusions": "Results and conclusions",
+        "recomendations": "Recommendations"
+      },
+      "tables": {
+        "steps": {
+          "title": "Process steps",
+          "columns": {
+            "step": "Step",
+            "posture": "Work posture",
+            "biomechanicalFactors": "Biomechanical factors"
+          }
+        },
+        "analyzedActivities": {
+          "title": "Analyzed activities",
+          "columns": {
+            "analyzedActivity": "Analyzed activity",
+            "workedTime": "Time (in the working day)",
+            "ergonomicTool": "Ergonomic tool",
+            "result": "Result"
+          }
+        }
+      }
+    },
     "delete": {
       "action": "Delete",
       "title": "Delete evaluation",
@@ -1633,6 +1801,37 @@
       "description": "The deletion is final and cannot be undone. The code will not be reused.",
       "confirm": "Delete evaluation",
       "deleting": "Deleting..."
+    },
+    "photoFailed": {
+      "created": "{code} created, but the photo was not uploaded: {error}",
+      "updated": "Data saved, but the photo was not uploaded: {error}"
+    },
+    "photoField": {
+      "hint": "Optional. {extensions} of up to {max} MB, of any dimensions.",
+      "selected": "Chosen photo: {name}. It is uploaded on saving.",
+      "keepHint": "Without a new photo, the current one stays.",
+      "typeNotAllowed": "Format not allowed ({extensions}).",
+      "tooLarge": "The photo exceeds {max} MB.",
+      "download": "Download photo",
+      "downloadNamed": "Download photo {name}",
+      "downloading": "Downloading...",
+      "remove": "Remove photo",
+      "none": "No photo"
+    },
+    "removePhoto": {
+      "title": "Remove photo",
+      "question": "Do you really want to remove the photo of evaluation <strong>{code}</strong>?",
+      "description": "The evaluation stays registered, but the photo is erased now and cannot be recovered. Changes not yet saved in the other fields are discarded.",
+      "confirm": "Remove photo",
+      "removing": "Removing..."
+    },
+    "rowsField": {
+      "rowNumber": "No.",
+      "actions": "Actions",
+      "addRow": "Add row",
+      "removeRow": "Remove row {row}",
+      "cellLabel": "{column}, row {row}",
+      "limit": "Up to {max} rows. A row left entirely blank is not saved."
     }
   },
   "errors": {
@@ -1738,6 +1937,7 @@
     "managementPlanCellStateInvalid": "Invalid state for the Management Plan cell.",
     "managementPlanCellGreenBeforePreviousLevels": "A cell can only turn green when the previous levels of its row are green.",
     "managementPlanGoalInvalid": "The Management Plan goal must be a whole number from 0 to 16.",
+    "requestBodyTooLarge": "The submission is too large. Reduce the content and try again.",
     "status400": "Check the information and try again.",
     "status404": "The requested record was not found.",
     "status409": "There is already a record with this information.",
@@ -1834,6 +2034,29 @@
     "ergonomicAnalysisInLocoShiftSchedulesTooLong": "The shift schedule of the In Loco Data Collection — Production must have at most 255 characters.",
     "ergonomicAnalysisInLocoSectorRequired": "Enter the sector of the In Loco Data Collection — Production.",
     "ergonomicAnalysisInLocoSectorTooLong": "The sector of the In Loco Data Collection — Production must have at most 255 characters.",
-    "ergonomicAnalysisInLocoAnswersInvalid": "Some answers of the In Loco Data Collection — Production are invalid. Review the questions and try again."
+    "ergonomicAnalysisInLocoAnswersInvalid": "Some answers of the In Loco Data Collection — Production are invalid. Review the questions and try again.",
+    "riskFactorNotFound": "Risk Identification not found.",
+    "riskFactorActivityRequired": "Select the activity of the Risk Identification.",
+    "riskFactorActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "riskFactorDateInvalid": "Enter a valid date for the Risk Identification.",
+    "riskFactorValuerRequired": "Enter the valuer of the Risk Identification.",
+    "riskFactorValuerTooLong": "The valuer of the Risk Identification must have at most 255 characters.",
+    "riskFactorNotesRequired": "Enter the notes of the Risk Identification.",
+    "riskFactorNotesTooLong": "The notes of the Risk Identification must have at most 5,000 characters.",
+    "riskFactorTotalRequired": "Enter the total of risk factors.",
+    "riskFactorTotalInvalid": "The total of risk factors must be a number greater than or equal to zero.",
+    "riskFactorAnswersInvalid": "Some marks of the Risk Identification are invalid. Review the board and try again.",
+    "ergonomicWorkAnalysisAdvancedNotFound": "Ergonomic Work Analysis – Production not found.",
+    "ergonomicWorkAnalysisAdvancedActivityRequired": "Select the activity of the Ergonomic Work Analysis – Production.",
+    "ergonomicWorkAnalysisAdvancedActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "ergonomicWorkAnalysisAdvancedDateInvalid": "Enter a valid date for the Ergonomic Work Analysis – Production.",
+    "ergonomicWorkAnalysisAdvancedAnswersInvalid": "Some fields or rows of the Ergonomic Work Analysis – Production are invalid. Review the texts (up to 5,000 characters) and the tables (up to 30 rows) and try again.",
+    "evaluationPhotoRequired": "Choose a photo to upload.",
+    "evaluationPhotoTypeNotAllowed": "Photo type not accepted. Send a JPG or PNG image.",
+    "evaluationPhotoEmpty": "The photo you sent is empty.",
+    "evaluationPhotoNameTooLong": "The photo name must have at most 255 characters.",
+    "evaluationPhotoTooLarge": "The photo must be at most 10 MB.",
+    "evaluationPhotoNotFound": "This evaluation has no photo.",
+    "evaluationPhotoUnavailable": "The photo of this evaluation could not be delivered. Try again later."
   }
 }

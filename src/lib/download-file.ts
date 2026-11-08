@@ -1,7 +1,9 @@
 import {
   type Document,
+  type ErgonomicWorkAnalysisAdvanced,
   getDocumentsIdFile,
   getDocumentsTemplatesESocial,
+  getEvaluationsErgonomicWorkAnalysesAdvancedIdPhoto,
   getImprovementProjectsIdFilesAttachment,
   getImprovementProjectsTemplatesTemplate,
   getMaterialReceiptsIdFile,
@@ -258,6 +260,30 @@ export async function fetchImprovementProjectPhoto(
   const response = await getImprovementProjectsIdFilesAttachment(
     record.id,
     photo,
+    { signal }
+  )
+
+  if (response.status !== 200) {
+    throw toFetchError(response.status, response.data)
+  }
+
+  return response.data
+}
+
+/**
+ * Fetches the sector photo of an Análise Ergonômica do Trabalho – Produção as
+ * a `Blob`, or `null` when the record has none (FR-020). The view's
+ * thumbnail, "Baixar foto" and the PDF read it on demand (NFR-007): there is
+ * no URL the browser could load it from on its own.
+ */
+export async function fetchEvaluationPhoto(
+  record: ErgonomicWorkAnalysisAdvanced,
+  signal?: AbortSignal
+) {
+  if (!record.photo) return null
+
+  const response = await getEvaluationsErgonomicWorkAnalysesAdvancedIdPhoto(
+    record.id,
     { signal }
   )
 

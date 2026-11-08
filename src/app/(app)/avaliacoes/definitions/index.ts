@@ -3,13 +3,17 @@ import type { EvaluationType } from '@/lib/evaluation-types'
 import { changeAssessmentDefinition } from './change-assessment'
 import { checklistDefinition } from './checklist'
 import { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
+import { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 import { hitListDefinition } from './hit-list'
+import { riskFactorDefinition } from './risk-factor'
 import type { EvaluationWebDefinition } from './types'
 
 export { changeAssessmentDefinition } from './change-assessment'
 export { checklistDefinition } from './checklist'
 export { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
+export { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 export { hitListDefinition } from './hit-list'
+export { riskFactorDefinition } from './risk-factor'
 export type { EvaluationWebDefinition } from './types'
 
 /**
@@ -18,6 +22,8 @@ export type { EvaluationWebDefinition } from './types'
  */
 const EVALUATION_WEB_DEFINITIONS = {
   ergonomic_analysis_in_loco: ergonomicAnalysisInLocoDefinition,
+  risk_factor: riskFactorDefinition,
+  ergonomic_work_analysis_advanced: ergonomicWorkAnalysisAdvancedDefinition,
   hit_list: hitListDefinition,
   checklist: checklistDefinition,
   change_assessment: changeAssessmentDefinition,

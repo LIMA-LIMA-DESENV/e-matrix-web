@@ -23,6 +23,10 @@ import {
   evaluationsListHref,
 } from './list-href'
 import type { EvaluationActivityOptionsState } from './use-evaluation-activity-options'
+import {
+  useEvaluationFormPhoto,
+  useEvaluationPhotoDownload,
+} from './use-evaluation-photo'
 
 /** `<tab>/[id]` of any evaluation type (FR-010, D-5). */
 export function ViewEvaluationPage({ type }: { type: EvaluationType }) {
@@ -38,8 +42,9 @@ export function ViewEvaluationPage({ type }: { type: EvaluationType }) {
 /**
  * Shows a record of the type to every role (J2): the type's form, filled
  * and with every control disabled, without "Salvar". The header has the PDF
- * of the record and, for who may edit, "Alterar". The deletion is on the
- * listing only.
+ * of the record and, for who may edit, "Alterar". A type with a photo shows
+ * its thumbnail and "Baixar foto", or "Sem foto" (FR-024). The deletion is
+ * on the listing only.
  */
 function ViewEvaluation({
   definition,
@@ -62,6 +67,8 @@ function ViewEvaluation({
     () => (record ? definition.form.toFormValues(record) : undefined),
     [definition, record]
   )
+  const currentPhoto = useEvaluationFormPhoto(definition, record)
+  const photoDownload = useEvaluationPhotoDownload(definition, record)
 
   // The select only needs the record's own activity, as the detail carries
   // it: the view requests no activity list.
@@ -92,7 +99,13 @@ function ViewEvaluation({
     if (!record || pdf.isGenerating) return
 
     setPdfError(null)
+    photoDownload.clearError()
     void pdf.downloadPdf(record.id)
+  }
+
+  function handleDownloadPhoto() {
+    setPdfError(null)
+    void photoDownload.download()
   }
 
   const Form = definition.form.Component
@@ -105,7 +118,15 @@ function ViewEvaluation({
       initialValues={initialValues}
       activities={activities}
       listHref={listHref}
-      errorMessage={pdfError}
+      errorMessage={
+        pdfError ??
+        (photoDownload.error ? translateError(photoDownload.error) : null)
+      }
+      {...(definition.photo && {
+        currentPhoto,
+        onDownloadPhoto: handleDownloadPhoto,
+        isDownloadingPhoto: photoDownload.isDownloading,
+      })}
       headerActions={
         <>
           <Button

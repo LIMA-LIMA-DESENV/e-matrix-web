@@ -244,6 +244,37 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
     'ergonomicAnalysisInLocoSectorTooLong',
   'Invalid ergonomic analysis in loco answers.':
     'ergonomicAnalysisInLocoAnswersInvalid',
+  'Risk factor not found.': 'riskFactorNotFound',
+  'Risk factor activity is required.': 'riskFactorActivityRequired',
+  'Risk factor activity not found.': 'riskFactorActivityNotFound',
+  'Invalid risk factor date.': 'riskFactorDateInvalid',
+  'Risk factor valuer is required.': 'riskFactorValuerRequired',
+  'Risk factor valuer is too long.': 'riskFactorValuerTooLong',
+  'Risk factor notes are required.': 'riskFactorNotesRequired',
+  'Risk factor notes are too long.': 'riskFactorNotesTooLong',
+  'Risk factor total is required.': 'riskFactorTotalRequired',
+  'Invalid risk factor total.': 'riskFactorTotalInvalid',
+  'Invalid risk factor answers.': 'riskFactorAnswersInvalid',
+  'Production ergonomic work analysis not found.':
+    'ergonomicWorkAnalysisAdvancedNotFound',
+  'Production ergonomic work analysis activity is required.':
+    'ergonomicWorkAnalysisAdvancedActivityRequired',
+  'Production ergonomic work analysis activity not found.':
+    'ergonomicWorkAnalysisAdvancedActivityNotFound',
+  'Invalid production ergonomic work analysis date.':
+    'ergonomicWorkAnalysisAdvancedDateInvalid',
+  'Invalid production ergonomic work analysis answers.':
+    'ergonomicWorkAnalysisAdvancedAnswersInvalid',
+  // The photo of any evaluation type that has one (D-3).
+  'Evaluation photo is required.': 'evaluationPhotoRequired',
+  'Evaluation photo type not allowed.': 'evaluationPhotoTypeNotAllowed',
+  'Evaluation photo is empty.': 'evaluationPhotoEmpty',
+  'Evaluation photo name is too long.': 'evaluationPhotoNameTooLong',
+  'Evaluation photo exceeds the 10 MB limit.': 'evaluationPhotoTooLarge',
+  'Evaluation photo not found.': 'evaluationPhotoNotFound',
+  'Evaluation photo is unavailable.': 'evaluationPhotoUnavailable',
+  // 'Only one file is allowed.' is the generic upload message, mapped above.
+  'Request body is too large.': 'requestBodyTooLarge',
 }
 
 const STATUS_KEYS: Record<number, ErrorKey> = {

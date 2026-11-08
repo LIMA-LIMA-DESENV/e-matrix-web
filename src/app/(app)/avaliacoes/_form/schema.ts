@@ -9,9 +9,14 @@ import type {
   ErgonomicAnalysisInLoco,
   ErgonomicAnalysisInLocoInput,
   ErgonomicAnalysisInLocoInputAnswers,
+  ErgonomicWorkAnalysisAdvanced,
+  ErgonomicWorkAnalysisAdvancedInput,
   HitList,
   HitListAnswersInput,
   HitListInput,
+  RiskFactor,
+  RiskFactorInput,
+  RiskFactorInputAnswers,
 } from '@/http/api'
 import { defaultLocale } from '@/i18n/config'
 
@@ -27,7 +32,19 @@ import {
   ERGONOMIC_ANALYSIS_IN_LOCO_QUESTIONS,
   type ErgonomicAnalysisInLocoQuestion,
 } from '../components/ergonomic-analysis-in-loco-questions'
+import {
+  ERGONOMIC_WORK_ANALYSIS_ADVANCED_ROW_COLUMNS,
+  ERGONOMIC_WORK_ANALYSIS_ADVANCED_TEXT_ANSWERS,
+  type ErgonomicWorkAnalysisAdvancedColumn,
+  type ErgonomicWorkAnalysisAdvancedTable,
+  type ErgonomicWorkAnalysisAdvancedTextAnswer,
+  MAX_EVALUATION_ROWS,
+} from '../components/ergonomic-work-analysis-advanced-fields'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
+import {
+  RISK_FACTOR_KEYS,
+  type RiskFactorKey,
+} from '../components/risk-factor-board'
 
 /**
  * The longest text answer the API accepts, in code points after the trim:
@@ -634,5 +651,360 @@ export function toErgonomicAnalysisInLocoInput(
     shift_schedules: data.shift_schedules.trim(),
     sector: data.sector.trim(),
     answers,
+  }
+}
+
+/**
+ * The longest valuer of an Identificação de Riscos, in code points after the
+ * trim: the `varchar(255)` of the column (FR-006).
+ */
+export const MAX_RISK_FACTOR_VALUER_LENGTH = 255
+
+/**
+ * Mirrors the API rules of an Identificação de Riscos write (FR-006,
+ * FR-018): the activity chosen among the listed ones, a real date, not
+ * compared with the periods, the valuer not blank after the trim and of at
+ * most 255 code points, the notes not blank and of at most 5,000, and the
+ * total required, a number of at least zero typed in the user's `locale`,
+ * which it becomes. The 39 marks are independent booleans, none required
+ * (R-8, R-9). Area and fabric are shown by the view only: kept as they come,
+ * never sent. The API stays the authority, including whether the activity
+ * still exists.
+ */
+export function makeRiskFactorSchema(
+  tv: Translate,
+  locale: string = defaultLocale
+) {
+  const requiredText = (requiredMessage: string, max: number) =>
+    z
+      .string()
+      .refine((value) => value.trim().length > 0, { message: requiredMessage })
+      .refine((value) => answerLength(value) <= max, {
+        message: tv('textTooLong', { max }),
+      })
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    date: z.string().refine(isCalendarDay, tv('checklistDateRequired')),
+    valuer: requiredText(tv('valuerRequired'), MAX_RISK_FACTOR_VALUER_LENGTH),
+    location: z.object({ area: z.string(), fabric: z.string() }),
+    marks: z.object(
+      shapeOf(RISK_FACTOR_KEYS, z.boolean()) as Record<
+        RiskFactorKey,
+        z.ZodBoolean
+      >
+    ),
+    notes: requiredText(tv('notesRequired'), MAX_EVALUATION_TEXT_LENGTH),
+    total: z.string().transform((value, ctx) => {
+      const parsed = parseLocaleDecimal(value, locale)
+      if (parsed === null || !Number.isFinite(parsed) || parsed < 0) {
+        ctx.addIssue({ code: 'custom', message: tv('riskFactorTotalInvalid') })
+        return z.NEVER
+      }
+      return parsed
+    }),
+  })
+}
+
+/** The form as its controls hold it: the total as typed. */
+export type RiskFactorFormInput = z.input<
+  ReturnType<typeof makeRiskFactorSchema>
+>
+/** The form once valid: the total as a number. */
+export type RiskFactorFormData = z.output<
+  ReturnType<typeof makeRiskFactorSchema>
+>
+
+/**
+ * The form data of the definition: what the create starts from, what the
+ * stored record becomes and what a valid form sends. The total is `null`
+ * only in an empty form, a blank control; once valid it is a number.
+ */
+export type RiskFactorFormValues = Omit<RiskFactorFormData, 'total'> & {
+  total: number | null
+}
+
+/** No mark at all: every item of the board unmarked. */
+function unmarked(): Record<RiskFactorKey, boolean> {
+  return shapeOf(RISK_FACTOR_KEYS, false) as Record<RiskFactorKey, boolean>
+}
+
+/** An empty Identificação de Riscos: no field, no mark and no total. */
+export function riskFactorFormDefaultValues(): RiskFactorFormValues {
+  return {
+    activity_id: '',
+    date: '',
+    valuer: '',
+    location: { area: '', fabric: '' },
+    marks: unmarked(),
+    notes: '',
+    total: null,
+  }
+}
+
+/**
+ * A stored Identificação de Riscos as the form holds it, with the current
+ * area and fabric of its activity for the view (R-6). Only `true` is a mark:
+ * `false` and `null` are unmarked (FR-007).
+ */
+export function toRiskFactorFormValues(
+  record: RiskFactor
+): RiskFactorFormValues {
+  const answers = record.answers as unknown as Record<string, unknown>
+
+  return {
+    activity_id: record.activity.id,
+    date: record.date,
+    valuer: record.valuer,
+    location: { area: record.activity.area, fabric: record.activity.fabric },
+    marks: Object.fromEntries(
+      RISK_FACTOR_KEYS.map((key) => [key, answers[key] === true])
+    ) as Record<RiskFactorKey, boolean>,
+    notes: record.notes,
+    total: record.total,
+  }
+}
+
+/**
+ * The values of the controls: the total written in the user's number format
+ * (`formatNumber`), so "2,5" in pt-BR and "2.5" in en (FR-018).
+ */
+export function toRiskFactorFormInput(
+  data: RiskFactorFormValues,
+  formatNumber: (value: number) => string
+): RiskFactorFormInput {
+  return {
+    ...data,
+    total: data.total === null ? '' : formatNumber(data.total),
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/risk-factors` (FR-010, FR-018): the
+ * date as typed, the valuer trimmed, the notes trimmed keeping their inner
+ * line breaks, the total as a number, and the 39 marks in the order of the
+ * board, `true` for a marked item and `null` for the others, so the database
+ * keeps only the marks and the `PUT` clears what was unmarked. Area and
+ * fabric are never sent.
+ */
+export function toRiskFactorInput(data: RiskFactorFormValues): RiskFactorInput {
+  // Only a valid form is sent, and the schema never lets a blank total
+  // through: a missing one is a bug, not a value to send.
+  if (data.total === null) throw new Error('Risk factor total is required.')
+
+  const answers = Object.fromEntries(
+    RISK_FACTOR_KEYS.map((key) => [key, data.marks[key] ? true : null])
+  ) as RiskFactorInputAnswers
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    date: data.date,
+    valuer: data.valuer.trim(),
+    notes: data.notes.trim(),
+    total: data.total,
+    answers,
+  }
+}
+
+/**
+ * Mirrors the API rules of an Análise Ergonômica do Trabalho – Produção write
+ * (FR-011, FR-012, FR-025): the activity chosen among the listed ones, a real
+ * date, not compared with the periods, every text and every cell optional, of
+ * at most 5,000 code points after the trim, and at most 30 rows per table
+ * (H-4). The API stays the authority, including whether the activity still
+ * exists.
+ */
+export function makeErgonomicWorkAnalysisAdvancedSchema(tv: Translate) {
+  const text = z
+    .string()
+    .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+      message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+    })
+  const rows = <T extends ErgonomicWorkAnalysisAdvancedTable>(table: T) =>
+    z
+      .array(
+        z.object(
+          shapeOf(
+            ERGONOMIC_WORK_ANALYSIS_ADVANCED_ROW_COLUMNS[table],
+            text
+          ) as Record<ErgonomicWorkAnalysisAdvancedColumn<T>, typeof text>
+        )
+      )
+      .max(MAX_EVALUATION_ROWS, {
+        message: tv('tooManyRows', { max: MAX_EVALUATION_ROWS }),
+      })
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    date: z.string().refine(isCalendarDay, tv('checklistDateRequired')),
+    answers: z.object({
+      ...(shapeOf(
+        ERGONOMIC_WORK_ANALYSIS_ADVANCED_TEXT_ANSWERS,
+        text
+      ) as Record<ErgonomicWorkAnalysisAdvancedTextAnswer, typeof text>),
+      steps: rows('steps'),
+      analyzedActivities: rows('analyzedActivities'),
+    }),
+  })
+}
+
+export type ErgonomicWorkAnalysisAdvancedFormInput = z.input<
+  ReturnType<typeof makeErgonomicWorkAnalysisAdvancedSchema>
+>
+export type ErgonomicWorkAnalysisAdvancedFormData = z.output<
+  ReturnType<typeof makeErgonomicWorkAnalysisAdvancedSchema>
+>
+
+/** A row of a table as the form holds it: one text per column, `''` blank. */
+type ErgonomicWorkAnalysisAdvancedFormRow<
+  T extends ErgonomicWorkAnalysisAdvancedTable,
+> = Record<ErgonomicWorkAnalysisAdvancedColumn<T>, string>
+
+/** A row of a table with every cell blank, as "Adicionar linha" appends. */
+function emptyErgonomicWorkAnalysisAdvancedRow<
+  T extends ErgonomicWorkAnalysisAdvancedTable,
+>(table: T): ErgonomicWorkAnalysisAdvancedFormRow<T> {
+  return shapeOf(
+    ERGONOMIC_WORK_ANALYSIS_ADVANCED_ROW_COLUMNS[table],
+    ''
+  ) as ErgonomicWorkAnalysisAdvancedFormRow<T>
+}
+
+/**
+ * The stored rows of a table as the form holds them: each cell `''` when
+ * blank, and one empty row when there is none, so the form always shows a
+ * row (R-17).
+ */
+function toErgonomicWorkAnalysisAdvancedFormRows<
+  T extends ErgonomicWorkAnalysisAdvancedTable,
+>(
+  table: T,
+  stored: readonly object[] | null | undefined
+): ErgonomicWorkAnalysisAdvancedFormRow<T>[] {
+  if (!stored || stored.length === 0) {
+    return [emptyErgonomicWorkAnalysisAdvancedRow(table)]
+  }
+
+  return stored.map((row) => {
+    const cells = row as Partial<Record<string, string | null>>
+
+    return Object.fromEntries(
+      ERGONOMIC_WORK_ANALYSIS_ADVANCED_ROW_COLUMNS[table].map((column) => [
+        column,
+        cells[column] ?? '',
+      ])
+    ) as ErgonomicWorkAnalysisAdvancedFormRow<T>
+  })
+}
+
+/**
+ * The rows of a table as the body sends them (FR-025, R-16): each cell
+ * trimmed, keeping its inner line breaks, a blank one as `null`; a row with
+ * every cell blank is left out, the others keep their order; and a table
+ * without any row left goes as `null`, which the API stores as absent.
+ */
+function toErgonomicWorkAnalysisAdvancedRowsInput<
+  T extends ErgonomicWorkAnalysisAdvancedTable,
+>(
+  table: T,
+  rows: readonly Partial<Record<string, string>>[]
+): Record<ErgonomicWorkAnalysisAdvancedColumn<T>, string | null>[] | null {
+  const columns = ERGONOMIC_WORK_ANALYSIS_ADVANCED_ROW_COLUMNS[table]
+  const kept = rows
+    .map(
+      (row) =>
+        Object.fromEntries(
+          columns.map((column) => [column, row[column]?.trim() || null])
+        ) as Record<ErgonomicWorkAnalysisAdvancedColumn<T>, string | null>
+    )
+    .filter((row) => Object.values(row).some((cell) => cell !== null))
+
+  return kept.length > 0 ? kept : null
+}
+
+/**
+ * An empty Análise Ergonômica do Trabalho – Produção: no identification, no
+ * text and one empty row in each table (R-17).
+ */
+export function ergonomicWorkAnalysisAdvancedFormDefaultValues(): ErgonomicWorkAnalysisAdvancedFormData {
+  return {
+    activity_id: '',
+    date: '',
+    answers: {
+      ...(shapeOf(ERGONOMIC_WORK_ANALYSIS_ADVANCED_TEXT_ANSWERS, '') as Record<
+        ErgonomicWorkAnalysisAdvancedTextAnswer,
+        string
+      >),
+      steps: [emptyErgonomicWorkAnalysisAdvancedRow('steps')],
+      analyzedActivities: [
+        emptyErgonomicWorkAnalysisAdvancedRow('analyzedActivities'),
+      ],
+    },
+  }
+}
+
+/**
+ * A stored Análise Ergonômica do Trabalho – Produção as the form holds it: an
+ * absent text (`null`) is a blank text area, and a table without rows (`null`)
+ * is one empty row (FR-025).
+ */
+export function toErgonomicWorkAnalysisAdvancedFormValues(
+  record: ErgonomicWorkAnalysisAdvanced
+): ErgonomicWorkAnalysisAdvancedFormData {
+  return {
+    activity_id: record.activity.id,
+    date: record.date,
+    answers: {
+      ...(Object.fromEntries(
+        ERGONOMIC_WORK_ANALYSIS_ADVANCED_TEXT_ANSWERS.map((key) => [
+          key,
+          record.answers[key] ?? '',
+        ])
+      ) as Record<ErgonomicWorkAnalysisAdvancedTextAnswer, string>),
+      steps: toErgonomicWorkAnalysisAdvancedFormRows(
+        'steps',
+        record.answers.steps
+      ),
+      analyzedActivities: toErgonomicWorkAnalysisAdvancedFormRows(
+        'analyzedActivities',
+        record.answers.analyzedActivities
+      ),
+    },
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/ergonomic-work-analyses-advanced`
+ * (FR-014, FR-025): the date as typed, every text trimmed keeping its inner
+ * line breaks, a blank one as `null`, so the `PUT` clears what was emptied,
+ * and the tables without their blank rows. The photo is not here: it goes
+ * after, through `PUT …/photo` (D-2).
+ */
+export function toErgonomicWorkAnalysisAdvancedInput(
+  data: ErgonomicWorkAnalysisAdvancedFormData
+): ErgonomicWorkAnalysisAdvancedInput {
+  const texts = Object.fromEntries(
+    ERGONOMIC_WORK_ANALYSIS_ADVANCED_TEXT_ANSWERS.map((key) => [
+      key,
+      data.answers[key]?.trim() || null,
+    ])
+  ) as Record<ErgonomicWorkAnalysisAdvancedTextAnswer, string | null>
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    date: data.date,
+    answers: {
+      ...texts,
+      steps: toErgonomicWorkAnalysisAdvancedRowsInput(
+        'steps',
+        data.answers.steps
+      ),
+      analyzedActivities: toErgonomicWorkAnalysisAdvancedRowsInput(
+        'analyzedActivities',
+        data.answers.analyzedActivities
+      ),
+    },
   }
 }

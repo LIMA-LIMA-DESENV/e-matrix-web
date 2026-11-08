@@ -5,9 +5,21 @@ import {
 
 /**
  * One-shot success params the tab reads and then drops. Each carries the
- * record's code, which is what the message cites (J1, J3, FR-017).
+ * record's code, which is what the message cites (J1, J3, FR-017), and
+ * `photoRemoved` the removal of a photo (D-7).
  */
-export const EVALUATION_FEEDBACK_PARAMS = ['created', 'updated'] as const
+export const EVALUATION_FEEDBACK_PARAMS = [
+  'created',
+  'updated',
+  'photoRemoved',
+] as const
+
+/**
+ * One-shot param of the edit route: the `POST` saved the record but the
+ * photo's upload failed (J1, D-2). It carries the key of the translated
+ * error (`errors.<key>`); the edit reads it, shows the notice and drops it.
+ */
+export const PHOTO_FAILED_PARAM = 'photoFailed'
 
 export type EvaluationFeedbackParam =
   (typeof EVALUATION_FEEDBACK_PARAMS)[number]
@@ -32,6 +44,7 @@ interface SearchParamsLike {
 function listParams(searchParams: SearchParamsLike) {
   const params = new URLSearchParams(searchParams.toString())
   for (const key of EVALUATION_FEEDBACK_PARAMS) params.delete(key)
+  params.delete(PHOTO_FAILED_PARAM)
   return params
 }
 

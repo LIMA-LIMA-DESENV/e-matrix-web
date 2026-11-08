@@ -1277,12 +1277,16 @@
     "tabs": {
       "label": "Tipos de avaliação",
       "ergonomic_analysis_in_loco": "Coleta de Dados In Loco — Produção",
+      "risk_factor": "Identificação de Riscos",
+      "ergonomic_work_analysis_advanced": "Análise Ergonômica do Trabalho – Produção",
       "hit_list": "Hit List",
       "checklist": "Coleta de Dados In Loco — Escritório",
       "change_assessment": "Avaliação de Mudanças / Projetos"
     },
     "types": {
       "ergonomic_analysis_in_loco": "Coleta de Dados In Loco — Produção",
+      "risk_factor": "Identificação de Riscos",
+      "ergonomic_work_analysis_advanced": "Análise Ergonômica do Trabalho – Produção",
       "hit_list": "Hit List",
       "checklist": "Coleta de Dados In Loco — Escritório",
       "change_assessment": "Avaliação de Mudanças / Projetos"
@@ -1527,9 +1531,52 @@
           "physicalEffort": "4a. Esforço físico (baixo, médio, alto)\n4b. Escala de Borg (0 a 10)",
           "manualHandling": "5a. Há levantamento manual de peso? Se sim, qual peso?\n5b. Há tração ou impulsão (puxar ou empurrar)?"
         }
+      },
+      "riskFactor": {
+        "title": "Identificação de Riscos",
+        "fields": {
+          "date": "Data",
+          "activity": "Atividade",
+          "area": "Área",
+          "fabric": "Fábrica",
+          "valuer": "Avaliador",
+          "notes": "Observações",
+          "total": "Total de fatores de risco"
+        }
+      },
+      "ergonomicWorkAnalysisAdvanced": {
+        "title": "Análise Ergonômica do Trabalho – Produção",
+        "activity": "Atividade",
+        "date": "Data",
+        "photo": "IMAGEM DO SETOR",
+        "description": "DESCRIÇÃO DA TAREFA",
+        "tables": {
+          "steps": {
+            "title": "Dados da Atividade",
+            "columns": {
+              "step": "ETAPAS DO PROCESSO",
+              "posture": "POSTURA DE TRABALHO",
+              "biomechanicalFactors": "FATORES BIOMECÂNICOS"
+            }
+          },
+          "analyzedActivities": {
+            "title": "Tabela de Análise Ergonômica Avançada",
+            "columns": {
+              "analyzedActivity": "ATIVIDADE ANALISADA",
+              "workedTime": "TEMPO (NA JORNADA DE TRABALHO)",
+              "ergonomicTool": "FERRAMENTA ERGONÔMICA",
+              "result": "RESULTADO"
+            }
+          }
+        },
+        "complementaryData": "DADOS COMPLEMENTARES",
+        "resultsAndConclusions": "RESULTADOS E CONCLUSÕES",
+        "recomendations": "RECOMENDAÇÕES"
       }
     },
     "newErgonomicAnalysisInLoco": "Nova Coleta de Dados — Produção",
+    "newRiskFactor": "Nova Identificação de Riscos",
+    "newErgonomicWorkAnalysisAdvanced": "Nova Análise Ergonômica do Trabalho – Produção",
     "newHitList": "Nova Hit List",
     "newChecklist": "Nova Coleta de Dados — Escritório",
     "newChangeAssessment": "Nova Avaliação de Mudanças",
@@ -1539,7 +1586,8 @@
     "feedback": {
       "created": "Avaliação {code} cadastrada com sucesso.",
       "updated": "Avaliação {code} alterada com sucesso.",
-      "deleted": "Avaliação {code} excluída com sucesso."
+      "deleted": "Avaliação {code} excluída com sucesso.",
+      "photoRemoved": "Foto da avaliação {code} removida com sucesso."
     },
     "form": {
       "newDescription": "{type}: escolha a atividade e a data da avaliação. Os demais campos são opcionais.",
@@ -1565,7 +1613,11 @@
       "sectorRequired": "Informe o setor.",
       "checklistDateRequired": "Informe uma data válida.",
       "shiftSchedulesRequired": "Informe o horário dos turnos.",
-      "timesPerShiftInvalid": "Informe um número maior ou igual a zero."
+      "timesPerShiftInvalid": "Informe um número maior ou igual a zero.",
+      "valuerRequired": "Informe o avaliador.",
+      "notesRequired": "Informe as observações.",
+      "riskFactorTotalInvalid": "Informe um número maior ou igual a zero.",
+      "tooManyRows": "A tabela deve ter no máximo {max} linhas."
     },
     "hitListForm": {
       "sections": {
@@ -1626,6 +1678,122 @@
       "processStepsLabel": "Roteiro",
       "timesPerShiftHint": "Um número maior ou igual a zero; decimais com vírgula ou ponto."
     },
+    "riskFactorForm": {
+      "newDescription": "{type}: escolha a atividade, informe a data e o avaliador, marque no quadro os fatores de risco observados e conclua com as observações e o total.",
+      "editDescription": "{type}: altere os campos e as marcações da avaliação, inclusive a atividade.",
+      "sections": {
+        "identification": "Identificação",
+        "riskFactors": "Fatores de risco",
+        "conclusion": "Conclusão"
+      },
+      "riskFactorsDescription": "Clique numa figura ou num rótulo para marcar o fator de risco; clique de novo para desmarcar. Nenhuma marcação é obrigatória.",
+      "totalHint": "Um número maior ou igual a zero, digitado pelo avaliador; decimais com vírgula ou ponto."
+    },
+    "riskFactorBoard": {
+      "columns": {
+        "bodyPart": "Partes do corpo",
+        "posture": "Postura",
+        "static": "Estático",
+        "repetition": "Repetição",
+        "force": "Força"
+      },
+      "bodyParts": {
+        "hands": "Mãos / Punhos",
+        "elbows": "Cotovelos",
+        "shoulders": "Ombros",
+        "back": "Costas",
+        "neck": "Pescoço",
+        "legs": "Pernas",
+        "other": "Outros"
+      },
+      "items": {
+        "handsFlexion": "Flexão",
+        "radialDeviation": "Desvio radial",
+        "handsExtension": "Extensão",
+        "ulnarDeviation": "Desvio ulnar",
+        "handsStatic": "Estático > 10 s",
+        "handsRapid": "Rápido, muitas vezes",
+        "pinch": "Apertar",
+        "grip": "Agarrar",
+        "hammer": "Martelar",
+        "supinationPronation": "Supinação / Pronação",
+        "elbowsStatic": "Estático > 10 s",
+        "elbowsRapid": "Rápido, muitas vezes",
+        "forearmTwist": "Torção do antebraço / Torque",
+        "reachForward": "Avançar",
+        "overShoulder": "Sobre o ombro",
+        "abduction": "Abdução",
+        "shouldersStatic": "Estático > 10 s",
+        "shouldersRapid": "Rápido, muitas vezes",
+        "push": "Empurrar",
+        "pull": "Puxar",
+        "backFlexion": "Flexão",
+        "backTwist": "Girar",
+        "backExtension": "Estender",
+        "backStatic": "Estático > 10 s",
+        "backRapid": "Rápido, muitas vezes",
+        "lift": "Levantar",
+        "pushPull": "Empurrar / Puxar",
+        "neckFlexion": "Flexão",
+        "neckTwist": "Girar",
+        "neckExtension": "Estender",
+        "neckStatic": "Estático > 10 s",
+        "neckRapid": "Rápido, muitas vezes",
+        "squat": "Agachar",
+        "kneel": "De joelhos",
+        "legsStatic": "Estático > 10 s",
+        "legsRapid": "Rápido, muitas vezes",
+        "vibration": "Vibração",
+        "extremeColdTemperature": "Temperatura extremamente fria",
+        "contactStress": "Estresse de contato"
+      },
+      "itemName": "{bodyPart} — {item}"
+    },
+    "ergonomicWorkAnalysisAdvancedForm": {
+      "sections": {
+        "identification": "Identificação",
+        "sectorAndTask": "Imagem do setor e descrição da tarefa",
+        "complementaryData": "Dados complementares",
+        "results": "Resultados e recomendações"
+      },
+      "fields": {
+        "date": "Data",
+        "photo": "Imagem do setor"
+      }
+    },
+    "ergonomicWorkAnalysisAdvancedFields": {
+      "answers": {
+        "description": "Descrição da tarefa",
+        "complementaryData1": "Levantamento, transporte e manuseio individual de materiais",
+        "complementaryData2": "Mobiliário e equipamentos do posto de trabalho (dimensões)",
+        "complementaryData3": "Tempo da atividade",
+        "complementaryData4": "Jornada de trabalho",
+        "complementaryData5": "Rodízios",
+        "complementaryData6": "Pausas",
+        "complementaryData7": "Melhorias já realizadas",
+        "resultsAndConclusions": "Resultados e conclusões",
+        "recomendations": "Recomendações"
+      },
+      "tables": {
+        "steps": {
+          "title": "Etapas do processo",
+          "columns": {
+            "step": "Etapa",
+            "posture": "Postura de trabalho",
+            "biomechanicalFactors": "Fatores biomecânicos"
+          }
+        },
+        "analyzedActivities": {
+          "title": "Atividades analisadas",
+          "columns": {
+            "analyzedActivity": "Atividade analisada",
+            "workedTime": "Tempo (na jornada de trabalho)",
+            "ergonomicTool": "Ferramenta ergonômica",
+            "result": "Resultado"
+          }
+        }
+      }
+    },
     "delete": {
       "action": "Excluir",
       "title": "Excluir avaliação",
@@ -1633,6 +1801,37 @@
       "description": "A exclusão é definitiva e não pode ser desfeita. O código não será reaproveitado.",
       "confirm": "Excluir avaliação",
       "deleting": "Excluindo..."
+    },
+    "photoFailed": {
+      "created": "{code} cadastrada, mas a foto não foi enviada: {error}",
+      "updated": "Dados salvos, mas a foto não foi enviada: {error}"
+    },
+    "photoField": {
+      "hint": "Opcional. {extensions} de até {max} MB, de qualquer dimensão.",
+      "selected": "Foto escolhida: {name}. Ela será enviada ao salvar.",
+      "keepHint": "Sem uma foto nova, a atual continua.",
+      "typeNotAllowed": "Formato não permitido ({extensions}).",
+      "tooLarge": "A foto passa de {max} MB.",
+      "download": "Baixar foto",
+      "downloadNamed": "Baixar foto {name}",
+      "downloading": "Baixando...",
+      "remove": "Remover foto",
+      "none": "Sem foto"
+    },
+    "removePhoto": {
+      "title": "Remover foto",
+      "question": "Deseja realmente remover a foto da avaliação <strong>{code}</strong>?",
+      "description": "A avaliação continua cadastrada, mas a foto é apagada agora e não pode ser recuperada. As alterações ainda não salvas nos outros campos são descartadas.",
+      "confirm": "Remover foto",
+      "removing": "Removendo..."
+    },
+    "rowsField": {
+      "rowNumber": "Nº",
+      "actions": "Ações",
+      "addRow": "Adicionar linha",
+      "removeRow": "Remover linha {row}",
+      "cellLabel": "{column}, linha {row}",
+      "limit": "Até {max} linhas. Uma linha toda em branco não é gravada."
     }
   },
   "errors": {
@@ -1738,6 +1937,7 @@
     "managementPlanCellStateInvalid": "Estado inválido para a célula do Plano de Gestão.",
     "managementPlanCellGreenBeforePreviousLevels": "A célula só pode ficar verde quando os níveis anteriores da linha estiverem verdes.",
     "managementPlanGoalInvalid": "A meta do Plano de Gestão deve ser um número inteiro de 0 a 16.",
+    "requestBodyTooLarge": "O envio é grande demais. Reduza o conteúdo e tente novamente.",
     "status400": "Verifique os dados informados e tente novamente.",
     "status404": "O registro solicitado não foi encontrado.",
     "status409": "Já existe um registro com os dados informados.",
@@ -1834,6 +2034,29 @@
     "ergonomicAnalysisInLocoShiftSchedulesTooLong": "O horário dos turnos da Coleta de Dados In Loco — Produção deve ter no máximo 255 caracteres.",
     "ergonomicAnalysisInLocoSectorRequired": "Informe o setor da Coleta de Dados In Loco — Produção.",
     "ergonomicAnalysisInLocoSectorTooLong": "O setor da Coleta de Dados In Loco — Produção deve ter no máximo 255 caracteres.",
-    "ergonomicAnalysisInLocoAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco — Produção são inválidas. Revise as perguntas e tente novamente."
+    "ergonomicAnalysisInLocoAnswersInvalid": "Algumas respostas da Coleta de Dados In Loco — Produção são inválidas. Revise as perguntas e tente novamente.",
+    "riskFactorNotFound": "Identificação de Riscos não encontrada.",
+    "riskFactorActivityRequired": "Selecione a atividade da Identificação de Riscos.",
+    "riskFactorActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "riskFactorDateInvalid": "Informe uma data válida para a Identificação de Riscos.",
+    "riskFactorValuerRequired": "Informe o avaliador da Identificação de Riscos.",
+    "riskFactorValuerTooLong": "O avaliador da Identificação de Riscos deve ter no máximo 255 caracteres.",
+    "riskFactorNotesRequired": "Informe as observações da Identificação de Riscos.",
+    "riskFactorNotesTooLong": "As observações da Identificação de Riscos devem ter no máximo 5.000 caracteres.",
+    "riskFactorTotalRequired": "Informe o total de fatores de risco.",
+    "riskFactorTotalInvalid": "O total de fatores de risco deve ser um número maior ou igual a zero.",
+    "riskFactorAnswersInvalid": "Algumas marcações da Identificação de Riscos são inválidas. Revise o quadro e tente novamente.",
+    "ergonomicWorkAnalysisAdvancedNotFound": "Análise Ergonômica do Trabalho – Produção não encontrada.",
+    "ergonomicWorkAnalysisAdvancedActivityRequired": "Selecione a atividade da Análise Ergonômica do Trabalho – Produção.",
+    "ergonomicWorkAnalysisAdvancedActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "ergonomicWorkAnalysisAdvancedDateInvalid": "Informe uma data válida para a Análise Ergonômica do Trabalho – Produção.",
+    "ergonomicWorkAnalysisAdvancedAnswersInvalid": "Alguns campos ou linhas da Análise Ergonômica do Trabalho – Produção são inválidos. Revise os textos (até 5.000 caracteres) e as tabelas (até 30 linhas) e tente novamente.",
+    "evaluationPhotoRequired": "Escolha uma foto para enviar.",
+    "evaluationPhotoTypeNotAllowed": "Tipo de foto não aceito. Envie uma imagem JPG ou PNG.",
+    "evaluationPhotoEmpty": "A foto enviada está vazia.",
+    "evaluationPhotoNameTooLong": "O nome da foto deve ter no máximo 255 caracteres.",
+    "evaluationPhotoTooLarge": "A foto deve ter no máximo 10 MB.",
+    "evaluationPhotoNotFound": "Esta avaliação não tem foto.",
+    "evaluationPhotoUnavailable": "Não foi possível entregar a foto desta avaliação. Tente novamente mais tarde."
   }
 }

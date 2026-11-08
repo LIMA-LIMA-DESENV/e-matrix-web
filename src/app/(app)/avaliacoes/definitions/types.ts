@@ -33,6 +33,16 @@ export interface EvaluationDetail {
   id: string
   code: string
   activity: ImprovementProjectActivity
+  /**
+   * The stored photo of a type that declares `photo` (FR-020), `null` when
+   * it has none; absent on the types without a photo.
+   */
+  photo?: EvaluationPhoto | null
+}
+
+/** What the detail says of a stored photo: the name it was uploaded with. */
+export interface EvaluationPhoto {
+  name: string
 }
 
 /** The listing query of a type, through a common signature (RK-2). */
@@ -77,16 +87,68 @@ export interface EvaluationMutationState {
 export interface EvaluationCreateMutation<TInput>
   extends EvaluationMutationState {
   /**
-   * Resolves with the code the API assigned (`null` for an answer without
-   * the record) and rejects when the request fails.
+   * Resolves with the id and the code the API assigned (`null` for an answer
+   * without the record) and rejects when the request fails.
    */
-  create(input: TInput): Promise<string | null>
+  create(input: TInput): Promise<EvaluationCreated | null>
+}
+
+/** The record a `POST` created: its id, for the edit route, and its code. */
+export interface EvaluationCreated {
+  id: string
+  code: string
 }
 
 /** The generated `PUT` of a type (hook); rejects when the request fails. */
 export interface EvaluationUpdateMutation<TInput>
   extends EvaluationMutationState {
   update(id: string, input: TInput): Promise<unknown>
+}
+
+/**
+ * The generated `PUT …/{id}/photo` of a type (hook): sends one JPEG or PNG,
+ * which replaces the stored one, and rejects when the request fails.
+ */
+export interface EvaluationPhotoUploadMutation extends EvaluationMutationState {
+  upload(id: string, photo: File): Promise<unknown>
+}
+
+/**
+ * The generated `DELETE …/{id}/photo` of a type (hook): removes the photo
+ * and keeps the record; rejects when the request fails.
+ */
+export interface EvaluationPhotoRemoveMutation extends EvaluationMutationState {
+  remove(id: string): Promise<unknown>
+}
+
+/**
+ * The photo of a type (FR-020, D-2): a sub-resource of the record, sent after
+ * the `POST` or the `PUT` of the data, which stay in JSON. A type without it
+ * has no photo call at all.
+ */
+export interface EvaluationPhotoDefinition<TDetail> {
+  /**
+   * Downloads the stored photo through the authenticated `GET …/photo`, or
+   * resolves `null` when the record has none.
+   */
+  fetch(record: TDetail, signal?: AbortSignal): Promise<Blob | null>
+  useUpload(): EvaluationPhotoUploadMutation
+  useRemove(): EvaluationPhotoRemoveMutation
+}
+
+/** The files the form picked, kept out of react-hook-form (D-7). */
+export interface EvaluationFormFiles {
+  /** A photo checked by `checkFile(PHOTO_POLICY)`; absent keeps the stored one. */
+  photo?: File
+}
+
+/**
+ * The stored photo as the form shows it: its name and the download of its
+ * thumbnail, a stable function (`PhotoPreview` loads again on a new one).
+ */
+export interface EvaluationFormPhoto {
+  name: string
+  load(signal: AbortSignal): Promise<Blob | null>
 }
 
 /**
@@ -106,8 +168,22 @@ export interface EvaluationFormProps<TFormData> {
   headerActions?: ReactNode
   isSubmitting?: boolean
   errorMessage?: string | null
-  /** Sends the form; resolves `true` once saved (`useGuardedSubmit`). */
-  onSubmit?(data: TFormData): Promise<boolean>
+  /**
+   * Sends the form, with the photo picked when the type has one; resolves
+   * `true` once saved (`useGuardedSubmit`).
+   */
+  onSubmit?(data: TFormData, files?: EvaluationFormFiles): Promise<boolean>
+  /**
+   * The stored photo of the view and the edit, `null` when the record has
+   * none; absent to create and on the types without a photo.
+   */
+  currentPhoto?: EvaluationFormPhoto | null
+  /** Edit only: opens the confirmation of the photo's removal (D-7). */
+  onRemovePhoto?(): void
+  /** View and edit: downloads the stored photo. */
+  onDownloadPhoto?(): void
+  /** The stored photo is being downloaded. */
+  isDownloadingPhoto?: boolean
 }
 
 /**
@@ -137,9 +213,13 @@ export interface EvaluationPdfAdapter<TDetail> {
   usePdfBuilder(): () => Promise<EvaluationPdfBuilder<TDetail>>
 }
 
-/** The report of a type, loaded: builds the PDF of a record or the blank. */
+/**
+ * The report of a type, loaded: builds the PDF of a record or the blank. A
+ * report that needs more of the record than the detail, such as its photo
+ * (FR-026), resolves once it has fetched it.
+ */
 export interface EvaluationPdfBuilder<TDetail> {
-  build(detail: TDetail | null): Blob
+  build(detail: TDetail | null): Blob | Promise<Blob>
 }
 
 /**
@@ -186,6 +266,8 @@ export interface EvaluationWebDefinition<
   pdf: EvaluationPdfAdapter<TDetail>
   /** `<code>-<base>.pdf` for a record and `<base>.pdf` for the blank form. */
   fileBaseName: string
+  /** The photo of the record, for the types that have one (FR-020). */
+  photo?: EvaluationPhotoDefinition<TDetail>
 }
 
 /** Adapts a generated read query to `EvaluationQueryState`. */
@@ -212,8 +294,8 @@ export function toEvaluationCreateMutation<TInput>(mutation: {
   mutateAsync(variables: {
     data: TInput
   }): Promise<
-    | { status: 201; data: { code: string } }
-    | { status: 400 | 401 | 403 | 404 | 409 | 500; data: unknown }
+    | { status: 201; data: EvaluationCreated }
+    | { status: 400 | 401 | 403 | 404 | 409 | 413 | 500; data: unknown }
   >
   isPending: boolean
   isError: boolean
@@ -225,7 +307,9 @@ export function toEvaluationCreateMutation<TInput>(mutation: {
     error: mutation.error,
     async create(input) {
       const response = await mutation.mutateAsync({ data: input })
-      return response.status === 201 ? response.data.code : null
+      return response.status === 201
+        ? { id: response.data.id, code: response.data.code }
+        : null
     },
   }
 }

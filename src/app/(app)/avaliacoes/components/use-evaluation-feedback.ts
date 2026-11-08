@@ -9,8 +9,9 @@ import type { ListFeedbackMessage } from '@/components/list'
 import { EVALUATION_FEEDBACK_PARAMS } from '../_form/list-href'
 
 /**
- * Shows the success message a record page left in the URL — created or
- * updated, each carrying the record's code (J1, J3, FR-017) — and then drops
+ * Shows the success message a record page left in the URL — created,
+ * updated or photo removed, each carrying the record's code (J1, J3, FR-017,
+ * D-7) — and then drops
  * the param, so a reload does not show it again.
  */
 export function useEvaluationFeedback(
@@ -23,12 +24,16 @@ export function useEvaluationFeedback(
 
   const createdCode = searchParams.get('created')
   const updatedCode = searchParams.get('updated')
+  const photoRemovedCode = searchParams.get('photoRemoved')
 
   useEffect(() => {
     let text: string | null = null
 
     if (createdCode) text = t('created', { code: createdCode })
     else if (updatedCode) text = t('updated', { code: updatedCode })
+    else if (photoRemovedCode) {
+      text = t('photoRemoved', { code: photoRemovedCode })
+    }
 
     if (!text) return
 
@@ -38,5 +43,14 @@ export function useEvaluationFeedback(
     for (const key of EVALUATION_FEEDBACK_PARAMS) params.delete(key)
     const query = params.toString()
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
-  }, [createdCode, updatedCode, onFeedback, pathname, router, searchParams, t])
+  }, [
+    createdCode,
+    updatedCode,
+    photoRemovedCode,
+    onFeedback,
+    pathname,
+    router,
+    searchParams,
+    t,
+  ])
 }

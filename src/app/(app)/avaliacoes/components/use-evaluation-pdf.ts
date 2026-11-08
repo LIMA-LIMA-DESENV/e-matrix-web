@@ -53,7 +53,7 @@ export function useEvaluationPdf(
       }
 
       const detail = response ? response.data : null
-      const blob = builder.build(detail)
+      const blob = await builder.build(detail)
 
       saveBlobAsFile(
         blob,
