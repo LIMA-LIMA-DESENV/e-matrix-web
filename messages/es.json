@@ -1279,6 +1279,7 @@
       "ergonomic_analysis_in_loco": "Recopilación de Datos In Loco — Producción",
       "risk_factor": "Identificación de Riesgos",
       "ergonomic_work_analysis_advanced": "Análisis Ergonómico del Trabajo – Producción",
+      "priority_criterion": "Criterio de Prioridad",
       "hit_list": "Hit List",
       "checklist": "Recopilación de Datos In Loco — Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
@@ -1287,6 +1288,7 @@
       "ergonomic_analysis_in_loco": "Recopilación de Datos In Loco — Producción",
       "risk_factor": "Identificación de Riesgos",
       "ergonomic_work_analysis_advanced": "Análisis Ergonómico del Trabajo – Producción",
+      "priority_criterion": "Criterio de Prioridad",
       "hit_list": "Hit List",
       "checklist": "Recopilación de Datos In Loco — Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
@@ -1572,11 +1574,28 @@
         "complementaryData": "DATOS COMPLEMENTARIOS",
         "resultsAndConclusions": "RESULTADOS Y CONCLUSIONES",
         "recomendations": "RECOMENDACIONES"
+      },
+      "priorityCriterion": {
+        "title": "Criterio de Prioridad",
+        "fields": {
+          "date": "Fecha",
+          "sector": "Sector",
+          "numberOfEmployees": "N.º de empleados",
+          "activity": "Actividad",
+          "area": "Área",
+          "fabric": "Fábrica"
+        },
+        "sum": "Suma",
+        "category": "Categoría",
+        "actions": "Acciones",
+        "valuer": "Evaluador",
+        "signature": "Firma"
       }
     },
     "newErgonomicAnalysisInLoco": "Nueva Recopilación de Datos — Producción",
     "newRiskFactor": "Nueva Identificación de Riesgos",
     "newErgonomicWorkAnalysisAdvanced": "Nuevo Análisis Ergonómico del Trabajo – Producción",
+    "newPriorityCriterion": "Nuevo Criterio de Prioridad",
     "newHitList": "Nueva Hit List",
     "newChecklist": "Nueva Recopilación de Datos — Oficina",
     "newChangeAssessment": "Nueva Evaluación de Cambios",
@@ -1617,7 +1636,9 @@
       "valuerRequired": "Ingrese el evaluador.",
       "notesRequired": "Ingrese las observaciones.",
       "riskFactorTotalInvalid": "Ingrese un número mayor o igual a cero.",
-      "tooManyRows": "La tabla debe tener como máximo {max} filas."
+      "tooManyRows": "La tabla debe tener como máximo {max} filas.",
+      "choiceRequired": "Elija una opción.",
+      "nonNegativeIntegerInvalid": "Ingrese un número entero mayor o igual a cero."
     },
     "hitListForm": {
       "sections": {
@@ -1792,6 +1813,62 @@
             "result": "Resultado"
           }
         }
+      }
+    },
+    "priorityCriterionForm": {
+      "newDescription": "{type}: elija la actividad, complete la identificación, responda las 5 preguntas sobre el riesgo ergonómico y, si lo desea, describa las soluciones de cada categoría.",
+      "editDescription": "{type}: modifique los campos y las respuestas de la evaluación, incluida la actividad. Una solución vaciada queda sin respuesta.",
+      "sections": {
+        "identification": "Identificación",
+        "risk": "Evaluación del riesgo ergonómico"
+      },
+      "numberOfEmployeesHint": "Un número entero mayor o igual a cero, solo con dígitos.",
+      "riskDescription": "Elija una opción en cada pregunta; todas son obligatorias. El número entre paréntesis es la puntuación de la opción.",
+      "sum": "Suma",
+      "partialSum": "Suma parcial",
+      "priority": "Prioridad",
+      "missing": "Responda las 5 preguntas para ver la prioridad ({count, plural, one {falta #} other {faltan #}}).",
+      "categoriesDescription": "Opcionales. Describa las soluciones de cada categoría."
+    },
+    "priorityCriterionQuestions": {
+      "questions": {
+        "question1": "Evaluación del riesgo ergonómico",
+        "question2": "¿Hay quejas de dolores musculares o fatiga excesiva entre los trabajadores en esa tarea?",
+        "question3": "¿Hay datos históricos de preocupaciones ergonómicas?",
+        "question4": "¿Hay quejas médicas comprobadas?",
+        "question5": "¿Hay casos de bajas laborales o restricciones de trabajo?"
+      },
+      "options": {
+        "noRisk": "Ausencia de riesgo",
+        "hazard": "Peligro",
+        "risk": "Riesgo",
+        "highRisk": "Alto riesgo",
+        "no": "no",
+        "yes": "sí",
+        "some": "alguna",
+        "frequent": "frecuente"
+      },
+      "levels": {
+        "low": {
+          "priority": "Baja prioridad",
+          "action": "Ninguna acción"
+        },
+        "medium": {
+          "priority": "Media",
+          "action": "Acompañar"
+        },
+        "high": {
+          "priority": "Alta",
+          "action": "Actuación inmediata"
+        }
+      },
+      "categoriesTitle": "Categorías de prioridades",
+      "categories": {
+        "solution1": "Soluciones sencillas",
+        "solution2": "Soluciones de alto costo",
+        "solution3": "Soluciones que requieren más estudios",
+        "solution4": "Soluciones administrativas",
+        "solution5": "Soluciones de organización del trabajo"
       }
     },
     "delete": {
@@ -2051,6 +2128,19 @@
     "ergonomicWorkAnalysisAdvancedActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
     "ergonomicWorkAnalysisAdvancedDateInvalid": "Ingrese una fecha válida para el Análisis Ergonómico del Trabajo – Producción.",
     "ergonomicWorkAnalysisAdvancedAnswersInvalid": "Algunos campos o filas del Análisis Ergonómico del Trabajo – Producción no son válidos. Revise los textos (hasta 5.000 caracteres) y las tablas (hasta 30 filas) e intente nuevamente.",
+    "priorityCriterionNotFound": "Criterio de Prioridad no encontrado.",
+    "priorityCriterionActivityRequired": "Seleccione la actividad del Criterio de Prioridad.",
+    "priorityCriterionActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "priorityCriterionDateInvalid": "Ingrese una fecha válida para el Criterio de Prioridad.",
+    "priorityCriterionSectorRequired": "Ingrese el sector del Criterio de Prioridad.",
+    "priorityCriterionSectorTooLong": "El sector del Criterio de Prioridad debe tener como máximo 255 caracteres.",
+    "priorityCriterionNumberOfEmployeesRequired": "Ingrese el número de empleados.",
+    "priorityCriterionNumberOfEmployeesInvalid": "El número de empleados debe ser un número entero mayor o igual a cero.",
+    "priorityCriterionResponsibleRequired": "Ingrese el evaluador del Criterio de Prioridad.",
+    "priorityCriterionResponsibleTooLong": "El evaluador del Criterio de Prioridad debe tener como máximo 255 caracteres.",
+    "priorityCriterionQuestionAnswerRequired": "Responda todas las preguntas de la evaluación del riesgo ergonómico.",
+    "priorityCriterionQuestionAnswerInvalid": "Una de las respuestas de la evaluación del riesgo ergonómico no es válida. Elija una de las opciones de cada pregunta.",
+    "priorityCriterionAnswersInvalid": "Algunas soluciones del Criterio de Prioridad no son válidas. Revise los textos (hasta 5.000 caracteres) e intente nuevamente.",
     "evaluationPhotoRequired": "Elija una foto para enviar.",
     "evaluationPhotoTypeNotAllowed": "Tipo de foto no aceptado. Envíe una imagen JPG o PNG.",
     "evaluationPhotoEmpty": "La foto enviada está vacía.",

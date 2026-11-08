@@ -170,6 +170,79 @@ export function ThreeStateAnswer({
   )
 }
 
+/**
+ * A required single choice among scored options (CP FR-018): a radio group
+ * labelled by its question (NFR-008), so the arrow keys move the choice, with
+ * each option shown as "( n ) label", n its points, as in the legacy. There
+ * is no "no answer" option: a new record starts with none checked, and once
+ * an option is chosen only another can replace it. The value of an option is
+ * its points as a string; `''` is no choice yet.
+ */
+export function ChoiceAnswer({
+  id,
+  legend,
+  registration,
+  options,
+  error,
+}: {
+  id: string
+  legend: ReactNode
+  registration: UseFormRegisterReturn
+  options: readonly { points: number; label: string }[]
+  error?: string
+}) {
+  const legendId = `${id}-legend`
+  const errorId = `${id}-error`
+
+  return (
+    <div className="space-y-2">
+      <p
+        id={legendId}
+        className="ml-1 text-sm font-semibold text-on-surface-variant"
+      >
+        {legend}
+      </p>
+      <div
+        role="radiogroup"
+        aria-labelledby={legendId}
+        aria-describedby={error ? errorId : undefined}
+        aria-invalid={error ? true : undefined}
+        aria-required
+        className="flex flex-wrap gap-x-6 gap-y-2 pt-1"
+      >
+        {options.map((option) => {
+          const optionId = `${id}-${option.points}`
+
+          return (
+            <label
+              key={option.points}
+              htmlFor={optionId}
+              className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-on-surface"
+            >
+              <input
+                id={optionId}
+                type="radio"
+                value={String(option.points)}
+                className="h-4 w-4 accent-primary"
+                {...registration}
+              />
+              <span>
+                <span className="tabular-nums">( {option.points} )</span>{' '}
+                {option.label}
+              </span>
+            </label>
+          )
+        })}
+      </div>
+      {error && (
+        <p id={errorId} className="ml-1 text-xs font-medium text-error">
+          {error}
+        </p>
+      )}
+    </div>
+  )
+}
+
 /** One section of the form, in the order of the report (R-2). */
 export function Section({
   title,

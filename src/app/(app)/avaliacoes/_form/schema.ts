@@ -14,6 +14,9 @@ import type {
   HitList,
   HitListAnswersInput,
   HitListInput,
+  PriorityCriterion,
+  PriorityCriterionInput,
+  PriorityCriterionInputAnswers,
   RiskFactor,
   RiskFactorInput,
   RiskFactorInputAnswers,
@@ -41,6 +44,12 @@ import {
   MAX_EVALUATION_ROWS,
 } from '../components/ergonomic-work-analysis-advanced-fields'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
+import {
+  PRIORITY_CRITERION_CATEGORIES,
+  PRIORITY_CRITERION_QUESTIONS,
+  type PriorityCriterionQuestionField,
+  type PriorityCriterionSolutionKey,
+} from '../components/priority-criterion-questions'
 import {
   RISK_FACTOR_KEYS,
   type RiskFactorKey,
@@ -1006,5 +1015,191 @@ export function toErgonomicWorkAnalysisAdvancedInput(
         data.answers.analyzedActivities
       ),
     },
+  }
+}
+
+/**
+ * The longest sector and valuer of a Critério de Prioridade, in code points
+ * after the trim: the `varchar(255)` of the columns (FR-006).
+ */
+export const MAX_PRIORITY_CRITERION_TEXT_LENGTH = 255
+
+/** The largest number of employees: the limit of the `integer` column (H-4). */
+export const MAX_PRIORITY_CRITERION_NUMBER_OF_EMPLOYEES = 2147483647
+
+/** `solution1` to `solution5`, in the order of the categories. */
+const PRIORITY_CRITERION_SOLUTION_KEYS: readonly PriorityCriterionSolutionKey[] =
+  PRIORITY_CRITERION_CATEGORIES.map(({ answer }) => answer)
+
+/** Only digits: no sign, no separator, no decimal ("2,5", "-1", "abc"). */
+const DIGITS_ONLY = /^\d+$/
+
+/**
+ * Mirrors the API rules of a Critério de Prioridade write (FR-006, FR-019):
+ * the activity chosen among the listed ones, a real date, not compared with
+ * the periods, the sector and the valuer not blank after the trim and of at
+ * most 255 code points, the number of employees typed with digits only, an
+ * integer from 0 to 2147483647, each of the 5 questions answered with one of
+ * its own points (R-9), and each solution optional, of at most 5,000 code
+ * points. The answers stay as their radio groups hold them (the points as a
+ * string) and the number as typed: `toPriorityCriterionInput` turns them into
+ * numbers. Area and fabric are shown by the view only: kept as they come,
+ * never sent. The API stays the authority, including whether the activity
+ * still exists.
+ */
+export function makePriorityCriterionSchema(tv: Translate) {
+  const requiredText = (requiredMessage: string) =>
+    z
+      .string()
+      .refine((value) => value.trim().length > 0, { message: requiredMessage })
+      .refine(
+        (value) => answerLength(value) <= MAX_PRIORITY_CRITERION_TEXT_LENGTH,
+        {
+          message: tv('textTooLong', {
+            max: MAX_PRIORITY_CRITERION_TEXT_LENGTH,
+          }),
+        }
+      )
+
+  const solution = z
+    .string()
+    .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+      message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+    })
+
+  const questions = Object.fromEntries(
+    PRIORITY_CRITERION_QUESTIONS.map((question) => [
+      question.field,
+      z
+        .string()
+        .refine(
+          (value) =>
+            question.options.some(({ points }) => String(points) === value),
+          { message: tv('choiceRequired') }
+        ),
+    ])
+  ) as Record<PriorityCriterionQuestionField, z.ZodString>
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    assessment_date: z
+      .string()
+      .refine(isCalendarDay, tv('assessmentDateRequired')),
+    sector: requiredText(tv('sectorRequired')),
+    number_of_employees: z.string().refine(
+      (value) => {
+        const trimmed = value.trim()
+        return (
+          DIGITS_ONLY.test(trimmed) &&
+          Number(trimmed) <= MAX_PRIORITY_CRITERION_NUMBER_OF_EMPLOYEES
+        )
+      },
+      { message: tv('nonNegativeIntegerInvalid') }
+    ),
+    responsible: requiredText(tv('valuerRequired')),
+    location: z.object({ area: z.string(), fabric: z.string() }),
+    ...questions,
+    answers: z.object(
+      shapeOf(PRIORITY_CRITERION_SOLUTION_KEYS, solution) as Record<
+        PriorityCriterionSolutionKey,
+        typeof solution
+      >
+    ),
+  })
+}
+
+export type PriorityCriterionFormData = z.output<
+  ReturnType<typeof makePriorityCriterionSchema>
+>
+
+/**
+ * An empty Critério de Prioridade: no field, no question answered (a new
+ * record starts with no option chosen) and no solution.
+ */
+export function priorityCriterionFormDefaultValues(): PriorityCriterionFormData {
+  return {
+    activity_id: '',
+    assessment_date: '',
+    sector: '',
+    number_of_employees: '',
+    responsible: '',
+    location: { area: '', fabric: '' },
+    question1: '',
+    question2: '',
+    question3: '',
+    question4: '',
+    question5: '',
+    answers: shapeOf(PRIORITY_CRITERION_SOLUTION_KEYS, '') as Record<
+      PriorityCriterionSolutionKey,
+      string
+    >,
+  }
+}
+
+/**
+ * A stored Critério de Prioridade as the form holds it, with the current area
+ * and fabric of its activity for the view (R-6): each question's points as
+ * the value of its radio, the number of employees as digits, and an absent
+ * solution (`null`) as a blank text area.
+ */
+export function toPriorityCriterionFormValues(
+  record: PriorityCriterion
+): PriorityCriterionFormData {
+  return {
+    activity_id: record.activity.id,
+    assessment_date: record.assessment_date,
+    sector: record.sector,
+    number_of_employees: String(record.number_of_employees),
+    responsible: record.responsible,
+    location: { area: record.activity.area, fabric: record.activity.fabric },
+    question1: String(record.question1),
+    question2: String(record.question2),
+    question3: String(record.question3),
+    question4: String(record.question4),
+    question5: String(record.question5),
+    answers: Object.fromEntries(
+      PRIORITY_CRITERION_SOLUTION_KEYS.map((key) => [
+        key,
+        record.answers[key] ?? '',
+      ])
+    ) as Record<PriorityCriterionSolutionKey, string>,
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/priority-criteria` (FR-011, FR-019):
+ * the date as typed, the sector and the valuer trimmed, the number of
+ * employees and each question's points as numbers, and the 5 solutions
+ * trimmed, keeping their inner line breaks; a blank one goes as `null`, which
+ * the API stores as absent, so the `PUT` clears a solution that was emptied.
+ * Area and fabric are never sent.
+ */
+export function toPriorityCriterionInput(
+  data: PriorityCriterionFormData
+): PriorityCriterionInput {
+  const answers = Object.fromEntries(
+    PRIORITY_CRITERION_SOLUTION_KEYS.map(
+      (key): [PriorityCriterionSolutionKey, string | null] => [
+        key,
+        data.answers[key]?.trim() || null,
+      ]
+    )
+  ) as PriorityCriterionInputAnswers
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    assessment_date: data.assessment_date,
+    sector: data.sector.trim(),
+    number_of_employees: Number(data.number_of_employees.trim()),
+    responsible: data.responsible.trim(),
+    // Only a valid form is sent: each value is one of the question's points,
+    // the `enum` of the contract (RK-1).
+    question1: Number(data.question1) as PriorityCriterionInput['question1'],
+    question2: Number(data.question2) as PriorityCriterionInput['question2'],
+    question3: Number(data.question3) as PriorityCriterionInput['question3'],
+    question4: Number(data.question4) as PriorityCriterionInput['question4'],
+    question5: Number(data.question5) as PriorityCriterionInput['question5'],
+    answers,
   }
 }

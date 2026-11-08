@@ -265,6 +265,26 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
     'ergonomicWorkAnalysisAdvancedDateInvalid',
   'Invalid production ergonomic work analysis answers.':
     'ergonomicWorkAnalysisAdvancedAnswersInvalid',
+  'Priority criterion not found.': 'priorityCriterionNotFound',
+  'Priority criterion activity is required.':
+    'priorityCriterionActivityRequired',
+  'Priority criterion activity not found.': 'priorityCriterionActivityNotFound',
+  'Invalid priority criterion date.': 'priorityCriterionDateInvalid',
+  'Priority criterion sector is required.': 'priorityCriterionSectorRequired',
+  'Priority criterion sector is too long.': 'priorityCriterionSectorTooLong',
+  'Priority criterion number of employees is required.':
+    'priorityCriterionNumberOfEmployeesRequired',
+  'Invalid priority criterion number of employees.':
+    'priorityCriterionNumberOfEmployeesInvalid',
+  'Priority criterion responsible is required.':
+    'priorityCriterionResponsibleRequired',
+  'Priority criterion responsible is too long.':
+    'priorityCriterionResponsibleTooLong',
+  'Priority criterion question answer is required.':
+    'priorityCriterionQuestionAnswerRequired',
+  'Invalid priority criterion question answer.':
+    'priorityCriterionQuestionAnswerInvalid',
+  'Invalid priority criterion answers.': 'priorityCriterionAnswersInvalid',
   // The photo of any evaluation type that has one (D-3).
   'Evaluation photo is required.': 'evaluationPhotoRequired',
   'Evaluation photo type not allowed.': 'evaluationPhotoTypeNotAllowed',

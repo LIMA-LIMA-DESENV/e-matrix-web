@@ -5,6 +5,7 @@ import { checklistDefinition } from './checklist'
 import { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
 import { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 import { hitListDefinition } from './hit-list'
+import { priorityCriterionDefinition } from './priority-criterion'
 import { riskFactorDefinition } from './risk-factor'
 import type { EvaluationWebDefinition } from './types'
 
@@ -13,6 +14,7 @@ export { checklistDefinition } from './checklist'
 export { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
 export { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 export { hitListDefinition } from './hit-list'
+export { priorityCriterionDefinition } from './priority-criterion'
 export { riskFactorDefinition } from './risk-factor'
 export type { EvaluationWebDefinition } from './types'
 
@@ -24,6 +26,7 @@ const EVALUATION_WEB_DEFINITIONS = {
   ergonomic_analysis_in_loco: ergonomicAnalysisInLocoDefinition,
   risk_factor: riskFactorDefinition,
   ergonomic_work_analysis_advanced: ergonomicWorkAnalysisAdvancedDefinition,
+  priority_criterion: priorityCriterionDefinition,
   hit_list: hitListDefinition,
   checklist: checklistDefinition,
   change_assessment: changeAssessmentDefinition,
