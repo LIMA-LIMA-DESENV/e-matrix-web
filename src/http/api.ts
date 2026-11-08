@@ -419,6 +419,7 @@ export const EvaluationTypeItemType = {
   priority_criterion: 'priority_criterion',
   hit_list: 'hit_list',
   checklist: 'checklist',
+  ergonomic_work_analysis: 'ergonomic_work_analysis',
   change_assessment: 'change_assessment',
 } as const;
 
@@ -435,6 +436,7 @@ export const EvaluationTypeItemCode = {
   CP: 'CP',
   HL: 'HL',
   CDIA: 'CDIA',
+  AETA: 'AETA',
   AMP: 'AMP',
 } as const;
 
@@ -4090,6 +4092,211 @@ export interface PriorityCriterionInput {
   answers?: PriorityCriterionInputAnswers;
 }
 
+/**
+ * An item of the AETA listing (the Análise Ergonômica do Trabalho – Escritório, the Escritório tab of the legacy evaluations). The activity is the one shown for projects: as it is now, without area nor fabric. The answers and the photo are only in the detail.
+ */
+export interface ErgonomicWorkAnalysisItem {
+  id: string;
+  /**
+     * Sequential number of the AETAs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AETA-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The 11 answers of an AETA, in the order of the legacy report, with the legacy keys: six plain texts and the five measures of the physical environment. Every key is answered, null when absent. The reference values are text of the web, never of the API.
+ */
+export interface ErgonomicWorkAnalysisAnswers {
+  /**
+     * 'Configurações básicas do posto administrativo': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  basicConfigurationsStation: string | null;
+  /**
+     * 'Postura de trabalho': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  workPosture: string | null;
+  /**
+     * 'Fatores biomecânicos': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  biomechanicalFactors: string | null;
+  /**
+     * 'Setor' ('Tabela de Análise Ergonômica Avançada'): plain text, trimmed, at most 255 characters (code points); a line break is not refused here, the single line is the web field's; null when absent
+     * @maxLength 255
+     * @nullable
+     */
+  sector: string | null;
+  /**
+     * 'Classificação global do posto de trabalho': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  globalClassificationWorkStation: string | null;
+  /**
+     * 'Alteração necessária': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  changeNeeded: string | null;
+  /**
+     * 'Luminosidade (lux)' ('Tabela de Análise do Ambiente Físico'): an integer at least zero; the reference *(500) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 2147483647
+     * @nullable
+     */
+  luminosity: number | null;
+  /**
+     * 'Ruído (dB)': an integer at least zero; the reference *(<65) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 2147483647
+     * @nullable
+     */
+  noise: number | null;
+  /**
+     * 'Velocidade do ar (m/s)': a number at least zero, decimals allowed; the reference *(<0,75) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @nullable
+     */
+  airSpeed: number | null;
+  /**
+     * 'Temperatura efetiva (°C)': any finite number, negatives and decimals allowed; the reference *(20-23) is only shown by the web, never checked; null when absent
+     * @nullable
+     */
+  effectiveTemperature: number | null;
+  /**
+     * 'Umidade do ar (%)': a number from 0 to 100, inclusive, decimals allowed; the reference *(>40) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  airHumidity: number | null;
+}
+
+/**
+ * An AETA with its 11 answers and its photo, right after the answers.
+ */
+export interface ErgonomicWorkAnalysis {
+  id: string;
+  /**
+     * Sequential number of the AETAs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AETA-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  date: string;
+  created_at: string;
+  updated_at: string;
+  answers: ErgonomicWorkAnalysisAnswers;
+  /** The photo ('Imagem do posto'), or null when there is none. Its file is downloaded from GET /evaluations/ergonomic-work-analyses/{id}/photo */
+  photo: EvaluationPhoto | null;
+}
+
+/**
+ * Absent or null is the same as {}: no answer at all. Each text is a string or null, trimmed, empty or null stored as absent, at most 255 characters (code points) for the sector and 5000 for the others. Each measure is a JSON number or null, null stored as absent, with the range of its key, and is stored as it came. A key outside the 11 of the catalog or a value of the wrong kind is refused
+ * @nullable
+ */
+export type ErgonomicWorkAnalysisInputAnswers = {
+  /**
+     * 'Configurações básicas do posto administrativo': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  basicConfigurationsStation?: string | null;
+  /**
+     * 'Postura de trabalho': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  workPosture?: string | null;
+  /**
+     * 'Fatores biomecânicos': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  biomechanicalFactors?: string | null;
+  /**
+     * 'Setor' ('Tabela de Análise Ergonômica Avançada'): plain text, trimmed, at most 255 characters (code points); a line break is not refused here, the single line is the web field's; null when absent
+     * @maxLength 255
+     * @nullable
+     */
+  sector?: string | null;
+  /**
+     * 'Classificação global do posto de trabalho': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  globalClassificationWorkStation?: string | null;
+  /**
+     * 'Alteração necessária': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  changeNeeded?: string | null;
+  /**
+     * 'Luminosidade (lux)' ('Tabela de Análise do Ambiente Físico'): an integer at least zero; the reference *(500) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 2147483647
+     * @nullable
+     */
+  luminosity?: number | null;
+  /**
+     * 'Ruído (dB)': an integer at least zero; the reference *(<65) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 2147483647
+     * @nullable
+     */
+  noise?: number | null;
+  /**
+     * 'Velocidade do ar (m/s)': a number at least zero, decimals allowed; the reference *(<0,75) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @nullable
+     */
+  airSpeed?: number | null;
+  /**
+     * 'Temperatura efetiva (°C)': any finite number, negatives and decimals allowed; the reference *(20-23) is only shown by the web, never checked; null when absent
+     * @nullable
+     */
+  effectiveTemperature?: number | null;
+  /**
+     * 'Umidade do ar (%)': a number from 0 to 100, inclusive, decimals allowed; the reference *(>40) is only shown by the web, never checked; null when absent
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  airHumidity?: number | null;
+} | null;
+
+/**
+ * The fields of an AETA creation or update, as JSON. Any other top-level field (id, number, code, photo, photo_key, photo_name, created_at, created_by...) is ignored; the number comes from the sequence, the authorship from the token, and the photo has routes of its own.
+ */
+export interface ErgonomicWorkAnalysisInput {
+  /** An existing activity (see GET /evaluations/ergonomic-work-analyses/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  date: string;
+  /**
+     * Absent or null is the same as {}: no answer at all. Each text is a string or null, trimmed, empty or null stored as absent, at most 255 characters (code points) for the sector and 5000 for the others. Each measure is a JSON number or null, null stored as absent, with the range of its key, and is stored as it came. A key outside the 11 of the catalog or a value of the wrong kind is refused
+     * @nullable
+     */
+  answers?: ErgonomicWorkAnalysisInputAnswers;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -4170,6 +4377,11 @@ period_id?: string;
 };
 
 export type PutEvaluationsErgonomicWorkAnalysesAdvancedIdPhotoBody = {
+  /** The photo: .jpg, .jpeg or .png, at most 10 MB */
+  photo: Blob | File;
+};
+
+export type PutEvaluationsErgonomicWorkAnalysesIdPhotoBody = {
   /** The photo: .jpg, .jpeg or .png, at most 10 MB */
   photo: Blob | File;
 };
@@ -19174,4 +19386,1100 @@ export const useDeleteEvaluationsPriorityCriteriaId = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getDeleteEvaluationsPriorityCriteriaIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsErgonomicWorkAnalysesResponse200 = {
+  data: ErgonomicWorkAnalysisItem[]
+  status: 200
+}
+
+export type getEvaluationsErgonomicWorkAnalysesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicWorkAnalysesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicWorkAnalysesResponseSuccess = (getEvaluationsErgonomicWorkAnalysesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicWorkAnalysesResponseError = (getEvaluationsErgonomicWorkAnalysesResponse401 | getEvaluationsErgonomicWorkAnalysesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicWorkAnalysesResponse = (getEvaluationsErgonomicWorkAnalysesResponseSuccess | getEvaluationsErgonomicWorkAnalysesResponseError)
+
+export const getGetEvaluationsErgonomicWorkAnalysesUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses`
+}
+
+/**
+ * Every AETA of the installation (the Análise Ergonômica do Trabalho – Escritório of the Escritório tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The answers and the photo are only in the detail, and the listing never reads the storage. Requires only an authenticated user, so any role, and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary List office ergonomic work analyses (AETA)
+ */
+export const getEvaluationsErgonomicWorkAnalyses = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicWorkAnalysesResponse> => {
+
+  return customFetch<getEvaluationsErgonomicWorkAnalysesResponse>(getGetEvaluationsErgonomicWorkAnalysesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesQueryKey = () => {
+    return [
+    `/evaluations/ergonomic-work-analyses`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicWorkAnalysesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>> = ({ signal }) => getEvaluationsErgonomicWorkAnalyses({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicWorkAnalysesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>>
+export type GetEvaluationsErgonomicWorkAnalysesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicWorkAnalyses<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalyses<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalyses<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List office ergonomic work analyses (AETA)
+ */
+
+export function useGetEvaluationsErgonomicWorkAnalyses<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalyses>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicWorkAnalysesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsErgonomicWorkAnalysesResponse201 = {
+  data: ErgonomicWorkAnalysis
+  status: 201
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postEvaluationsErgonomicWorkAnalysesResponseSuccess = (postEvaluationsErgonomicWorkAnalysesResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsErgonomicWorkAnalysesResponseError = (postEvaluationsErgonomicWorkAnalysesResponse400 | postEvaluationsErgonomicWorkAnalysesResponse401 | postEvaluationsErgonomicWorkAnalysesResponse403 | postEvaluationsErgonomicWorkAnalysesResponse404 | postEvaluationsErgonomicWorkAnalysesResponse413) & {
+  headers: Headers;
+};
+
+export type postEvaluationsErgonomicWorkAnalysesResponse = (postEvaluationsErgonomicWorkAnalysesResponseSuccess | postEvaluationsErgonomicWorkAnalysesResponseError)
+
+export const getPostEvaluationsErgonomicWorkAnalysesUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses`
+}
+
+/**
+ * Creates an AETA from a JSON body, always without a photo: the photo is sent afterwards to PUT /evaluations/ergonomic-work-analyses/{id}/photo. The number is the next one of the AETA sequence, taken inside the INSERT, and is never handed out again, not even after the AETA is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new AETA (409 there) or finished first (400 here), never a foreign key violation. The texts are trimmed, an empty text or a null is stored as absent, and the measures are stored as they came. Answers the same body as GET /evaluations/ergonomic-work-analyses/{id}, with photo null. Not idempotent: sending it again creates another AETA. Requires the user or admin role and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Create office ergonomic work analysis (AETA)
+ */
+export const postEvaluationsErgonomicWorkAnalyses = async (ergonomicWorkAnalysisInput: ErgonomicWorkAnalysisInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsErgonomicWorkAnalysesResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsErgonomicWorkAnalysesResponse>(getPostEvaluationsErgonomicWorkAnalysesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(ergonomicWorkAnalysisInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsErgonomicWorkAnalysesMutationKey = () => ['postEvaluationsErgonomicWorkAnalyses'] as const;
+
+export const getPostEvaluationsErgonomicWorkAnalysesMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>, TError,PostEvaluationsErgonomicWorkAnalysesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>, TError,PostEvaluationsErgonomicWorkAnalysesMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsErgonomicWorkAnalysesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>, PostEvaluationsErgonomicWorkAnalysesMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsErgonomicWorkAnalyses(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsErgonomicWorkAnalysesMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>>
+    export type PostEvaluationsErgonomicWorkAnalysesMutationBody = ErgonomicWorkAnalysisInput
+    export type PostEvaluationsErgonomicWorkAnalysesMutationError = ErrorResponse
+    export type PostEvaluationsErgonomicWorkAnalysesMutationVariables = {data: ErgonomicWorkAnalysisInput}
+
+    /**
+ * @summary Create office ergonomic work analysis (AETA)
+ */
+export const usePostEvaluationsErgonomicWorkAnalyses = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>, TError,PostEvaluationsErgonomicWorkAnalysesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsErgonomicWorkAnalyses>>,
+        TError,
+        PostEvaluationsErgonomicWorkAnalysesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsErgonomicWorkAnalysesMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponseSuccess = (getEvaluationsErgonomicWorkAnalysesActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponseError = (getEvaluationsErgonomicWorkAnalysesActivitiesResponse401 | getEvaluationsErgonomicWorkAnalysesActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicWorkAnalysesActivitiesResponse = (getEvaluationsErgonomicWorkAnalysesActivitiesResponseSuccess | getEvaluationsErgonomicWorkAnalysesActivitiesResponseError)
+
+export const getGetEvaluationsErgonomicWorkAnalysesActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the AETA form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary List the activities an AETA can belong to
+ */
+export const getEvaluationsErgonomicWorkAnalysesActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicWorkAnalysesActivitiesResponse> => {
+
+  return customFetch<getEvaluationsErgonomicWorkAnalysesActivitiesResponse>(getGetEvaluationsErgonomicWorkAnalysesActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesActivitiesQueryKey = () => {
+    return [
+    `/evaluations/ergonomic-work-analyses/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicWorkAnalysesActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>> = ({ signal }) => getEvaluationsErgonomicWorkAnalysesActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicWorkAnalysesActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>>
+export type GetEvaluationsErgonomicWorkAnalysesActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicWorkAnalysesActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities an AETA can belong to
+ */
+
+export function useGetEvaluationsErgonomicWorkAnalysesActivities<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicWorkAnalysesActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsErgonomicWorkAnalysesIdResponse200 = {
+  data: ErgonomicWorkAnalysis
+  status: 200
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdResponseSuccess = (getEvaluationsErgonomicWorkAnalysesIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicWorkAnalysesIdResponseError = (getEvaluationsErgonomicWorkAnalysesIdResponse401 | getEvaluationsErgonomicWorkAnalysesIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicWorkAnalysesIdResponse = (getEvaluationsErgonomicWorkAnalysesIdResponseSuccess | getEvaluationsErgonomicWorkAnalysesIdResponseError)
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}`
+}
+
+/**
+ * One AETA: the item of the listing plus its 11 answers and its photo. Every key of the catalog is answered, null when absent or stored with a value of the wrong kind (a stored negative measure reads as null, except effectiveTemperature); a stored key outside the catalog is never answered. The decimals of the measures come back exactly as stored. The photo answers its original name and MIME type, never its storage key, and the detail never reads the storage. Requires only an authenticated user, so any role, and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Get office ergonomic work analysis (AETA)
+ */
+export const getEvaluationsErgonomicWorkAnalysesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicWorkAnalysesIdResponse> => {
+
+  return customFetch<getEvaluationsErgonomicWorkAnalysesIdResponse>(getGetEvaluationsErgonomicWorkAnalysesIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/ergonomic-work-analyses/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicWorkAnalysesIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>> = ({ signal }) => getEvaluationsErgonomicWorkAnalysesId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicWorkAnalysesIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>>
+export type GetEvaluationsErgonomicWorkAnalysesIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicWorkAnalysesId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get office ergonomic work analysis (AETA)
+ */
+
+export function useGetEvaluationsErgonomicWorkAnalysesId<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicWorkAnalysesIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse200 = {
+  data: ErgonomicWorkAnalysis
+  status: 200
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponseSuccess = (putEvaluationsErgonomicWorkAnalysesIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsErgonomicWorkAnalysesIdResponseError = (putEvaluationsErgonomicWorkAnalysesIdResponse400 | putEvaluationsErgonomicWorkAnalysesIdResponse401 | putEvaluationsErgonomicWorkAnalysesIdResponse403 | putEvaluationsErgonomicWorkAnalysesIdResponse404 | putEvaluationsErgonomicWorkAnalysesIdResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsErgonomicWorkAnalysesIdResponse = (putEvaluationsErgonomicWorkAnalysesIdResponseSuccess | putEvaluationsErgonomicWorkAnalysesIdResponseError)
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}`
+}
+
+/**
+ * Replaces the activity, the date and every answer of an AETA with the JSON body: the activity may change, and an answer left out of answers goes back to null (absent answers empties them all). The photo never changes here, whatever the body carries (photo, photo_key or photo_name are ignored): it has routes of its own. number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the AETA will point at is locked (shared) and then the AETA's row (for update), so two updates serialize and the last one wins, and an update never undoes a concurrent photo upload. Answers the same body as GET /evaluations/ergonomic-work-analyses/{id}. Requires the user or admin role and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Update office ergonomic work analysis (AETA)
+ */
+export const putEvaluationsErgonomicWorkAnalysesId = async (id: string,
+    ergonomicWorkAnalysisInput: ErgonomicWorkAnalysisInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsErgonomicWorkAnalysesIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsErgonomicWorkAnalysesIdResponse>(getPutEvaluationsErgonomicWorkAnalysesIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(ergonomicWorkAnalysisInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdMutationKey = () => ['putEvaluationsErgonomicWorkAnalysesId'] as const;
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>, TError,PutEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>, TError,PutEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsErgonomicWorkAnalysesIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>, PutEvaluationsErgonomicWorkAnalysesIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsErgonomicWorkAnalysesId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsErgonomicWorkAnalysesIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>>
+    export type PutEvaluationsErgonomicWorkAnalysesIdMutationBody = ErgonomicWorkAnalysisInput
+    export type PutEvaluationsErgonomicWorkAnalysesIdMutationError = ErrorResponse
+    export type PutEvaluationsErgonomicWorkAnalysesIdMutationVariables = {id: string;data: ErgonomicWorkAnalysisInput}
+
+    /**
+ * @summary Update office ergonomic work analysis (AETA)
+ */
+export const usePutEvaluationsErgonomicWorkAnalysesId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>, TError,PutEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesId>>,
+        TError,
+        PutEvaluationsErgonomicWorkAnalysesIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsErgonomicWorkAnalysesIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponseSuccess = (deleteEvaluationsErgonomicWorkAnalysesIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponseError = (deleteEvaluationsErgonomicWorkAnalysesIdResponse401 | deleteEvaluationsErgonomicWorkAnalysesIdResponse403 | deleteEvaluationsErgonomicWorkAnalysesIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdResponse = (deleteEvaluationsErgonomicWorkAnalysesIdResponseSuccess | deleteEvaluationsErgonomicWorkAnalysesIdResponseError)
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}`
+}
+
+/**
+ * Deletes an AETA permanently; there is no soft delete. Its photo is removed from the storage after the commit; a failure to remove it is logged with its key and the deletion still answers 204. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same AETA again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Delete office ergonomic work analysis (AETA)
+ */
+export const deleteEvaluationsErgonomicWorkAnalysesId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsErgonomicWorkAnalysesIdResponse> => {
+
+  return customFetch<deleteEvaluationsErgonomicWorkAnalysesIdResponse>(getDeleteEvaluationsErgonomicWorkAnalysesIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdMutationKey = () => ['deleteEvaluationsErgonomicWorkAnalysesId'] as const;
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsErgonomicWorkAnalysesIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>, DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsErgonomicWorkAnalysesId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>>
+
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdMutationError = ErrorResponse
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete office ergonomic work analysis (AETA)
+ */
+export const useDeleteEvaluationsErgonomicWorkAnalysesId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesId>>,
+        TError,
+        DeleteEvaluationsErgonomicWorkAnalysesIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsErgonomicWorkAnalysesIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse200ImageJpeg = {
+  data: Blob
+  status: 200
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse200ImagePng = {
+  data: Blob
+  status: 200
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess = (getEvaluationsErgonomicWorkAnalysesIdPhotoResponse200ImageJpeg | getEvaluationsErgonomicWorkAnalysesIdPhotoResponse200ImagePng) & {
+  headers: Headers;
+};
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponseError = (getEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 | getEvaluationsErgonomicWorkAnalysesIdPhotoResponse404 | getEvaluationsErgonomicWorkAnalysesIdPhotoResponse500) & {
+  headers: Headers;
+};
+
+export type getEvaluationsErgonomicWorkAnalysesIdPhotoResponse = (getEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess | getEvaluationsErgonomicWorkAnalysesIdPhotoResponseError)
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}/photo`
+}
+
+/**
+ * Streams the photo of an AETA ('Imagem do posto') to an authenticated user, with the MIME type of the server's map, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered on the API's origin. The photo may show people at their work station, and there is no other way to reach it: no static route, no signed URL and no public object. Requires only an authenticated user, so any role, and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Download the photo of an AETA
+ */
+export const getEvaluationsErgonomicWorkAnalysesIdPhoto = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsErgonomicWorkAnalysesIdPhotoResponse> => {
+
+  return customFetch<getEvaluationsErgonomicWorkAnalysesIdPhotoResponse>(getGetEvaluationsErgonomicWorkAnalysesIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdPhotoQueryKey = (id: string,) => {
+    return [
+    `/evaluations/ergonomic-work-analyses/${id}/photo`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsErgonomicWorkAnalysesIdPhotoQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsErgonomicWorkAnalysesIdPhotoQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>> = ({ signal }) => getEvaluationsErgonomicWorkAnalysesIdPhoto(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsErgonomicWorkAnalysesIdPhotoQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>>
+export type GetEvaluationsErgonomicWorkAnalysesIdPhotoQueryError = ErrorResponse
+
+
+export function useGetEvaluationsErgonomicWorkAnalysesIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsErgonomicWorkAnalysesIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download the photo of an AETA
+ */
+
+export function useGetEvaluationsErgonomicWorkAnalysesIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsErgonomicWorkAnalysesIdPhotoQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse200 = {
+  data: ErgonomicWorkAnalysis
+  status: 200
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess = (putEvaluationsErgonomicWorkAnalysesIdPhotoResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponseError = (putEvaluationsErgonomicWorkAnalysesIdPhotoResponse400 | putEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 | putEvaluationsErgonomicWorkAnalysesIdPhotoResponse403 | putEvaluationsErgonomicWorkAnalysesIdPhotoResponse404 | putEvaluationsErgonomicWorkAnalysesIdPhotoResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsErgonomicWorkAnalysesIdPhotoResponse = (putEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess | putEvaluationsErgonomicWorkAnalysesIdPhotoResponseError)
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}/photo`
+}
+
+/**
+ * Sends the photo of an AETA, or replaces the one it has, as the multipart part photo: one JPEG or PNG of at most 10 MB (10485760 bytes, inclusive), accepted by its extension, case-insensitively, never by the Content-Type the client sent, and with no limit of pixels. The server names the stored object; the original name is kept for display and for the download. The object is stored first, then the AETA's row is locked and only the photo and updated_by are written, and the previous object is removed only after the commit; when anything fails after the object was stored, it is removed. An AETA has at most one photo. Answers 200 with the same body as GET /evaluations/ergonomic-work-analyses/{id}. Requires the user or admin role and ergonomic_work_analysis enabled by EVALUATION_TYPES; the role is checked before the upload is read, so a viewer never makes the server write a byte.
+ * @summary Send or replace the photo of an AETA
+ */
+export const putEvaluationsErgonomicWorkAnalysesIdPhoto = async (id: string,
+    putEvaluationsErgonomicWorkAnalysesIdPhotoBody: PutEvaluationsErgonomicWorkAnalysesIdPhotoBody, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsErgonomicWorkAnalysesIdPhotoResponse> => {
+    const formData = new FormData();
+formData.append(`photo`, putEvaluationsErgonomicWorkAnalysesIdPhotoBody.photo);
+
+  return customFetch<putEvaluationsErgonomicWorkAnalysesIdPhotoResponse>(getPutEvaluationsErgonomicWorkAnalysesIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdPhotoMutationKey = () => ['putEvaluationsErgonomicWorkAnalysesIdPhoto'] as const;
+
+export const getPutEvaluationsErgonomicWorkAnalysesIdPhotoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsErgonomicWorkAnalysesIdPhotoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>, PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsErgonomicWorkAnalysesIdPhoto(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>>
+    export type PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationBody = PutEvaluationsErgonomicWorkAnalysesIdPhotoBody
+    export type PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationError = ErrorResponse
+    export type PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables = {id: string;data: PutEvaluationsErgonomicWorkAnalysesIdPhotoBody}
+
+    /**
+ * @summary Send or replace the photo of an AETA
+ */
+export const usePutEvaluationsErgonomicWorkAnalysesIdPhoto = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsErgonomicWorkAnalysesIdPhoto>>,
+        TError,
+        PutEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsErgonomicWorkAnalysesIdPhotoMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse200 = {
+  data: ErgonomicWorkAnalysis
+  status: 200
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess = (deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse200) & {
+  headers: Headers;
+};
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponseError = (deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse401 | deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse403 | deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse = (deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponseSuccess | deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponseError)
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/ergonomic-work-analyses/${id}/photo`
+}
+
+/**
+ * Removes the photo of an AETA and keeps the AETA, which starts answering photo: null. Answers 200 with the updated AETA, and not 204, because the resource still exists and changed. An AETA without a photo answers 404 'Evaluation photo not found.', which makes a second call observable. Inside the transaction the row is locked and only the photo and updated_by are written; the object is removed only after the commit, and a failure to remove it is logged with its key and does not change the answer. The confirmation is the interface's responsibility. Requires the user or admin role and ergonomic_work_analysis enabled by EVALUATION_TYPES.
+ * @summary Remove the photo of an AETA
+ */
+export const deleteEvaluationsErgonomicWorkAnalysesIdPhoto = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse> => {
+
+  return customFetch<deleteEvaluationsErgonomicWorkAnalysesIdPhotoResponse>(getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationKey = () => ['deleteEvaluationsErgonomicWorkAnalysesIdPhoto'] as const;
+
+export const getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>, DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsErgonomicWorkAnalysesIdPhoto(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>>
+
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationError = ErrorResponse
+    export type DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables = {id: string}
+
+    /**
+ * @summary Remove the photo of an AETA
+ */
+export const useDeleteEvaluationsErgonomicWorkAnalysesIdPhoto = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>, TError,DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsErgonomicWorkAnalysesIdPhoto>>,
+        TError,
+        DeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationOptions(options), queryClient);
     }
