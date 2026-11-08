@@ -416,6 +416,7 @@ export const EvaluationTypeItemType = {
   ergonomic_analysis_in_loco: 'ergonomic_analysis_in_loco',
   risk_factor: 'risk_factor',
   ergonomic_work_analysis_advanced: 'ergonomic_work_analysis_advanced',
+  priority_criterion: 'priority_criterion',
   hit_list: 'hit_list',
   checklist: 'checklist',
   change_assessment: 'change_assessment',
@@ -431,6 +432,7 @@ export const EvaluationTypeItemCode = {
   CDIP: 'CDIP',
   FR: 'FR',
   AETP: 'AETP',
+  CP: 'CP',
   HL: 'HL',
   CDIA: 'CDIA',
   AMP: 'AMP',
@@ -3751,6 +3753,341 @@ export interface ErgonomicWorkAnalysisAdvancedInput {
      * @nullable
      */
   answers?: ErgonomicWorkAnalysisAdvancedInputAnswers;
+}
+
+/**
+ * An item of the CP listing (the Critério de Prioridade, the Produção tab of the legacy evaluations). The activity is the one shown for projects: as it is now, without area nor fabric. The five questions, the solutions and the priority are only in the detail.
+ */
+export interface PriorityCriterionItem {
+  id: string;
+  /**
+     * Sequential number of the CPs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** CP-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  /**
+     * The sector, typed freely ('Setor'), with no link to the areas
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * The number of employees ('Qtde. de Func')
+     * @minimum 0
+     * @maximum 2147483647
+     */
+  number_of_employees: number;
+  /**
+     * Who evaluated, typed freely ('Avaliador')
+     * @maxLength 255
+     */
+  responsible: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The level of the ergonomic risk: 0 Ausência de risco, 1 Perigo, 2 Risco, 3 Alto risco. The score of the chosen option, which identifies it inside its question
+ */
+export type PriorityCriterionQuestion1 = typeof PriorityCriterionQuestion1[keyof typeof PriorityCriterionQuestion1];
+
+
+export const PriorityCriterionQuestion1 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+  NUMBER_2: 2,
+  NUMBER_3: 3,
+} as const;
+
+/**
+ * Complaints of muscle pain or excessive fatigue among the workers of the task: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question
+ */
+export type PriorityCriterionQuestion2 = typeof PriorityCriterionQuestion2[keyof typeof PriorityCriterionQuestion2];
+
+
+export const PriorityCriterionQuestion2 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * Historical data of ergonomic concerns: 0 não, 2 alguma, 4 frequente. The score of the chosen option, which identifies it inside its question
+ */
+export type PriorityCriterionQuestion3 = typeof PriorityCriterionQuestion3[keyof typeof PriorityCriterionQuestion3];
+
+
+export const PriorityCriterionQuestion3 = {
+  NUMBER_0: 0,
+  NUMBER_2: 2,
+  NUMBER_4: 4,
+} as const;
+
+/**
+ * Proven medical complaints: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question
+ */
+export type PriorityCriterionQuestion4 = typeof PriorityCriterionQuestion4[keyof typeof PriorityCriterionQuestion4];
+
+
+export const PriorityCriterionQuestion4 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * Cases of leave or work restrictions: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question
+ */
+export type PriorityCriterionQuestion5 = typeof PriorityCriterionQuestion5[keyof typeof PriorityCriterionQuestion5];
+
+
+export const PriorityCriterionQuestion5 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * The five solutions of the 'Categorias de Prioridades', in the order of the categories. Plain text with its line breaks, null when absent; a stored key outside the catalog is never answered.
+ */
+export interface PriorityCriterionAnswers {
+  /**
+     * 1 - Soluções simples
+     * @maxLength 5000
+     * @nullable
+     */
+  solution1: string | null;
+  /**
+     * 2 - Soluções com custo elevado
+     * @maxLength 5000
+     * @nullable
+     */
+  solution2: string | null;
+  /**
+     * 3 - Soluções que necessitam de mais estudos
+     * @maxLength 5000
+     * @nullable
+     */
+  solution3: string | null;
+  /**
+     * 4 - Soluções administrativas
+     * @maxLength 5000
+     * @nullable
+     */
+  solution4: string | null;
+  /**
+     * 5 - Soluções de organização do trabalho
+     * @maxLength 5000
+     * @nullable
+     */
+  solution5: string | null;
+}
+
+/**
+ * The range of the sum: low 0 to 3, medium 4 to 6, high 7 to 10
+ */
+export type PriorityCriterionPriorityLevel = typeof PriorityCriterionPriorityLevel[keyof typeof PriorityCriterionPriorityLevel];
+
+
+export const PriorityCriterionPriorityLevel = {
+  low: 'low',
+  medium: 'medium',
+  high: 'high',
+} as const;
+
+/**
+ * The priority of a CP, derived on every read from its five answers and never stored: the sum of the scores and the level of its range, 0 to 3 low (Nenhuma ação), 4 to 6 medium (Acompanhar) and 7 to 10 high (Atuação imediata).
+ */
+export interface PriorityCriterionPriority {
+  /**
+     * The sum of the five scores
+     * @minimum 0
+     * @maximum 10
+     */
+  sum: number;
+  /** The range of the sum: low 0 to 3, medium 4 to 6, high 7 to 10 */
+  level: PriorityCriterionPriorityLevel;
+}
+
+/**
+ * A CP with its five answers, its solutions and its priority. The activity also answers its current area and fabric.
+ */
+export interface PriorityCriterion {
+  id: string;
+  /**
+     * Sequential number of the CPs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** CP-<number>, derived and never stored */
+  code: string;
+  activity: EvaluationActivityLocation;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  /**
+     * The sector, typed freely ('Setor'), with no link to the areas
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * The number of employees ('Qtde. de Func')
+     * @minimum 0
+     * @maximum 2147483647
+     */
+  number_of_employees: number;
+  /**
+     * Who evaluated, typed freely ('Avaliador')
+     * @maxLength 255
+     */
+  responsible: string;
+  /** The level of the ergonomic risk: 0 Ausência de risco, 1 Perigo, 2 Risco, 3 Alto risco. The score of the chosen option, which identifies it inside its question */
+  question1: PriorityCriterionQuestion1;
+  /** Complaints of muscle pain or excessive fatigue among the workers of the task: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question */
+  question2: PriorityCriterionQuestion2;
+  /** Historical data of ergonomic concerns: 0 não, 2 alguma, 4 frequente. The score of the chosen option, which identifies it inside its question */
+  question3: PriorityCriterionQuestion3;
+  /** Proven medical complaints: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question */
+  question4: PriorityCriterionQuestion4;
+  /** Cases of leave or work restrictions: 0 não, 1 sim. The score of the chosen option, which identifies it inside its question */
+  question5: PriorityCriterionQuestion5;
+  created_at: string;
+  updated_at: string;
+  answers: PriorityCriterionAnswers;
+  priority: PriorityCriterionPriority;
+}
+
+/**
+ * Required: the level of the ergonomic risk: 0 Ausência de risco, 1 Perigo, 2 Risco, 3 Alto risco. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused
+ */
+export type PriorityCriterionInputQuestion1 = typeof PriorityCriterionInputQuestion1[keyof typeof PriorityCriterionInputQuestion1];
+
+
+export const PriorityCriterionInputQuestion1 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+  NUMBER_2: 2,
+  NUMBER_3: 3,
+} as const;
+
+/**
+ * Required: complaints of muscle pain or excessive fatigue among the workers of the task: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused
+ */
+export type PriorityCriterionInputQuestion2 = typeof PriorityCriterionInputQuestion2[keyof typeof PriorityCriterionInputQuestion2];
+
+
+export const PriorityCriterionInputQuestion2 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * Required: historical data of ergonomic concerns: 0 não, 2 alguma, 4 frequente. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused
+ */
+export type PriorityCriterionInputQuestion3 = typeof PriorityCriterionInputQuestion3[keyof typeof PriorityCriterionInputQuestion3];
+
+
+export const PriorityCriterionInputQuestion3 = {
+  NUMBER_0: 0,
+  NUMBER_2: 2,
+  NUMBER_4: 4,
+} as const;
+
+/**
+ * Required: proven medical complaints: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused
+ */
+export type PriorityCriterionInputQuestion4 = typeof PriorityCriterionInputQuestion4[keyof typeof PriorityCriterionInputQuestion4];
+
+
+export const PriorityCriterionInputQuestion4 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * Required: cases of leave or work restrictions: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused
+ */
+export type PriorityCriterionInputQuestion5 = typeof PriorityCriterionInputQuestion5[keyof typeof PriorityCriterionInputQuestion5];
+
+
+export const PriorityCriterionInputQuestion5 = {
+  NUMBER_0: 0,
+  NUMBER_1: 1,
+} as const;
+
+/**
+ * Absent or null is the same as {}: no solution at all. Each solution is plain text, trimmed, keeping its inner line breaks as they came, at most 5000 characters (code points), or null; null and empty texts are stored as absent. A key outside the five solutions, or a value that is neither a string nor null, is refused
+ * @nullable
+ */
+export type PriorityCriterionInputAnswers = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  solution1?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  solution2?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  solution3?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  solution4?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  solution5?: string | null;
+} | null;
+
+/**
+ * The fields of a CP creation or update, as JSON. Any other top-level field (id, number, code, area, fabric, priority, created_at, created_by...) is ignored; the number comes from the sequence, the priority from the answers and the authorship from the token.
+ */
+export interface PriorityCriterionInput {
+  /** An existing activity (see GET /evaluations/priority-criteria/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  assessment_date: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * Required: a JSON integer from 0 to 2147483647; a string (even "3"), a boolean, a negative or a decimal is refused
+     * @minimum 0
+     * @maximum 2147483647
+     */
+  number_of_employees: number;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  responsible: string;
+  /** Required: the level of the ergonomic risk: 0 Ausência de risco, 1 Perigo, 2 Risco, 3 Alto risco. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused */
+  question1: PriorityCriterionInputQuestion1;
+  /** Required: complaints of muscle pain or excessive fatigue among the workers of the task: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused */
+  question2: PriorityCriterionInputQuestion2;
+  /** Required: historical data of ergonomic concerns: 0 não, 2 alguma, 4 frequente. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused */
+  question3: PriorityCriterionInputQuestion3;
+  /** Required: proven medical complaints: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused */
+  question4: PriorityCriterionInputQuestion4;
+  /** Required: cases of leave or work restrictions: 0 não, 1 sim. A JSON number among the scores of the options; a string (even "1"), a boolean, a decimal or another number is refused */
+  question5: PriorityCriterionInputQuestion5;
+  /**
+     * Absent or null is the same as {}: no solution at all. Each solution is plain text, trimmed, keeping its inner line breaks as they came, at most 5000 characters (code points), or null; null and empty texts are stored as absent. A key outside the five solutions, or a value that is neither a string nor null, is refused
+     * @nullable
+     */
+  answers?: PriorityCriterionInputAnswers;
 }
 
 export type PostSessionsBody = {
@@ -18098,4 +18435,743 @@ export const useDeleteEvaluationsErgonomicWorkAnalysesAdvancedIdPhoto = <TError 
         TContext
       > => {
       return useMutation(getDeleteEvaluationsErgonomicWorkAnalysesAdvancedIdPhotoMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsPriorityCriteriaResponse200 = {
+  data: PriorityCriterionItem[]
+  status: 200
+}
+
+export type getEvaluationsPriorityCriteriaResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsPriorityCriteriaResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsPriorityCriteriaResponseSuccess = (getEvaluationsPriorityCriteriaResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsPriorityCriteriaResponseError = (getEvaluationsPriorityCriteriaResponse401 | getEvaluationsPriorityCriteriaResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsPriorityCriteriaResponse = (getEvaluationsPriorityCriteriaResponseSuccess | getEvaluationsPriorityCriteriaResponseError)
+
+export const getGetEvaluationsPriorityCriteriaUrl = () => {
+
+
+
+
+  return `/evaluations/priority-criteria`
+}
+
+/**
+ * Every CP of the installation (the Critério de Prioridade of the Produção tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The five questions, the solutions and the priority are only in the detail. Requires only an authenticated user, so any role, and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary List priority criteria (CP)
+ */
+export const getEvaluationsPriorityCriteria = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsPriorityCriteriaResponse> => {
+
+  return customFetch<getEvaluationsPriorityCriteriaResponse>(getGetEvaluationsPriorityCriteriaUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsPriorityCriteriaQueryKey = () => {
+    return [
+    `/evaluations/priority-criteria`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsPriorityCriteriaQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsPriorityCriteriaQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>> = ({ signal }) => getEvaluationsPriorityCriteria({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsPriorityCriteriaQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>>
+export type GetEvaluationsPriorityCriteriaQueryError = ErrorResponse
+
+
+export function useGetEvaluationsPriorityCriteria<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteria<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteria<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List priority criteria (CP)
+ */
+
+export function useGetEvaluationsPriorityCriteria<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteria>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsPriorityCriteriaQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsPriorityCriteriaResponse201 = {
+  data: PriorityCriterion
+  status: 201
+}
+
+export type postEvaluationsPriorityCriteriaResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsPriorityCriteriaResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsPriorityCriteriaResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsPriorityCriteriaResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsPriorityCriteriaResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postEvaluationsPriorityCriteriaResponseSuccess = (postEvaluationsPriorityCriteriaResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsPriorityCriteriaResponseError = (postEvaluationsPriorityCriteriaResponse400 | postEvaluationsPriorityCriteriaResponse401 | postEvaluationsPriorityCriteriaResponse403 | postEvaluationsPriorityCriteriaResponse404 | postEvaluationsPriorityCriteriaResponse413) & {
+  headers: Headers;
+};
+
+export type postEvaluationsPriorityCriteriaResponse = (postEvaluationsPriorityCriteriaResponseSuccess | postEvaluationsPriorityCriteriaResponseError)
+
+export const getPostEvaluationsPriorityCriteriaUrl = () => {
+
+
+
+
+  return `/evaluations/priority-criteria`
+}
+
+/**
+ * Creates a CP from a JSON body. The number is the next one of the CP sequence, taken inside the INSERT, and is never handed out again, not even after the CP is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new CP (409 there) or finished first (400 here), never a foreign key violation. Answers the same body as GET /evaluations/priority-criteria/{id}, with the priority derived from the five answers. Not idempotent: sending it again creates another CP. Requires the user or admin role and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary Create priority criterion (CP)
+ */
+export const postEvaluationsPriorityCriteria = async (priorityCriterionInput: PriorityCriterionInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsPriorityCriteriaResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsPriorityCriteriaResponse>(getPostEvaluationsPriorityCriteriaUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(priorityCriterionInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsPriorityCriteriaMutationKey = () => ['postEvaluationsPriorityCriteria'] as const;
+
+export const getPostEvaluationsPriorityCriteriaMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>, TError,PostEvaluationsPriorityCriteriaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>, TError,PostEvaluationsPriorityCriteriaMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsPriorityCriteriaMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>, PostEvaluationsPriorityCriteriaMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsPriorityCriteria(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsPriorityCriteriaMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>>
+    export type PostEvaluationsPriorityCriteriaMutationBody = PriorityCriterionInput
+    export type PostEvaluationsPriorityCriteriaMutationError = ErrorResponse
+    export type PostEvaluationsPriorityCriteriaMutationVariables = {data: PriorityCriterionInput}
+
+    /**
+ * @summary Create priority criterion (CP)
+ */
+export const usePostEvaluationsPriorityCriteria = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>, TError,PostEvaluationsPriorityCriteriaMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsPriorityCriteria>>,
+        TError,
+        PostEvaluationsPriorityCriteriaMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsPriorityCriteriaMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsPriorityCriteriaActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsPriorityCriteriaActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsPriorityCriteriaActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsPriorityCriteriaActivitiesResponseSuccess = (getEvaluationsPriorityCriteriaActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsPriorityCriteriaActivitiesResponseError = (getEvaluationsPriorityCriteriaActivitiesResponse401 | getEvaluationsPriorityCriteriaActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsPriorityCriteriaActivitiesResponse = (getEvaluationsPriorityCriteriaActivitiesResponseSuccess | getEvaluationsPriorityCriteriaActivitiesResponseError)
+
+export const getGetEvaluationsPriorityCriteriaActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/priority-criteria/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Critério de Prioridade form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary List the activities a CP can belong to
+ */
+export const getEvaluationsPriorityCriteriaActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsPriorityCriteriaActivitiesResponse> => {
+
+  return customFetch<getEvaluationsPriorityCriteriaActivitiesResponse>(getGetEvaluationsPriorityCriteriaActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsPriorityCriteriaActivitiesQueryKey = () => {
+    return [
+    `/evaluations/priority-criteria/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsPriorityCriteriaActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsPriorityCriteriaActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>> = ({ signal }) => getEvaluationsPriorityCriteriaActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsPriorityCriteriaActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>>
+export type GetEvaluationsPriorityCriteriaActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsPriorityCriteriaActivities<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteriaActivities<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteriaActivities<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities a CP can belong to
+ */
+
+export function useGetEvaluationsPriorityCriteriaActivities<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsPriorityCriteriaActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsPriorityCriteriaIdResponse200 = {
+  data: PriorityCriterion
+  status: 200
+}
+
+export type getEvaluationsPriorityCriteriaIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsPriorityCriteriaIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsPriorityCriteriaIdResponseSuccess = (getEvaluationsPriorityCriteriaIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsPriorityCriteriaIdResponseError = (getEvaluationsPriorityCriteriaIdResponse401 | getEvaluationsPriorityCriteriaIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsPriorityCriteriaIdResponse = (getEvaluationsPriorityCriteriaIdResponseSuccess | getEvaluationsPriorityCriteriaIdResponseError)
+
+export const getGetEvaluationsPriorityCriteriaIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/priority-criteria/${id}`
+}
+
+/**
+ * One CP: the item of the listing plus its five questions, at their place in the header, its five solutions, the activity with its current area and fabric, read in the same query as its code and name, and the priority, derived on every read from the five stored answers and never stored. An absent solution is null; a stored key outside the catalog is never answered. Requires only an authenticated user, so any role, and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary Get priority criterion (CP)
+ */
+export const getEvaluationsPriorityCriteriaId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsPriorityCriteriaIdResponse> => {
+
+  return customFetch<getEvaluationsPriorityCriteriaIdResponse>(getGetEvaluationsPriorityCriteriaIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsPriorityCriteriaIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/priority-criteria/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsPriorityCriteriaIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsPriorityCriteriaIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>> = ({ signal }) => getEvaluationsPriorityCriteriaId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsPriorityCriteriaIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>>
+export type GetEvaluationsPriorityCriteriaIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsPriorityCriteriaId<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteriaId<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsPriorityCriteriaId<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get priority criterion (CP)
+ */
+
+export function useGetEvaluationsPriorityCriteriaId<TData = Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsPriorityCriteriaId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsPriorityCriteriaIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsPriorityCriteriaIdResponse200 = {
+  data: PriorityCriterion
+  status: 200
+}
+
+export type putEvaluationsPriorityCriteriaIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsPriorityCriteriaIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsPriorityCriteriaIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsPriorityCriteriaIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsPriorityCriteriaIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsPriorityCriteriaIdResponseSuccess = (putEvaluationsPriorityCriteriaIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsPriorityCriteriaIdResponseError = (putEvaluationsPriorityCriteriaIdResponse400 | putEvaluationsPriorityCriteriaIdResponse401 | putEvaluationsPriorityCriteriaIdResponse403 | putEvaluationsPriorityCriteriaIdResponse404 | putEvaluationsPriorityCriteriaIdResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsPriorityCriteriaIdResponse = (putEvaluationsPriorityCriteriaIdResponseSuccess | putEvaluationsPriorityCriteriaIdResponseError)
+
+export const getPutEvaluationsPriorityCriteriaIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/priority-criteria/${id}`
+}
+
+/**
+ * Replaces every field of a CP with the JSON body: the activity may change, the five answers are required again, and a solution left out of answers goes back to null (absent answers empties them all). number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the CP will point at is locked (shared) and then the CP's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/priority-criteria/{id}, with the priority of the new answers. Requires the user or admin role and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary Update priority criterion (CP)
+ */
+export const putEvaluationsPriorityCriteriaId = async (id: string,
+    priorityCriterionInput: PriorityCriterionInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsPriorityCriteriaIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsPriorityCriteriaIdResponse>(getPutEvaluationsPriorityCriteriaIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(priorityCriterionInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsPriorityCriteriaIdMutationKey = () => ['putEvaluationsPriorityCriteriaId'] as const;
+
+export const getPutEvaluationsPriorityCriteriaIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>, TError,PutEvaluationsPriorityCriteriaIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>, TError,PutEvaluationsPriorityCriteriaIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsPriorityCriteriaIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>, PutEvaluationsPriorityCriteriaIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsPriorityCriteriaId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsPriorityCriteriaIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>>
+    export type PutEvaluationsPriorityCriteriaIdMutationBody = PriorityCriterionInput
+    export type PutEvaluationsPriorityCriteriaIdMutationError = ErrorResponse
+    export type PutEvaluationsPriorityCriteriaIdMutationVariables = {id: string;data: PriorityCriterionInput}
+
+    /**
+ * @summary Update priority criterion (CP)
+ */
+export const usePutEvaluationsPriorityCriteriaId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>, TError,PutEvaluationsPriorityCriteriaIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsPriorityCriteriaId>>,
+        TError,
+        PutEvaluationsPriorityCriteriaIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsPriorityCriteriaIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsPriorityCriteriaIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsPriorityCriteriaIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsPriorityCriteriaIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsPriorityCriteriaIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsPriorityCriteriaIdResponseSuccess = (deleteEvaluationsPriorityCriteriaIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsPriorityCriteriaIdResponseError = (deleteEvaluationsPriorityCriteriaIdResponse401 | deleteEvaluationsPriorityCriteriaIdResponse403 | deleteEvaluationsPriorityCriteriaIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsPriorityCriteriaIdResponse = (deleteEvaluationsPriorityCriteriaIdResponseSuccess | deleteEvaluationsPriorityCriteriaIdResponseError)
+
+export const getDeleteEvaluationsPriorityCriteriaIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/priority-criteria/${id}`
+}
+
+/**
+ * Deletes a CP permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same CP again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and priority_criterion enabled by EVALUATION_TYPES.
+ * @summary Delete priority criterion (CP)
+ */
+export const deleteEvaluationsPriorityCriteriaId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsPriorityCriteriaIdResponse> => {
+
+  return customFetch<deleteEvaluationsPriorityCriteriaIdResponse>(getDeleteEvaluationsPriorityCriteriaIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsPriorityCriteriaIdMutationKey = () => ['deleteEvaluationsPriorityCriteriaId'] as const;
+
+export const getDeleteEvaluationsPriorityCriteriaIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>, TError,DeleteEvaluationsPriorityCriteriaIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>, TError,DeleteEvaluationsPriorityCriteriaIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsPriorityCriteriaIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>, DeleteEvaluationsPriorityCriteriaIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsPriorityCriteriaId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsPriorityCriteriaIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>>
+
+    export type DeleteEvaluationsPriorityCriteriaIdMutationError = ErrorResponse
+    export type DeleteEvaluationsPriorityCriteriaIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete priority criterion (CP)
+ */
+export const useDeleteEvaluationsPriorityCriteriaId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>, TError,DeleteEvaluationsPriorityCriteriaIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsPriorityCriteriaId>>,
+        TError,
+        DeleteEvaluationsPriorityCriteriaIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsPriorityCriteriaIdMutationOptions(options), queryClient);
     }
