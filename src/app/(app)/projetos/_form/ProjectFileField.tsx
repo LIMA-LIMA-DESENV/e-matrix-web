@@ -3,23 +3,19 @@ import type { ChangeEvent } from 'react'
 
 import { Button, Input, Label } from '@/components/ui'
 import type { ProjectFile } from '@/http/api'
-
-import {
-  formatProjectFileExtensions,
-  type ProjectFilePolicy,
-} from './file-validation'
+import { type FilePolicy, formatFileExtensions } from '@/lib/file-policy'
 
 interface ProjectFileFieldProps {
   /** The multipart part name, which doubles as the input id. */
   inputId: string
   /** Translated name of the attachment, e.g. "Foto antes". */
   label: string
-  policy: ProjectFilePolicy
+  policy: FilePolicy
   /** The file already stored, on the edit screen; `null` if none. */
   currentFile: ProjectFile | null
   /** The file the user just picked, kept out of the zod schema. */
   selectedFile: File | null
-  /** Already translated refusal from `validateProjectFile`. */
+  /** Already translated refusal from `checkFile`. */
   error?: string | null
   /** Translated "blank keeps the current file" sentence of this attachment. */
   keepHint: string
@@ -146,7 +142,7 @@ export function ProjectFileField({
             ? t('form.fileSelected', { name: selectedFile.name })
             : (hint ??
               t('form.fileHint', {
-                extensions: formatProjectFileExtensions(policy),
+                extensions: formatFileExtensions(policy),
                 max: policy.maxMegabytes,
               }))}
         </p>

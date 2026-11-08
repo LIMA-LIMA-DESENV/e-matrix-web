@@ -85,7 +85,7 @@ export function projectDate(tv: Translate, periods: readonly PeriodRange[]) {
  * Mirrors the API rules of an RGP/RGA (FR-003 to FR-006): the activity chosen
  * among the listed ones, the date in a period, and the three texts. The scope
  * comes from the route, not from the form. The two photos have their own
- * mirror in `file-validation.ts`. The API stays the authority on all of it,
+ * mirror in `@/lib/file-policy`. The API stays the authority on all of it,
  * including whether the activity still exists.
  */
 export function makeImprovementProjectSchema(

@@ -24,17 +24,13 @@ import {
   IMPROVEMENT_PROJECT_PHOTO_FIELDS,
   type ImprovementProjectPhotoKey,
 } from '@/lib/download-file'
+import { checkFile, type FileRejection, PHOTO_POLICY } from '@/lib/file-policy'
 
 import {
   formatProjectActivity,
   IMPROVEMENT_PROJECT_PHOTOS,
   SCOPE_TYPES,
 } from '../components'
-import {
-  PROJECT_PHOTO_POLICY,
-  type ProjectFileRejection,
-  validateProjectFile,
-} from './file-validation'
 import { ProjectFileField } from './ProjectFileField'
 import {
   type ImprovementProjectFormData,
@@ -172,7 +168,7 @@ export function ImprovementProjectForm({
   const [selectedPhotos, setSelectedPhotos] =
     useState<PerPhoto<File | null>>(NO_PHOTOS)
   const [photoRejections, setPhotoRejections] =
-    useState<PerPhoto<ProjectFileRejection | null>>(NO_PHOTOS)
+    useState<PerPhoto<FileRejection | null>>(NO_PHOTOS)
   const isSendingRef = useRef(false)
   const [isSaved, setIsSaved] = useState(false)
 
@@ -219,7 +215,7 @@ export function ImprovementProjectForm({
     if (!rejection) return null
 
     return rejection === 'too-large'
-      ? tv('photoTooLarge', { max: PROJECT_PHOTO_POLICY.maxMegabytes })
+      ? tv('photoTooLarge', { max: PHOTO_POLICY.maxMegabytes })
       : tv('photoTypeNotAllowed')
   }
 
@@ -233,9 +229,7 @@ export function ImprovementProjectForm({
     event: ChangeEvent<HTMLInputElement>
   ) {
     const file = event.target.files?.[0] ?? null
-    const rejection = file
-      ? validateProjectFile(file, PROJECT_PHOTO_POLICY)
-      : null
+    const rejection = file ? checkFile(file, PHOTO_POLICY) : null
 
     if (rejection) {
       // Clearing the input lets the user pick the same file again after
@@ -454,7 +448,7 @@ export function ImprovementProjectForm({
                   key={key}
                   inputId={IMPROVEMENT_PROJECT_PHOTO_FIELDS[key]}
                   label={tp(label)}
-                  policy={PROJECT_PHOTO_POLICY}
+                  policy={PHOTO_POLICY}
                   currentFile={currentFile}
                   selectedFile={selectedPhotos[key]}
                   error={photoError(key)}

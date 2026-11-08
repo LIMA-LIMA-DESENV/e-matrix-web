@@ -902,6 +902,12 @@
       "deleting": "Deleting..."
     }
   },
+  "files": {
+    "photo": {
+      "loading": "Loading photo...",
+      "unavailable": "Photo unavailable"
+    }
+  },
   "projects": {
     "title": "Projects",
     "description": "Records of the program's ergonomic improvement actions: the production and office projects and the receiving of materials.",
@@ -985,8 +991,6 @@
       "title": "Project Register",
       "photos": "Photos",
       "noPhoto": "No photo",
-      "photoLoading": "Loading photo...",
-      "photoUnavailable": "Photo unavailable",
       "photoAlt": "{photo} of {code}: {name}"
     },
     "materialReceiptDetails": {

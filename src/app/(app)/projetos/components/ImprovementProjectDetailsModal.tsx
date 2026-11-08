@@ -1,7 +1,9 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { type ReactNode, useEffect, useId, useRef } from 'react'
+import { type ReactNode, useEffect, useId, useMemo, useRef } from 'react'
+
+import { PhotoPreview } from '@/components/files'
 
 import {
   Button,
@@ -14,13 +16,13 @@ import {
 } from '@/components/ui'
 import type { ImprovementProject } from '@/http/api'
 import {
+  fetchImprovementProjectPhoto,
   IMPROVEMENT_PROJECT_PHOTO_FIELDS,
   type ImprovementProjectPhotoKey,
 } from '@/lib/download-file'
 import { useFormatDateOnly } from '@/lib/format-date'
 
 import { formatProjectActivity, IMPROVEMENT_PROJECT_PHOTOS } from './listing'
-import { PhotoPreview } from './PhotoPreview'
 import { ProjectCodeBadge } from './ProjectCodeBadge'
 import { SCOPE_TYPES } from './types'
 
@@ -66,6 +68,21 @@ function ImprovementProjectDetailsDialog({
   const formatDateOnly = useFormatDateOnly()
   const titleId = useId()
   const dialogRef = useRef<HTMLDivElement>(null)
+
+  // One stable loader per photo, renewed only with the record, so a
+  // thumbnail loads again exactly when the record it shows changes.
+  const photoLoaders = useMemo(
+    (): Record<
+      ImprovementProjectPhotoKey,
+      (signal: AbortSignal) => Promise<Blob | null>
+    > => ({
+      'before-photo': (signal) =>
+        fetchImprovementProjectPhoto(record, 'before-photo', signal),
+      'after-photo': (signal) =>
+        fetchImprovementProjectPhoto(record, 'after-photo', signal),
+    }),
+    [record]
+  )
 
   useEffect(() => {
     dialogRef.current?.focus()
@@ -162,8 +179,7 @@ function ImprovementProjectDetailsDialog({
                         <>
                           <PhotoPreview
                             key={`${record.id}:${key}`}
-                            record={record}
-                            photo={key}
+                            load={photoLoaders[key]}
                             alt={t('details.photoAlt', {
                               photo: photoLabel,
                               code: record.code,

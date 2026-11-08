@@ -3,15 +3,14 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
-import type { ImprovementProject } from '@/http/api'
-import {
-  fetchImprovementProjectPhoto,
-  type ImprovementProjectPhotoKey,
-} from '@/lib/download-file'
-
 interface PhotoPreviewProps {
-  record: ImprovementProject
-  photo: ImprovementProjectPhotoKey
+  /**
+   * Downloads the photo through the authenticated route of its record,
+   * resolving `null` when it is not available. Pass a stable function
+   * (`useMemo`/`useCallback` over the record): a new one loads the photo
+   * again.
+   */
+  load: (signal: AbortSignal) => Promise<Blob | null>
   /** Accessible name of the image. */
   alt: string
 }
@@ -23,21 +22,21 @@ type PreviewState =
 
 /**
  * Thumbnail of a photo, loaded through the authenticated download as a `Blob`
- * and shown from an object URL (FR-037, §11): the photos have no URL of their
- * own. The object URL is revoked when the preview unmounts, which happens when
- * the detail closes or shows another record (render it with a `key` per record
+ * and shown from an object URL: the photos have no URL of their own. The
+ * object URL is revoked when the preview unmounts, which happens when the
+ * detail closes or shows another record (render it with a `key` per record
  * and photo). The browser applies the EXIF orientation of an `<img>` on its
  * own, so a portrait phone photo shows upright.
  */
-export function PhotoPreview({ record, photo, alt }: PhotoPreviewProps) {
-  const t = useTranslations('projects.details')
+export function PhotoPreview({ load, alt }: PhotoPreviewProps) {
+  const t = useTranslations('files.photo')
   const [state, setState] = useState<PreviewState>({ status: 'loading' })
 
   useEffect(() => {
     const controller = new AbortController()
     let url: string | null = null
 
-    fetchImprovementProjectPhoto(record, photo, controller.signal)
+    load(controller.signal)
       .then((blob) => {
         if (controller.signal.aborted) return
         if (!blob) {
@@ -56,7 +55,7 @@ export function PhotoPreview({ record, photo, alt }: PhotoPreviewProps) {
       controller.abort()
       if (url) URL.revokeObjectURL(url)
     }
-  }, [record, photo])
+  }, [load])
 
   if (state.status === 'ready') {
     return (
@@ -74,7 +73,7 @@ export function PhotoPreview({ record, photo, alt }: PhotoPreviewProps) {
       role={state.status === 'loading' ? 'status' : undefined}
       className="flex h-40 w-full items-center justify-center rounded-lg bg-surface-container-low px-4 text-center text-xs font-medium text-on-surface-variant"
     >
-      {state.status === 'loading' ? t('photoLoading') : t('photoUnavailable')}
+      {state.status === 'loading' ? t('loading') : t('unavailable')}
     </div>
   )
 }

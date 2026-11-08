@@ -15,13 +15,13 @@ import { useForm } from 'react-hook-form'
 
 import { Button, Card, Input, Label } from '@/components/ui'
 import type { Period, ProjectFile } from '@/http/api'
-
 import {
-  formatProjectFileExtensions,
-  MATERIAL_RECEIPT_FILE_POLICY,
-  type ProjectFileRejection,
-  validateProjectFile,
-} from './file-validation'
+  checkFile,
+  type FileRejection,
+  formatFileExtensions,
+} from '@/lib/file-policy'
+
+import { MATERIAL_RECEIPT_FILE_POLICY } from './file-validation'
 import { ProjectFileField } from './ProjectFileField'
 import {
   MAX_PROJECT_TEXT_LENGTH,
@@ -119,8 +119,7 @@ export function MaterialReceiptForm({
   const tp = useTranslations('projects')
   const tc = useTranslations('common')
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [fileRejection, setFileRejection] =
-    useState<ProjectFileRejection | null>(null)
+  const [fileRejection, setFileRejection] = useState<FileRejection | null>(null)
   const isSendingRef = useRef(false)
   const [isSaved, setIsSaved] = useState(false)
 
@@ -164,7 +163,7 @@ export function MaterialReceiptForm({
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0] ?? null
     const rejection = file
-      ? validateProjectFile(file, MATERIAL_RECEIPT_FILE_POLICY)
+      ? checkFile(file, MATERIAL_RECEIPT_FILE_POLICY)
       : null
 
     if (rejection) {
@@ -297,9 +296,7 @@ export function MaterialReceiptForm({
             policy={MATERIAL_RECEIPT_FILE_POLICY}
             icon="description"
             hint={t('receiptFileHint', {
-              extensions: formatProjectFileExtensions(
-                MATERIAL_RECEIPT_FILE_POLICY
-              ),
+              extensions: formatFileExtensions(MATERIAL_RECEIPT_FILE_POLICY),
               max: MATERIAL_RECEIPT_FILE_POLICY.maxMegabytes,
             })}
             currentFile={currentFile}

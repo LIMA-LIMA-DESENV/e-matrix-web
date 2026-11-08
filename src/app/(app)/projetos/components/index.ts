@@ -25,7 +25,6 @@ export {
   useOfficeRecordsTableColumns,
 } from './OfficeRecordsTable'
 export { OfficeTypeFilter } from './OfficeTypeFilter'
-export { PhotoPreview } from './PhotoPreview'
 export { ProjectCard } from './ProjectCard'
 export { ProjectCodeBadge } from './ProjectCodeBadge'
 export { ProjectsTabs } from './ProjectsTabs'

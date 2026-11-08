@@ -902,6 +902,12 @@
       "deleting": "Eliminando..."
     }
   },
+  "files": {
+    "photo": {
+      "loading": "Cargando foto...",
+      "unavailable": "Foto no disponible"
+    }
+  },
   "projects": {
     "title": "Proyectos",
     "description": "Registros de las acciones de mejora ergonómica del programa: los proyectos de producción y de oficina y la recepción de materiales.",
@@ -985,8 +991,6 @@
       "title": "Registro de Proyecto",
       "photos": "Fotos",
       "noPhoto": "Sin foto",
-      "photoLoading": "Cargando foto...",
-      "photoUnavailable": "Foto no disponible",
       "photoAlt": "{photo} de {code}: {name}"
     },
     "materialReceiptDetails": {
