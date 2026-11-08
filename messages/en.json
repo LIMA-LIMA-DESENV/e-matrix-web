@@ -1282,6 +1282,7 @@
       "priority_criterion": "Priority Criterion",
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
+      "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
       "change_assessment": "Evaluation of Changes / Projects"
     },
     "types": {
@@ -1291,6 +1292,7 @@
       "priority_criterion": "Priority Criterion",
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
+      "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
       "change_assessment": "Evaluation of Changes / Projects"
     },
     "columns": {
@@ -1575,6 +1577,39 @@
         "resultsAndConclusions": "RESULTS AND CONCLUSIONS",
         "recomendations": "RECOMMENDATIONS"
       },
+      "ergonomicWorkAnalysis": {
+        "title": "Ergonomic Work Analysis – Office",
+        "activity": "Activity Data",
+        "date": "Date",
+        "photo": "Workstation image",
+        "tables": {
+          "workstation": {
+            "columns": {
+              "basicConfigurationsStation": "BASIC SETTINGS OF THE ADMINISTRATIVE WORKSTATION",
+              "workPosture": "WORK POSTURE",
+              "biomechanicalFactors": "BIOMECHANICAL FACTORS"
+            }
+          },
+          "advancedAnalysis": {
+            "title": "Advanced Ergonomic Analysis Table",
+            "columns": {
+              "sector": "SECTOR",
+              "globalClassificationWorkStation": "GLOBAL CLASSIFICATION OF THE WORKSTATION",
+              "changeNeeded": "REQUIRED CHANGE"
+            }
+          },
+          "physicalEnvironment": {
+            "title": "Physical Environment Analysis Table",
+            "columns": {
+              "luminosity": "LUMINOSITY",
+              "noise": "NOISE",
+              "airSpeed": "AIR SPEED",
+              "effectiveTemperature": "EFFECTIVE TEMPERATURE",
+              "airHumidity": "AIR HUMIDITY"
+            }
+          }
+        }
+      },
       "priorityCriterion": {
         "title": "Priority Criterion",
         "fields": {
@@ -1598,6 +1633,7 @@
     "newPriorityCriterion": "New Priority Criterion",
     "newHitList": "New Hit List",
     "newChecklist": "New Data Collection — Office",
+    "newErgonomicWorkAnalysis": "New Ergonomic Work Analysis – Office",
     "newChangeAssessment": "New Evaluation of Changes",
     "actions": {
       "edit": "Edit"
@@ -1638,7 +1674,10 @@
       "riskFactorTotalInvalid": "Enter a number greater than or equal to zero.",
       "tooManyRows": "The table must have at most {max} rows.",
       "choiceRequired": "Choose an option.",
-      "nonNegativeIntegerInvalid": "Enter a whole number greater than or equal to zero."
+      "nonNegativeIntegerInvalid": "Enter a whole number greater than or equal to zero.",
+      "nonNegativeNumberInvalid": "Enter a number greater than or equal to zero.",
+      "numberInvalid": "Enter a number.",
+      "numberRangeInvalid": "Enter a number from {min} to {max}."
     },
     "hitListForm": {
       "sections": {
@@ -1814,6 +1853,51 @@
           }
         }
       }
+    },
+    "ergonomicWorkAnalysisFields": {
+      "answers": {
+        "basicConfigurationsStation": "Basic settings of the administrative workstation",
+        "workPosture": "Work posture",
+        "biomechanicalFactors": "Biomechanical factors",
+        "sector": "Sector",
+        "globalClassificationWorkStation": "Global classification of the workstation",
+        "changeNeeded": "Required change",
+        "luminosity": "Luminosity",
+        "noise": "Noise",
+        "airSpeed": "Air speed",
+        "effectiveTemperature": "Effective temperature",
+        "airHumidity": "Air humidity"
+      },
+      "tables": {
+        "workstation": "Workstation",
+        "advancedAnalysis": "Advanced Ergonomic Analysis Table",
+        "physicalEnvironment": "Physical Environment Analysis Table"
+      },
+      "units": {
+        "luminosity": "lux",
+        "noise": "dB",
+        "airSpeed": "m/s",
+        "effectiveTemperature": "°C",
+        "airHumidity": "%"
+      },
+      "references": {
+        "luminosity": "*(500)",
+        "noise": "*(<65)",
+        "airSpeed": "*(<0.75)",
+        "effectiveTemperature": "*(20-23)",
+        "airHumidity": "*(>40)"
+      }
+    },
+    "ergonomicWorkAnalysisForm": {
+      "sections": {
+        "photo": "Workstation image",
+        "identification": "Identification"
+      },
+      "fields": {
+        "date": "Date",
+        "photo": "Workstation image"
+      },
+      "reference": "Reference: {value}"
     },
     "priorityCriterionForm": {
       "newDescription": "{type}: choose the activity, fill in the identification, answer the 5 questions on the ergonomic risk and, if you wish, describe the solutions of each category.",
@@ -2128,6 +2212,11 @@
     "ergonomicWorkAnalysisAdvancedActivityNotFound": "The chosen activity no longer exists. Select another activity.",
     "ergonomicWorkAnalysisAdvancedDateInvalid": "Enter a valid date for the Ergonomic Work Analysis – Production.",
     "ergonomicWorkAnalysisAdvancedAnswersInvalid": "Some fields or rows of the Ergonomic Work Analysis – Production are invalid. Review the texts (up to 5,000 characters) and the tables (up to 30 rows) and try again.",
+    "ergonomicWorkAnalysisNotFound": "Ergonomic Work Analysis – Office not found.",
+    "ergonomicWorkAnalysisActivityRequired": "Select the activity of the Ergonomic Work Analysis – Office.",
+    "ergonomicWorkAnalysisActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "ergonomicWorkAnalysisDateInvalid": "Enter a valid date for the Ergonomic Work Analysis – Office.",
+    "ergonomicWorkAnalysisAnswersInvalid": "Some fields of the Ergonomic Work Analysis – Office are invalid. Review the texts (the sector up to 255 characters, the others up to 5,000) and the measures and try again.",
     "priorityCriterionNotFound": "Priority Criterion not found.",
     "priorityCriterionActivityRequired": "Select the activity of the Priority Criterion.",
     "priorityCriterionActivityNotFound": "The chosen activity no longer exists. Select another activity.",

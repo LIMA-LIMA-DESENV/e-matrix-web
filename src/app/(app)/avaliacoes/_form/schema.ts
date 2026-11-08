@@ -9,8 +9,11 @@ import type {
   ErgonomicAnalysisInLoco,
   ErgonomicAnalysisInLocoInput,
   ErgonomicAnalysisInLocoInputAnswers,
+  ErgonomicWorkAnalysis,
   ErgonomicWorkAnalysisAdvanced,
   ErgonomicWorkAnalysisAdvancedInput,
+  ErgonomicWorkAnalysisInput,
+  ErgonomicWorkAnalysisInputAnswers,
   HitList,
   HitListAnswersInput,
   HitListInput,
@@ -43,6 +46,17 @@ import {
   type ErgonomicWorkAnalysisAdvancedTextAnswer,
   MAX_EVALUATION_ROWS,
 } from '../components/ergonomic-work-analysis-advanced-fields'
+import {
+  ERGONOMIC_WORK_ANALYSIS_ANSWERS,
+  ERGONOMIC_WORK_ANALYSIS_MAX_INTEGER,
+  ERGONOMIC_WORK_ANALYSIS_MEASURE_ANSWERS,
+  ERGONOMIC_WORK_ANALYSIS_MEASURES,
+  ERGONOMIC_WORK_ANALYSIS_SECTOR_MAX_LENGTH,
+  ERGONOMIC_WORK_ANALYSIS_TEXT_ANSWERS,
+  type ErgonomicWorkAnalysisMeasure,
+  type ErgonomicWorkAnalysisMeasureRule,
+  type ErgonomicWorkAnalysisTextAnswer,
+} from '../components/ergonomic-work-analysis-fields'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
 import {
   PRIORITY_CRITERION_CATEGORIES,
@@ -494,10 +508,24 @@ function escapeRegExp(value: string) {
  * takes a comma or a point as the decimal separator, so "2,5" and "2.5" are
  * both 2.5 in every locale. A sign, an exponent or a second separator, as in
  * "-1", "1e3" or "2,5,1", is not a plain number.
+ *
+ * With `signed` (FR-018), one leading `-` may come before any of those forms
+ * and gives the opposite of the value read: "-2,5", "-2.5" and "-1.000" in
+ * pt-BR are -2.5, -2.5 and -1000. "--1", "2-" and a lone "-" are still `NaN`.
+ * Without it, "-1" stays `NaN`, as for the CDIP and the FR.
  */
-export function parseLocaleDecimal(raw: string, locale: string) {
+export function parseLocaleDecimal(
+  raw: string,
+  locale: string,
+  options: { signed?: boolean } = {}
+): number | null {
   const value = raw.replace(/[\s  ]/g, '')
   if (!value) return null
+
+  if (options.signed && value.startsWith('-')) {
+    const magnitude = parseLocaleDecimal(value.slice(1), locale)
+    return magnitude === null ? Number.NaN : -magnitude
+  }
 
   const parts = new Intl.NumberFormat(locale).formatToParts(1234567.5)
   const group = parts.find((part) => part.type === 'group')?.value ?? ''
@@ -1015,6 +1043,196 @@ export function toErgonomicWorkAnalysisAdvancedInput(
         data.answers.analyzedActivities
       ),
     },
+  }
+}
+
+/**
+ * Whether a measure read by `parseLocaleDecimal` follows its rule (AETA
+ * FR-016), the web's copy of the API's `rules` (FR-001): finite; at least
+ * zero unless `signed`; a whole number of at most
+ * `ERGONOMIC_WORK_ANALYSIS_MAX_INTEGER` with `integer`; at most `max`.
+ */
+function isErgonomicWorkAnalysisMeasure(
+  value: number,
+  rule: ErgonomicWorkAnalysisMeasureRule
+) {
+  if (!Number.isFinite(value)) return false
+  if (!rule.signed && value < 0) return false
+  if (
+    rule.integer &&
+    (!Number.isInteger(value) || value > ERGONOMIC_WORK_ANALYSIS_MAX_INTEGER)
+  ) {
+    return false
+  }
+  return rule.max === undefined || value <= rule.max
+}
+
+/** The message of a measure refused by its rule (FR-016). */
+function ergonomicWorkAnalysisMeasureMessage(
+  tv: Translate,
+  rule: ErgonomicWorkAnalysisMeasureRule
+) {
+  if (rule.integer) return tv('nonNegativeIntegerInvalid')
+  if (rule.signed) return tv('numberInvalid')
+  if (rule.max !== undefined) {
+    return tv('numberRangeInvalid', { min: 0, max: rule.max })
+  }
+  return tv('nonNegativeNumberInvalid')
+}
+
+/**
+ * Mirrors the API rules of an Análise Ergonômica do Trabalho – Escritório
+ * write (FR-004, FR-006, FR-016): the activity chosen among the listed ones,
+ * a real date, not compared with the periods, every text optional, the
+ * sector of at most 255 code points after the trim and the others of at most
+ * 5,000, and each of the 5 measures blank or typed in the user's `locale`,
+ * read by `parseLocaleDecimal` (with `signed` only for the temperature) and
+ * checked by its rule of `ERGONOMIC_WORK_ANALYSIS_MEASURES`, so a refused one
+ * is shown in its field and never reaches the API (RK-1). The API stays the
+ * authority, including whether the activity still exists.
+ */
+export function makeErgonomicWorkAnalysisSchema(
+  tv: Translate,
+  locale: string = defaultLocale
+) {
+  const textOf = (max: number) =>
+    z.string().refine((value) => answerLength(value) <= max, {
+      message: tv('textTooLong', { max }),
+    })
+  const texts = Object.fromEntries(
+    ERGONOMIC_WORK_ANALYSIS_TEXT_ANSWERS.map((key) => [
+      key,
+      textOf(
+        key === 'sector'
+          ? ERGONOMIC_WORK_ANALYSIS_SECTOR_MAX_LENGTH
+          : MAX_EVALUATION_TEXT_LENGTH
+      ),
+    ])
+  ) as Record<ErgonomicWorkAnalysisTextAnswer, ReturnType<typeof textOf>>
+
+  const measureOf = (key: ErgonomicWorkAnalysisMeasure) => {
+    const { rule } = ERGONOMIC_WORK_ANALYSIS_MEASURES[key] as {
+      rule: ErgonomicWorkAnalysisMeasureRule
+    }
+    return z.string().transform((value, ctx) => {
+      const parsed = parseLocaleDecimal(value, locale, { signed: rule.signed })
+      if (parsed === null) return null
+      if (!isErgonomicWorkAnalysisMeasure(parsed, rule)) {
+        ctx.addIssue({
+          code: 'custom',
+          message: ergonomicWorkAnalysisMeasureMessage(tv, rule),
+        })
+        return z.NEVER
+      }
+      return parsed
+    })
+  }
+  const measures = Object.fromEntries(
+    ERGONOMIC_WORK_ANALYSIS_MEASURE_ANSWERS.map((key) => [key, measureOf(key)])
+  ) as Record<ErgonomicWorkAnalysisMeasure, ReturnType<typeof measureOf>>
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    date: z.string().refine(isCalendarDay, tv('checklistDateRequired')),
+    answers: z.object(texts),
+    measures: z.object(measures),
+  })
+}
+
+/** The form as its controls hold it: the measures as typed. */
+export type ErgonomicWorkAnalysisFormInput = z.input<
+  ReturnType<typeof makeErgonomicWorkAnalysisSchema>
+>
+/** The form once valid: each measure a number, or `null` when blank. */
+export type ErgonomicWorkAnalysisFormData = z.output<
+  ReturnType<typeof makeErgonomicWorkAnalysisSchema>
+>
+
+/** An empty Análise Ergonômica do Trabalho – Escritório: no field at all. */
+export function ergonomicWorkAnalysisFormDefaultValues(): ErgonomicWorkAnalysisFormData {
+  return {
+    activity_id: '',
+    date: '',
+    answers: shapeOf(ERGONOMIC_WORK_ANALYSIS_TEXT_ANSWERS, '') as Record<
+      ErgonomicWorkAnalysisTextAnswer,
+      string
+    >,
+    measures: shapeOf(ERGONOMIC_WORK_ANALYSIS_MEASURE_ANSWERS, null) as Record<
+      ErgonomicWorkAnalysisMeasure,
+      number | null
+    >,
+  }
+}
+
+/**
+ * A stored Análise Ergonômica do Trabalho – Escritório as the form holds it:
+ * an absent text (`null`) is blank, and a measure is its number or `null`.
+ */
+export function toErgonomicWorkAnalysisFormValues(
+  record: ErgonomicWorkAnalysis
+): ErgonomicWorkAnalysisFormData {
+  return {
+    activity_id: record.activity.id,
+    date: record.date,
+    answers: Object.fromEntries(
+      ERGONOMIC_WORK_ANALYSIS_TEXT_ANSWERS.map((key) => [
+        key,
+        record.answers[key] ?? '',
+      ])
+    ) as Record<ErgonomicWorkAnalysisTextAnswer, string>,
+    measures: Object.fromEntries(
+      ERGONOMIC_WORK_ANALYSIS_MEASURE_ANSWERS.map((key) => {
+        const value = record.answers[key]
+        return [key, typeof value === 'number' ? value : null]
+      })
+    ) as Record<ErgonomicWorkAnalysisMeasure, number | null>,
+  }
+}
+
+/**
+ * The values of the controls: each measure written in the user's number
+ * format (`formatNumber`), so "-2,5" in pt-BR and "-2.5" in en (FR-016,
+ * AC-009), and a blank one `''`.
+ */
+export function toErgonomicWorkAnalysisFormInput(
+  data: ErgonomicWorkAnalysisFormData,
+  formatNumber: (value: number) => string
+): ErgonomicWorkAnalysisFormInput {
+  return {
+    ...data,
+    measures: Object.fromEntries(
+      ERGONOMIC_WORK_ANALYSIS_MEASURE_ANSWERS.map((key) => {
+        const value = data.measures[key]
+        return [key, value === null ? '' : formatNumber(value)]
+      })
+    ) as Record<ErgonomicWorkAnalysisMeasure, string>,
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/ergonomic-work-analyses` (FR-008,
+ * FR-016): the date as typed and the 11 answers in the order of the catalog,
+ * each text trimmed keeping its inner line breaks and each measure a number;
+ * a blank one goes as `null`, so the `PUT` clears it. The photo is not here:
+ * it goes after, through `PUT …/photo`.
+ */
+export function toErgonomicWorkAnalysisInput(
+  data: ErgonomicWorkAnalysisFormData
+): ErgonomicWorkAnalysisInput {
+  const answers = Object.fromEntries(
+    ERGONOMIC_WORK_ANALYSIS_ANSWERS.map((key) => [
+      key,
+      key in data.measures
+        ? data.measures[key as ErgonomicWorkAnalysisMeasure]
+        : data.answers[key as ErgonomicWorkAnalysisTextAnswer]?.trim() || null,
+    ])
+  ) as ErgonomicWorkAnalysisInputAnswers
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    date: data.date,
+    answers,
   }
 }
 

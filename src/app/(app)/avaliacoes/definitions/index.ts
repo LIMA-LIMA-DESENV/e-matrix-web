@@ -3,6 +3,7 @@ import type { EvaluationType } from '@/lib/evaluation-types'
 import { changeAssessmentDefinition } from './change-assessment'
 import { checklistDefinition } from './checklist'
 import { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
+import { ergonomicWorkAnalysisDefinition } from './ergonomic-work-analysis'
 import { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 import { hitListDefinition } from './hit-list'
 import { priorityCriterionDefinition } from './priority-criterion'
@@ -12,6 +13,7 @@ import type { EvaluationWebDefinition } from './types'
 export { changeAssessmentDefinition } from './change-assessment'
 export { checklistDefinition } from './checklist'
 export { ergonomicAnalysisInLocoDefinition } from './ergonomic-analysis-in-loco'
+export { ergonomicWorkAnalysisDefinition } from './ergonomic-work-analysis'
 export { ergonomicWorkAnalysisAdvancedDefinition } from './ergonomic-work-analysis-advanced'
 export { hitListDefinition } from './hit-list'
 export { priorityCriterionDefinition } from './priority-criterion'
@@ -29,6 +31,7 @@ const EVALUATION_WEB_DEFINITIONS = {
   priority_criterion: priorityCriterionDefinition,
   hit_list: hitListDefinition,
   checklist: checklistDefinition,
+  ergonomic_work_analysis: ergonomicWorkAnalysisDefinition,
   change_assessment: changeAssessmentDefinition,
 } as const satisfies Record<EvaluationType, EvaluationWebDefinition>
 

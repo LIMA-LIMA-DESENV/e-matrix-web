@@ -1282,6 +1282,7 @@
       "priority_criterion": "Criterio de Prioridad",
       "hit_list": "Hit List",
       "checklist": "Recopilación de Datos In Loco — Oficina",
+      "ergonomic_work_analysis": "Análisis Ergonómico del Trabajo – Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "types": {
@@ -1291,6 +1292,7 @@
       "priority_criterion": "Criterio de Prioridad",
       "hit_list": "Hit List",
       "checklist": "Recopilación de Datos In Loco — Oficina",
+      "ergonomic_work_analysis": "Análisis Ergonómico del Trabajo – Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos"
     },
     "columns": {
@@ -1575,6 +1577,39 @@
         "resultsAndConclusions": "RESULTADOS Y CONCLUSIONES",
         "recomendations": "RECOMENDACIONES"
       },
+      "ergonomicWorkAnalysis": {
+        "title": "Análisis Ergonómico del Trabajo – Oficina",
+        "activity": "Datos de la Actividad",
+        "date": "Fecha",
+        "photo": "Imagen del puesto",
+        "tables": {
+          "workstation": {
+            "columns": {
+              "basicConfigurationsStation": "CONFIGURACIONES BÁSICAS DEL PUESTO ADMINISTRATIVO",
+              "workPosture": "POSTURA DE TRABAJO",
+              "biomechanicalFactors": "FACTORES BIOMECÁNICOS"
+            }
+          },
+          "advancedAnalysis": {
+            "title": "Tabla de Análisis Ergonómico Avanzado",
+            "columns": {
+              "sector": "SECTOR",
+              "globalClassificationWorkStation": "CLASIFICACIÓN GLOBAL DEL PUESTO DE TRABAJO",
+              "changeNeeded": "CAMBIO NECESARIO"
+            }
+          },
+          "physicalEnvironment": {
+            "title": "Tabla de Análisis del Ambiente Físico",
+            "columns": {
+              "luminosity": "LUMINOSIDAD",
+              "noise": "RUIDO",
+              "airSpeed": "VELOCIDAD DEL AIRE",
+              "effectiveTemperature": "TEMPERATURA EFECTIVA",
+              "airHumidity": "HUMEDAD DEL AIRE"
+            }
+          }
+        }
+      },
       "priorityCriterion": {
         "title": "Criterio de Prioridad",
         "fields": {
@@ -1598,6 +1633,7 @@
     "newPriorityCriterion": "Nuevo Criterio de Prioridad",
     "newHitList": "Nueva Hit List",
     "newChecklist": "Nueva Recopilación de Datos — Oficina",
+    "newErgonomicWorkAnalysis": "Nuevo Análisis Ergonómico del Trabajo – Oficina",
     "newChangeAssessment": "Nueva Evaluación de Cambios",
     "actions": {
       "edit": "Modificar"
@@ -1638,7 +1674,10 @@
       "riskFactorTotalInvalid": "Ingrese un número mayor o igual a cero.",
       "tooManyRows": "La tabla debe tener como máximo {max} filas.",
       "choiceRequired": "Elija una opción.",
-      "nonNegativeIntegerInvalid": "Ingrese un número entero mayor o igual a cero."
+      "nonNegativeIntegerInvalid": "Ingrese un número entero mayor o igual a cero.",
+      "nonNegativeNumberInvalid": "Ingrese un número mayor o igual a cero.",
+      "numberInvalid": "Ingrese un número.",
+      "numberRangeInvalid": "Ingrese un número de {min} a {max}."
     },
     "hitListForm": {
       "sections": {
@@ -1814,6 +1853,51 @@
           }
         }
       }
+    },
+    "ergonomicWorkAnalysisFields": {
+      "answers": {
+        "basicConfigurationsStation": "Configuraciones básicas del puesto administrativo",
+        "workPosture": "Postura de trabajo",
+        "biomechanicalFactors": "Factores biomecánicos",
+        "sector": "Sector",
+        "globalClassificationWorkStation": "Clasificación global del puesto de trabajo",
+        "changeNeeded": "Cambio necesario",
+        "luminosity": "Luminosidad",
+        "noise": "Ruido",
+        "airSpeed": "Velocidad del aire",
+        "effectiveTemperature": "Temperatura efectiva",
+        "airHumidity": "Humedad del aire"
+      },
+      "tables": {
+        "workstation": "Puesto de trabajo",
+        "advancedAnalysis": "Tabla de Análisis Ergonómico Avanzado",
+        "physicalEnvironment": "Tabla de Análisis del Ambiente Físico"
+      },
+      "units": {
+        "luminosity": "lux",
+        "noise": "dB",
+        "airSpeed": "m/s",
+        "effectiveTemperature": "°C",
+        "airHumidity": "%"
+      },
+      "references": {
+        "luminosity": "*(500)",
+        "noise": "*(<65)",
+        "airSpeed": "*(<0,75)",
+        "effectiveTemperature": "*(20-23)",
+        "airHumidity": "*(>40)"
+      }
+    },
+    "ergonomicWorkAnalysisForm": {
+      "sections": {
+        "photo": "Imagen del puesto",
+        "identification": "Identificación"
+      },
+      "fields": {
+        "date": "Fecha",
+        "photo": "Imagen del puesto"
+      },
+      "reference": "Referencia: {value}"
     },
     "priorityCriterionForm": {
       "newDescription": "{type}: elija la actividad, complete la identificación, responda las 5 preguntas sobre el riesgo ergonómico y, si lo desea, describa las soluciones de cada categoría.",
@@ -2128,6 +2212,11 @@
     "ergonomicWorkAnalysisAdvancedActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
     "ergonomicWorkAnalysisAdvancedDateInvalid": "Ingrese una fecha válida para el Análisis Ergonómico del Trabajo – Producción.",
     "ergonomicWorkAnalysisAdvancedAnswersInvalid": "Algunos campos o filas del Análisis Ergonómico del Trabajo – Producción no son válidos. Revise los textos (hasta 5.000 caracteres) y las tablas (hasta 30 filas) e intente nuevamente.",
+    "ergonomicWorkAnalysisNotFound": "Análisis Ergonómico del Trabajo – Oficina no encontrado.",
+    "ergonomicWorkAnalysisActivityRequired": "Seleccione la actividad del Análisis Ergonómico del Trabajo – Oficina.",
+    "ergonomicWorkAnalysisActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "ergonomicWorkAnalysisDateInvalid": "Ingrese una fecha válida para el Análisis Ergonómico del Trabajo – Oficina.",
+    "ergonomicWorkAnalysisAnswersInvalid": "Algunos campos del Análisis Ergonómico del Trabajo – Oficina no son válidos. Revise los textos (el sector hasta 255 caracteres, los demás hasta 5.000) y las medidas e intente nuevamente.",
     "priorityCriterionNotFound": "Criterio de Prioridad no encontrado.",
     "priorityCriterionActivityRequired": "Seleccione la actividad del Criterio de Prioridad.",
     "priorityCriterionActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",

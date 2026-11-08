@@ -8,7 +8,8 @@ export type EvaluationType = EvaluationTypeItemType
  * The route of each evaluation type, in the order the API lists the enabled
  * ones (`ergonomic_analysis_in_loco`, `risk_factor`,
  * `ergonomic_work_analysis_advanced`, `priority_criterion`, `hit_list`,
- * `checklist`, `change_assessment`, the order of the legacy tabs):
+ * `checklist`, `ergonomic_work_analysis`, `change_assessment`, the order of
+ * the legacy tabs):
  * `/avaliacoes` opens on the first enabled.
  */
 export const EVALUATION_TYPE_HREFS = {
@@ -19,6 +20,8 @@ export const EVALUATION_TYPE_HREFS = {
   priority_criterion: '/avaliacoes/criterio-de-prioridade',
   hit_list: '/avaliacoes/hit-list',
   checklist: '/avaliacoes/coleta-de-dados',
+  ergonomic_work_analysis:
+    '/avaliacoes/analise-ergonomica-do-trabalho-escritorio',
   change_assessment: '/avaliacoes/avaliacao-de-mudancas',
 } as const satisfies Record<EvaluationType, string>
 

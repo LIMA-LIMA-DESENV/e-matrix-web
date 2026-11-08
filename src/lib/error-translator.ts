@@ -265,6 +265,15 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
     'ergonomicWorkAnalysisAdvancedDateInvalid',
   'Invalid production ergonomic work analysis answers.':
     'ergonomicWorkAnalysisAdvancedAnswersInvalid',
+  'Office ergonomic work analysis not found.': 'ergonomicWorkAnalysisNotFound',
+  'Office ergonomic work analysis activity is required.':
+    'ergonomicWorkAnalysisActivityRequired',
+  'Office ergonomic work analysis activity not found.':
+    'ergonomicWorkAnalysisActivityNotFound',
+  'Invalid office ergonomic work analysis date.':
+    'ergonomicWorkAnalysisDateInvalid',
+  'Invalid office ergonomic work analysis answers.':
+    'ergonomicWorkAnalysisAnswersInvalid',
   'Priority criterion not found.': 'priorityCriterionNotFound',
   'Priority criterion activity is required.':
     'priorityCriterionActivityRequired',
