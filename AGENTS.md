@@ -53,7 +53,7 @@ src/
 │   │   ├── projetos/     # redirects to producao/ keeping the query; producao/ (RGP) and escritorio/ (RGA and RA) tabs share ?period= (ProjectsTabs); RGP list sliced by period, detail modal with photo thumbnails (blob: URLs revoked on close), effectiveness verification form; escritorio/ merges the RGA and RA queries into one table (?type=all|rga|ra), RA detail with its receipt form, receiving materials form; PDF of each RGP/RGA (row and detail) and the blank one (card), generated in the browser (see PDFs), none for RA; every role reads; canEdit writes RGP/RGA through _form/ (ImprovementProjectForm by scope, rgp|rga/novo and [id]/editar, the other scope redirects) and RA (MaterialReceiptForm, ra/novo and ra/[id]/editar), deletes on the listing only (DeleteProjectModal), "Novo" on the card and the empty state, ?created=/?updated=/?beforePhotoRemoved=/?afterPhotoRemoved=/?fileRemoved=<code>
 │   │   ├── plano-de-gestao/ # one GET for every period: SVG chart, mini-grids and the full grid of ?period=<id> (default resolved on the page, no "all"); every role reads, canEdit clicks cells and edits the goal (saved at once, not optimistic, grid locked while saving)
 │   │   ├── matriz/       # two tabs, each a route sharing only ?period= (MatrixTabs, like ProjectsTabs); graficos/ is the Gráficos tab: the same GET and period slice as Resultados (shared cache, read only), the three maps of the whole Matrix (charts.ts without React: maps, count, percent; MatrixPieChart in SVG without a library, legend, tooltip, "N de M sem valor", "Sem dados"; colors --color-chart-*); `?view=groups` (chips "Toda a matriz"/"Por fábrica, área e função", router.replace keeping ?period=, any other value is the whole Matrix) breaks each map into MatrixChartMapView: the general pie plus the Fábricas, Áreas and Funções columns (lg side by side, stacked below), groupMatrixChart in charts.ts groups by normalizeText with the first spelling in rows order as label, sorted by localeCompare base; groups with no value have no pie and no filter item; each column has a DropdownMenu of checkboxes with "Todos" that only shows/hides pies, local state reset on a new period or view; a slice with a count, or its legend button (click, Enter or Space), opens the Resultados of exactly its activities: getMatrixChartSliceTarget in charts.ts builds `/matriz?period=<id>&f.<field>=<value>` plus, on a group pie, `&f.<fabric|area|function>="<label>"` (the exact text filter, so the rows equal the tooltip count) and the columns that revealMatrixColumns shows before a router.push (back returns to the tab and view); slices with 0 and "Sem dados" open nothing; MatrixEmptyState variant="charts" without actions; Resultados tab: one GET of the Matrix of ?period=<id> (sliced by period, no "all": isPeriodIdValue and PeriodFilter includeAll={false}); not initialized → empty state; else one row per activity, columns.ts with the 27 columns (key, help, type, default), the 8 default ones shown, the visible columns remembered in localStorage (`ematrix.matrix.columns`, use-matrix-columns.ts, every access in try/catch, defaults when missing or invalid; ColumnPicker; revealMatrixColumns adds columns to the stored choice, outside React, hiding none), search over all 27 with the list values translated, a filter per column in the header kept in the URL as `f.<key>` (lists: all/values/`empty`; text: contains, or equals between double quotes — `"Solda"` keeps "Solda" and not "Solda Ponto", normalizeText on both sides, `""` or a lone quote stay contains; exactMatrixTextFilter builds that value), hidden columns keep filtering, "limpar" back to the default columns without search and filters keeping ?period=, sort and pages in the client; "Exportar" (ExportMenu, use-matrix-export.ts) saves the visible columns and the filtered rows of every page as CSV or .xlsx (see Exports); the ⋮ menu of each row (MatrixRowProjectsMenu, also on a right click on the row outside fields) lists the RGP and RGA of the activity by code from a single `GET /improvement-projects` loaded with the screen (use-matrix-projects.ts) and opens `/projetos/producao?period=all&q=<code>` or `/projetos/escritorio?period=all&type=rga&q=<code>`, with its own loading, empty and error/retry states; every role reads; canEdit starts the Matrix of a period once from the empty state (MatrixEmptyState: "Copiar de <copy_source>" and "Começar em branco", each confirmed with ConfirmActionModal; the POST answer replaces the cached Matrix; 409 `Matrix already initialized.` reads it again and shows the table, 409 `Matrix copy source has changed.` reads it again and shows the new origin with the message) and edits the 21 fields in their cells (MatrixCell, one editor open at a time, in a portal over the cell: lists save on choosing, text saves with Salvar or Ctrl/Cmd+Enter, Esc/Cancelar/click outside/blur never save; the cell shows the save and takes no other edit, not optimistic; use-update-matrix-field.ts puts the row the PUT answers with into the cache with setQueryData, only the saved field while two writes of the row overlap; a failure keeps the previous value with the translated error in the cell); the viewer gets plain text cells and no actions
-│   │   ├── avaliacoes/   # optional module (see Optional Modules): redirects to the tab of the first enabled type, or is not found with none; coleta-de-dados-producao/ (ergonomic_analysis_in_loco, CDIP), identificacao-de-riscos/ (risk_factor, FR), analise-ergonomica-do-trabalho-producao/ (ergonomic_work_analysis_advanced, AETP, with the sector photo), criterio-de-prioridade/ (priority_criterion, CP, with the live sum and priority), hit-list/, coleta-de-dados/ (the checklist of the API, CDIA) and avaliacao-de-mudancas/ (change_assessment, AMP) are one tab each, only for the enabled types, in the API order, a disabled one is not found (notFound()); one global list per type, never sliced by period (no usePeriodSlice): code badge, type, name (the translated type for the Hit List and the AMP, or the checklist name), activity, registered and changed at (date and time), search, sort and pages in the client, newest registered first; the Hit List, Coleta de Dados and AMP tabs have "PDF" in the ⋮ menu of each row and "PDF em branco" beside the search, shown in every state (see PDFs); every role reads and opens a record read only from "Visualizar" in the ⋮ menu; canEdit writes the three types through _form/ (form-parts.tsx holds the shared layout, fields, three-state radio groups, activity select and the submit guard; HitListForm in the six sections of the report, one react-hook-form instance without watch, the improvements' items as checkboxes sent in the order of HIT_LIST_ITEMS; ChecklistForm with the identification (activity, name, sector and date, all required) and the 11 blocks, each question yes/no/no answer labelled with its points, and the live score: each block's sum and percentage and the average at the foot, computed by computeChecklistScore from components/checklist-blocks.ts over useWatch of answers only, in aria-live="polite" regions; ChangeAssessmentForm with the identification (activity and date, both required) and the 8 questions of components/change-assessment-questions.ts, each a multiline text area labelled "N ) <question>" with the text of the PDF, optional, of up to 5,000 code points, a blank one sent as null; yes/no are three-state radio groups labelled by the question; readOnly disables every control through one disabled fieldset and hides "Salvar", the view still showing the score; schema.ts mirrors the API rules: activity, real calendar dates, texts of up to 5,000 code points, checklist name and sector not blank and of up to 255; use-evaluation-activity-options.ts reads GET /evaluations/<type>/activities; EvaluationTypeGuard calls notFound() for a disabled type before any request): <tab>/novo, <tab>/[id] (the view, with "Baixar PDF" and, for canEdit, "Alterar") and <tab>/[id]/editar for hit-list/, coleta-de-dados/ and avaliacao-de-mudancas/, each a thin route file over the generic _form/CreateEvaluation, ViewEvaluation and EditEvaluation (see Optional Modules), the write routes sending a Viewer back to the tab; "Nova Hit List"/"Nova Coleta de Dados"/"Nova Avaliação de Mudanças" beside the search and on the empty state and "Alterar" in the ⋮ menu for canEdit; ?created=/?updated=<code> (use-evaluation-feedback.ts, list-href.ts); "Excluir" in the ⋮ menu for canEdit, only on the listing (never on the view): DeleteEvaluationModal (ConfirmActionModal citing the code, final deletion, confirm disabled while pending) over use-delete-evaluation.ts (the generated DELETE of the type; drops the detail from the cache and refreshes the listing, also on failure, so a record deleted in another tab shows the translated "not found" and leaves the list)
+│   │   ├── avaliacoes/   # optional module (see Optional Modules): redirects to the tab of the first enabled type, or is not found with none; coleta-de-dados-producao/ (ergonomic_analysis_in_loco, CDIP), identificacao-de-riscos/ (risk_factor, FR), analise-ergonomica-do-trabalho-producao/ (ergonomic_work_analysis_advanced, AETP, with the sector photo), criterio-de-prioridade/ (priority_criterion, CP, with the live sum and priority), hit-list/, coleta-de-dados/ (the checklist of the API, CDIA), analise-ergonomica-do-trabalho-escritorio/ (ergonomic_work_analysis, AETA, with the workstation photo and the 5 measures beside their references) and avaliacao-de-mudancas/ (change_assessment, AMP) are one tab each, only for the enabled types, in the API order, a disabled one is not found (notFound()); one global list per type, never sliced by period (no usePeriodSlice): code badge, type, name (the translated type for the Hit List and the AMP, or the checklist name), activity, registered and changed at (date and time), search, sort and pages in the client, newest registered first; the Hit List, Coleta de Dados and AMP tabs have "PDF" in the ⋮ menu of each row and "PDF em branco" beside the search, shown in every state (see PDFs); every role reads and opens a record read only from "Visualizar" in the ⋮ menu; canEdit writes the three types through _form/ (form-parts.tsx holds the shared layout, fields, three-state radio groups, activity select and the submit guard; HitListForm in the six sections of the report, one react-hook-form instance without watch, the improvements' items as checkboxes sent in the order of HIT_LIST_ITEMS; ChecklistForm with the identification (activity, name, sector and date, all required) and the 11 blocks, each question yes/no/no answer labelled with its points, and the live score: each block's sum and percentage and the average at the foot, computed by computeChecklistScore from components/checklist-blocks.ts over useWatch of answers only, in aria-live="polite" regions; ChangeAssessmentForm with the identification (activity and date, both required) and the 8 questions of components/change-assessment-questions.ts, each a multiline text area labelled "N ) <question>" with the text of the PDF, optional, of up to 5,000 code points, a blank one sent as null; yes/no are three-state radio groups labelled by the question; readOnly disables every control through one disabled fieldset and hides "Salvar", the view still showing the score; schema.ts mirrors the API rules: activity, real calendar dates, texts of up to 5,000 code points, checklist name and sector not blank and of up to 255; use-evaluation-activity-options.ts reads GET /evaluations/<type>/activities; EvaluationTypeGuard calls notFound() for a disabled type before any request): <tab>/novo, <tab>/[id] (the view, with "Baixar PDF" and, for canEdit, "Alterar") and <tab>/[id]/editar for hit-list/, coleta-de-dados/ and avaliacao-de-mudancas/, each a thin route file over the generic _form/CreateEvaluation, ViewEvaluation and EditEvaluation (see Optional Modules), the write routes sending a Viewer back to the tab; "Nova Hit List"/"Nova Coleta de Dados"/"Nova Avaliação de Mudanças" beside the search and on the empty state and "Alterar" in the ⋮ menu for canEdit; ?created=/?updated=<code> (use-evaluation-feedback.ts, list-href.ts); "Excluir" in the ⋮ menu for canEdit, only on the listing (never on the view): DeleteEvaluationModal (ConfirmActionModal citing the code, final deletion, confirm disabled while pending) over use-delete-evaluation.ts (the generated DELETE of the type; drops the detail from the cache and refreshes the listing, also on failure, so a record deleted in another tab shows the translated "not found" and leaves the list)
 │   │   ├── usuarios/     # list, novo/, [id]/editar/, _form/ (shared form)
 │   │   └── parametros/   # redirects to its first tab; atividades/ and periodos/ (each list, novo/, [id]/editar/, _form/); ParametersTabs carries the admin-only "reset program items" action of both tabs
 │   ├── login/ esqueci-minha-senha/ redefinir-senha/[token]/
@@ -127,7 +127,8 @@ the select; `isPeriodFilterValue` is the `?period=` validator and
 Avaliações is optional per installation and per type
 (`ergonomic_analysis_in_loco`, `risk_factor`,
 `ergonomic_work_analysis_advanced`, `priority_criterion`, `hit_list`,
-`checklist`, `change_assessment`, the API's canonical order, the order of the legacy tabs), switched by
+`checklist`, `ergonomic_work_analysis`, `change_assessment`, the API's
+canonical order, the order of the legacy tabs), switched by
 `EVALUATION_TYPES` in the API. The web never has a
 `NEXT_PUBLIC_*` variable for it: it asks the API. `useEvaluationTypes()` in
 `src/lib/evaluation-types.ts` reads `GET /evaluations/types`, cached for the
@@ -201,7 +202,11 @@ the first type to use two capabilities of the core:
   `parseLocaleDecimal` in `_form/schema.ts` reads it in the user's locale
   (a comma or a point as the decimal separator, "1.000" a thousand in pt-BR
   and es), and the zod schema, built with the locale, turns it into the
-  number the body sends. The stored number comes back written with
+  number the body sends. A sign, an exponent or a second separator is not
+  a number ("-1" is `NaN`), unless the call passes `{ signed: true }`: then
+  one leading `-` may come before any accepted form ("-2,5", "-2.5",
+  "-1.000" in pt-BR) and gives the opposite value, while "--1" and "2-"
+  stay `NaN`. Only the AETA's effective temperature uses it. The stored number comes back written with
   `useFormatter().number`, in the form and in the PDF.
 - **The activity's location in the detail** (`detailActivityLocation` in the
   API definition): the detail's `activity` also has its current `area` and
@@ -281,6 +286,42 @@ text, since the AETA will be "– Escritório".
   goes back to the tab with `?photoRemoved=<code>`. The view shows the
   thumbnail and "Baixar foto", or "Sem foto". A type without `photo` makes
   no photo call.
+
+The Análise Ergonômica do Trabalho – Escritório (`ergonomic_work_analysis`,
+AETA, `analise-ergonomica-do-trabalho-escritorio/`) has the AETP's photo, the
+"Imagem do posto", and the first measures with their own rules. Its rows show
+the translated type in the name column, and "– Escritório" is in every text.
+
+- **Its fields** live in
+  `avaliacoes/components/ergonomic-work-analysis-fields.ts`, the web's only
+  list of the 11 answers (the API catalog's order and legacy keys), grouped
+  in the 3 legacy tables, and of each measure's unit, reference and rule
+  (`integer`, `signed`, `max`): the web's copy of the API catalog's `rules`,
+  shared by the form, the schema and the PDF. The references are translated
+  texts ("*(<0,75)" in pt-BR and es, "*(<0.75)" in en), only shown: no
+  measure is refused or highlighted for being out of its reference.
+- **The form** (`ErgonomicWorkAnalysisForm.tsx`) has five sections in the
+  legacy order: the workstation image (`EvaluationPhotoField`, as the AETP),
+  the identification (activity and date, both required), the workstation's
+  3 texts, the "Tabela de Análise Ergonômica Avançada" (the sector, a
+  one-line input of at most 255 characters, and 2 texts) and the "Tabela de
+  Análise do Ambiente Físico": 5 inputs labelled "<name> (<unit>)", each
+  described by its reference (`aria-describedby`), luminosity and noise with
+  `inputMode="numeric"` and the others `inputMode="decimal"`, in a grid that
+  wraps to one per row on a narrow screen. Every text and measure is
+  optional.
+- **The schema** (`makeErgonomicWorkAnalysisSchema`, built with the locale)
+  reads each typed measure with `parseLocaleDecimal` (`signed` only for the
+  temperature) and checks its rule, so a refused one shows in its field
+  before any request: "Informe um número inteiro maior ou igual a zero."
+  (luminosity and noise, up to 2147483647), "Informe um número maior ou igual
+  a zero." (air speed), "Informe um número." (temperature) and "Informe um
+  número de 0 a 100." (humidity). The API answers one message for every
+  refused answer, so the web is what names the field. The body sends the 11
+  answers in the catalog order, a blank one as `null`; a stored measure comes
+  back written with `useFormatter().number` ("-2,5" in pt-BR).
+- **The photo** is fetched by the definition's own `fetch`, over the
+  generated `GET …/{id}/photo`; the rest is the AETP's flow.
 
 The Critério de Prioridade (`priority_criterion`, CP,
 `criterio-de-prioridade/`) is the first type with required single choices and
@@ -474,6 +515,18 @@ it covers the accents of pt-BR and es, but not characters outside cp1252.
   each page, and a row is split only when taller than a page. The blank form
   has no code, no photo and no values, with a 60 mm photo cell and every text
   at least 3 lines high.
+- `ergonomic-work-analysis-pdf.ts`: the Análise Ergonômica do Trabalho –
+  Escritório (AETA) and its blank form, portrait A4, black on white in the
+  order of the legacy `ergonomicworkanalysis.pdf.twig`: the title and the
+  code, "Imagem do posto" across the width with the photo whole and in
+  proportion (60 to 120 mm high; "Foto indisponível" when it did not load),
+  "Dados da Atividade:" and "Data:", the workstation table (no title, as in
+  the legacy), "Tabela de Análise Ergonômica Avançada:" and "Tabela de
+  Análise do Ambiente Físico:" with 5 groups "<NAME> (<unit>)", each with
+  the measure as it comes and its reference. Texts keep their line breaks,
+  and a table goes on to the next page repeating its title and header. The
+  blank form has no code, no photo and no values, a 60 mm photo cell, every
+  text at least 3 lines high and the references.
 - `priority-criterion-pdf.ts`: the Critério de Prioridade (CP) and its
   blank form, portrait A4, in the order of the legacy
   `prioritycriterion.pdf.twig`: the title and the code, the header [Data |
@@ -552,6 +605,16 @@ reads the translations and formatters it needs and imports its module of
   the PDF is still saved. Saved as
   `AETP-<n>-analise-ergonomica-do-trabalho-producao.pdf` or
   `analise-ergonomica-do-trabalho-producao.pdf`.
+- `ergonomic-work-analysis-pdf-adapter.ts` does the same for the AETA: the
+  date with `useFormatDateOnly()`, the activity as `código — nome`, each
+  measure with `useFormatter().number` (`0,5` in pt-BR and es, `0.5` in en;
+  blank when absent), and the units and references of
+  `evaluations.ergonomicWorkAnalysisFields`. Its `build` fetches the
+  workstation photo with `definition.photo.fetch` and passes it through
+  `loadPdfPhoto`; a photo that does not download or decode is
+  `UNAVAILABLE_PHOTO` and the PDF is still saved. Saved as
+  `AETA-<n>-analise-ergonomica-do-trabalho-escritorio.pdf` or
+  `analise-ergonomica-do-trabalho-escritorio.pdf`.
 - `priority-criterion-pdf-adapter.ts` does the same for the CP: the date
   with `useFormatDateOnly()`, the number of employees with
   `useFormatter().number`, the activity as `código — nome`, the area and
