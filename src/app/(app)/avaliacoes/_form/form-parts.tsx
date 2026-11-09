@@ -253,6 +253,70 @@ export function ChoiceAnswer({
   )
 }
 
+/**
+ * A yes/no that may stay unanswered (FR-019): two `aria-pressed` buttons
+ * worth `true`, `false` or `null`. A click selects an option and clears the other,
+ * and a click on the selected one goes back to no answer. Inside a disabled
+ * fieldset the buttons are inert and the choice stays visible. With `hideLegend`
+ * the legend only names the group, for when a label beside it already shows it.
+ */
+export function OptionalChoiceAnswer({
+  id,
+  legend,
+  value,
+  onChange,
+  yesLabel,
+  noLabel,
+  hideLegend,
+}: {
+  id: string
+  legend: string
+  value: boolean | null
+  onChange: (value: boolean | null) => void
+  yesLabel: string
+  noLabel: string
+  hideLegend?: true
+}) {
+  const legendId = `${id}-legend`
+  const options = [
+    { option: true, label: yesLabel },
+    { option: false, label: noLabel },
+  ] as const
+
+  return (
+    <div className="space-y-2">
+      <p
+        id={legendId}
+        className={
+          hideLegend
+            ? 'sr-only'
+            : 'ml-1 text-sm font-semibold text-on-surface-variant'
+        }
+      >
+        {legend}
+      </p>
+      {/* biome-ignore lint/a11y/useSemanticElements: a fieldset would need a legend, and this group shares the label beside it. */}
+      <div role="group" aria-labelledby={legendId} className="flex gap-2">
+        {options.map(({ option, label }) => (
+          <button
+            key={label}
+            type="button"
+            aria-pressed={value === option}
+            onClick={() => onChange(value === option ? null : option)}
+            className={`min-h-10 rounded-lg border px-4 py-1.5 text-sm font-semibold disabled:cursor-not-allowed ${
+              value === option
+                ? 'border-primary-container bg-primary-container text-on-primary-container'
+                : 'border-outline-variant bg-transparent text-on-surface-variant enabled:hover:bg-surface-container-high'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 /** One section of the form, in the order of the report (R-2). */
 export function Section({
   title,

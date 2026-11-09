@@ -1,9 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { useParams, useSearchParams } from 'next/navigation'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { Suspense, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 
 import { Button } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
@@ -52,6 +52,7 @@ function ViewEvaluation({
   definition: EvaluationWebDefinition
 }) {
   const t = useTranslations('evaluations')
+  const router = useRouter()
   const searchParams = useSearchParams()
   const { id } = useParams<{ id: string }>()
   const translateError = useTranslateError()
@@ -59,8 +60,16 @@ function ViewEvaluation({
   const [pdfError, setPdfError] = useState<string | null>(null)
   const pdf = useEvaluationPdf(definition, setPdfError)
   const listHref = evaluationsListHref(definition.type, searchParams)
+  // A type that only editors read (FR-016): anyone else goes back to the tab,
+  // and the detail is disabled in this same render, so it is never requested
+  // nor shown from the cache. The real guard is the API.
+  const canRead = canEdit || !definition.restrictedRead
 
-  const detail = definition.useDetail(id, !!id)
+  useEffect(() => {
+    if (!canRead) router.replace(listHref)
+  }, [canRead, listHref, router])
+
+  const detail = definition.useDetail(id, canRead && !!id)
   const record = detail.data
 
   const initialValues = useMemo(
@@ -81,6 +90,8 @@ function ViewEvaluation({
     }),
     [record]
   )
+
+  if (!canRead) return null
 
   if (detail.isLoading) return <EvaluationFormSkeleton />
 

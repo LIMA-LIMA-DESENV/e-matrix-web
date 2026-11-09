@@ -95,6 +95,7 @@ function EnabledEvaluationType({ type }: { type: EvaluationType }) {
  * row, beside the row's PDF, and "Nova …" for who may edit. The record routes
  * carry the tab's state, so going back keeps it. "Excluir" asks for
  * confirmation and reports the result on the tab's feedback strip (FR-016).
+ * A type with `restrictedRead` has no row actions for who may not edit.
  */
 function useEvaluationRecordActions(
   definition: EvaluationWebDefinition,
@@ -181,7 +182,15 @@ function useEvaluationRecordActions(
     />
   ) : null
 
-  return { getRowActions, newButton, deleteModal }
+  // A type that only editors read (FR-016) has no row action for the others:
+  // the table then has no actions column, and "PDF em branco" stays.
+  const canReadRecords = canEdit || !definition.restrictedRead
+
+  return {
+    getRowActions: canReadRecords ? getRowActions : undefined,
+    newButton,
+    deleteModal,
+  }
 }
 
 /**

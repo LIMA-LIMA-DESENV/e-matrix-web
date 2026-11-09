@@ -14,6 +14,8 @@ import type {
   ErgonomicWorkAnalysisAdvancedInput,
   ErgonomicWorkAnalysisInput,
   ErgonomicWorkAnalysisInputAnswers,
+  FunctionalCinesioAssessment,
+  FunctionalCinesioAssessmentInput,
   HitList,
   HitListAnswersInput,
   HitListInput,
@@ -62,6 +64,11 @@ import {
   type ErgonomicWorkAnalysisMeasureRule,
   type ErgonomicWorkAnalysisTextAnswer,
 } from '../components/ergonomic-work-analysis-fields'
+import {
+  FUNCTIONAL_CINESIO_ASSESSMENT_ANSWERS,
+  type FunctionalCinesioAssessmentAnswer,
+  type FunctionalCinesioAssessmentAnswerKind,
+} from '../components/functional-cinesio-assessment-fields'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
 import {
   INCIDENT_INVESTIGATION_ANSWERS,
@@ -1705,5 +1712,231 @@ export function toIncidentInvestigationInput(
         ]
       )
     ),
+  }
+}
+
+/**
+ * The longest one-line text of an Avaliação Cinesiofuncional, in code points after
+ * the trim: the `maxLength: 255` of the API catalog (FR-006).
+ */
+export const MAX_FUNCTIONAL_CINESIO_ASSESSMENT_SHORT_TEXT_LENGTH = 255
+
+/** The highest pain intensity (R-32). */
+export const MAX_FUNCTIONAL_CINESIO_ASSESSMENT_PAIN_INTENSITY = 10
+
+const FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES = Object.entries(
+  FUNCTIONAL_CINESIO_ASSESSMENT_ANSWERS
+) as [
+  FunctionalCinesioAssessmentAnswer,
+  FunctionalCinesioAssessmentAnswerKind,
+][]
+
+/** The header of an ACF, the same as typed and as sent. */
+interface FunctionalCinesioAssessmentFormHeader {
+  activity_id: string
+  assessment_date: string
+  evaluated: string
+  birth_date: string
+  registry: string
+}
+
+/**
+ * The form as its controls hold it: a mark is a `boolean`, a Sim/Não or
+ * Adequado/Abaixo `true`, `false` or `null`, and the texts and measures as typed.
+ */
+export interface FunctionalCinesioAssessmentFormInput
+  extends FunctionalCinesioAssessmentFormHeader {
+  answers: Record<FunctionalCinesioAssessmentAnswer, string | boolean | null>
+}
+
+/** The valid form: the measures are numbers, and a blank one `null`. */
+export interface FunctionalCinesioAssessmentFormData
+  extends FunctionalCinesioAssessmentFormHeader {
+  answers: Record<
+    FunctionalCinesioAssessmentAnswer,
+    string | number | boolean | null
+  >
+}
+
+/**
+ * Mirrors the API rules of an Avaliação Cinesiofuncional write (FR-004, FR-020):
+ * the activity chosen among the listed ones, a real date (never compared with the
+ * periods), the name and the ID not blank and of up to 255 code points, a real birth
+ * date not after the date, the texts within their limits and the measures typed in
+ * the user's `locale`. The API answers one message for every refused answer, so this
+ * schema is what names the field.
+ */
+export function makeFunctionalCinesioAssessmentSchema(
+  tv: Translate,
+  locale: string = defaultLocale
+) {
+  const textOf = (max: number) =>
+    z.string().refine((value) => answerLength(value) <= max, {
+      message: tv('textTooLong', { max }),
+    })
+  const shortText = textOf(MAX_FUNCTIONAL_CINESIO_ASSESSMENT_SHORT_TEXT_LENGTH)
+  const requiredText = (requiredMessage: string) =>
+    z
+      .string()
+      .refine((value) => value.trim().length > 0, { message: requiredMessage })
+      .pipe(shortText)
+  const measure = (message: string, isValid: (value: number) => boolean) =>
+    z.string().transform((value, ctx) => {
+      const parsed = parseLocaleDecimal(value, locale)
+      if (parsed === null) return null
+      if (!Number.isFinite(parsed) || !isValid(parsed)) {
+        ctx.addIssue({ code: 'custom', message })
+        return z.NEVER
+      }
+      return parsed
+    })
+
+  const answerOfKind: Record<FunctionalCinesioAssessmentAnswerKind, z.ZodType> =
+    {
+      mark: z.boolean(),
+      exclusive: z.boolean().nullable(),
+      number: measure(tv('nonNegativeNumberInvalid'), (value) => value >= 0),
+      integer: measure(
+        tv('integerRangeInvalid', {
+          min: 0,
+          max: MAX_FUNCTIONAL_CINESIO_ASSESSMENT_PAIN_INTENSITY,
+        }),
+        (value) =>
+          Number.isInteger(value) &&
+          value >= 0 &&
+          value <= MAX_FUNCTIONAL_CINESIO_ASSESSMENT_PAIN_INTENSITY
+      ),
+      shortText,
+      longText: textOf(MAX_EVALUATION_TEXT_LENGTH),
+      select: z.string(),
+    }
+
+  return z
+    .object({
+      activity_id: z.string().min(1, tv('activityRequired')),
+      assessment_date: z
+        .string()
+        .refine(isCalendarDay, tv('assessmentDateRequired')),
+      evaluated: requiredText(tv('nameRequired')),
+      birth_date: z.string().refine(isCalendarDay, tv('birthDateRequired')),
+      registry: requiredText(tv('registryRequired')),
+      answers: z.object(
+        Object.fromEntries(
+          FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES.map(([key, kind]) => [
+            key,
+            answerOfKind[kind],
+          ])
+        )
+      ),
+    })
+    .superRefine((data, ctx) => {
+      // `YYYY-MM-DD` texts compare as the days they are, with no time zone.
+      if (
+        isCalendarDay(data.birth_date) &&
+        isCalendarDay(data.assessment_date) &&
+        data.birth_date > data.assessment_date
+      ) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['birth_date'],
+          message: tv('birthDateAfterAssessmentDate'),
+        })
+      }
+    }) as unknown as z.ZodType<
+    FunctionalCinesioAssessmentFormData,
+    FunctionalCinesioAssessmentFormInput
+  >
+}
+
+/** An empty ACF: every text blank, no mark and no answer. */
+export function functionalCinesioAssessmentFormDefaultValues(): FunctionalCinesioAssessmentFormData {
+  return {
+    activity_id: '',
+    assessment_date: '',
+    evaluated: '',
+    birth_date: '',
+    registry: '',
+    answers: Object.fromEntries(
+      FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES.map(([key, kind]) => {
+        if (kind === 'mark') return [key, false]
+        return [key, kind === 'exclusive' || isMeasure(kind) ? null : '']
+      })
+    ) as FunctionalCinesioAssessmentFormData['answers'],
+  }
+}
+
+function isMeasure(kind: FunctionalCinesioAssessmentAnswerKind) {
+  return kind === 'number' || kind === 'integer'
+}
+
+/**
+ * A stored ACF as the form holds it. Only `true` marks a mark, and only `true` or
+ * `false` answers an exclusive one: anything else stays unmarked or unanswered.
+ */
+export function toFunctionalCinesioAssessmentFormValues(
+  record: FunctionalCinesioAssessment
+): FunctionalCinesioAssessmentFormData {
+  return {
+    activity_id: record.activity.id,
+    assessment_date: record.assessment_date,
+    evaluated: record.evaluated,
+    birth_date: record.birth_date,
+    registry: record.registry,
+    answers: Object.fromEntries(
+      FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES.map(([key, kind]) => {
+        const value = record.answers[key] ?? null
+        if (kind === 'mark') return [key, value === true]
+        if (kind === 'exclusive' || isMeasure(kind)) return [key, value]
+        return [key, value ?? '']
+      })
+    ) as FunctionalCinesioAssessmentFormData['answers'],
+  }
+}
+
+/**
+ * The values of the controls: each measure written in the user's number format
+ * (`formatNumber`), which `parseLocaleDecimal` reads back unchanged, and a blank
+ * one `''`.
+ */
+export function toFunctionalCinesioAssessmentFormInput(
+  data: FunctionalCinesioAssessmentFormData,
+  formatNumber: (value: number) => string
+): FunctionalCinesioAssessmentFormInput {
+  return {
+    ...data,
+    answers: Object.fromEntries(
+      FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES.map(([key, kind]) => {
+        const value = data.answers[key]
+        if (!isMeasure(kind)) return [key, value]
+        return [key, typeof value === 'number' ? formatNumber(value) : '']
+      })
+    ) as FunctionalCinesioAssessmentFormInput['answers'],
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/functional-cinesio-assessments` (FR-020): the
+ * dates as typed and the header trimmed. A text goes trimmed, keeping its inner line
+ * breaks, and a blank one as `null`; a mark as `true` or `null`, never `false`; an
+ * exclusive answer as `true`, `false` or `null`; a measure as a JSON number or `null`.
+ */
+export function toFunctionalCinesioAssessmentInput(
+  data: FunctionalCinesioAssessmentFormData
+): FunctionalCinesioAssessmentInput {
+  return {
+    activity_id: data.activity_id,
+    // Calendar days go as typed (`YYYY-MM-DD`), never through Date.
+    assessment_date: data.assessment_date,
+    evaluated: data.evaluated.trim(),
+    birth_date: data.birth_date,
+    registry: data.registry.trim(),
+    answers: Object.fromEntries(
+      FUNCTIONAL_CINESIO_ASSESSMENT_ANSWER_ENTRIES.map(([key, kind]) => {
+        const value = data.answers[key]
+        if (kind === 'mark') return [key, value === true ? true : null]
+        if (typeof value === 'string') return [key, value.trim() || null]
+        return [key, value]
+      })
+    ) as FunctionalCinesioAssessmentInput['answers'],
   }
 }
