@@ -17,6 +17,8 @@ import type {
   HitList,
   HitListAnswersInput,
   HitListInput,
+  IncidentInvestigation,
+  IncidentInvestigationInput,
   PriorityCriterion,
   PriorityCriterionInput,
   PriorityCriterionInputAnswers,
@@ -61,6 +63,11 @@ import {
   type ErgonomicWorkAnalysisTextAnswer,
 } from '../components/ergonomic-work-analysis-fields'
 import { HIT_LIST_ITEMS } from '../components/hit-list-items'
+import {
+  INCIDENT_INVESTIGATION_ANSWERS,
+  INCIDENT_INVESTIGATION_SHORT_TEXT_MAX_LENGTH,
+  type IncidentInvestigationAnswer,
+} from '../components/incident-investigation-fields'
 import {
   PRIORITY_CRITERION_CATEGORIES,
   PRIORITY_CRITERION_QUESTIONS,
@@ -1597,5 +1604,106 @@ export function toProcedureAssessmentInput(
     question4: Number(data.question4) as ProcedureAssessmentInput['question4'],
     question5: Number(data.question5) as ProcedureAssessmentInput['question5'],
     answers,
+  }
+}
+
+/**
+ * Mirrors the API rules of an Avaliação de Incidente / Acidente write (FR-015):
+ * the activity chosen among the listed ones, a real date (never compared with
+ * the periods), the occurrence not blank and of up to 5,000 code points, the
+ * sector and the employee of up to 255 and the other two texts of up to 5,000.
+ * The API answers one message for every refused answer (D-3), so this schema is
+ * what names the field.
+ */
+export function makeIncidentInvestigationSchema(tv: Translate) {
+  const textOf = (max: number) =>
+    z.string().refine((value) => answerLength(value) <= max, {
+      message: tv('textTooLong', { max }),
+    })
+  const shortText = textOf(INCIDENT_INVESTIGATION_SHORT_TEXT_MAX_LENGTH)
+  const longText = textOf(MAX_EVALUATION_TEXT_LENGTH)
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    investigation_date: z
+      .string()
+      .refine(isCalendarDay, tv('checklistDateRequired')),
+    description: z
+      .string()
+      .refine((value) => value.trim().length > 0, {
+        message: tv('descriptionRequired'),
+      })
+      .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+        message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+      }),
+    answers: z.object({
+      sector: shortText,
+      employee: shortText,
+      ergonomicRiskFactors: longText,
+      comments: longText,
+    }),
+  })
+}
+
+export type IncidentInvestigationFormData = z.output<
+  ReturnType<typeof makeIncidentInvestigationSchema>
+>
+
+/** An empty Avaliação de Incidente / Acidente: every field blank. */
+export function incidentInvestigationFormDefaultValues(): IncidentInvestigationFormData {
+  return {
+    activity_id: '',
+    investigation_date: '',
+    description: '',
+    answers: shapeOf(INCIDENT_INVESTIGATION_ANSWERS, '') as Record<
+      IncidentInvestigationAnswer,
+      string
+    >,
+  }
+}
+
+/**
+ * A stored Avaliação de Incidente / Acidente as the form holds it: an absent
+ * answer (`null`) as a blank field.
+ */
+export function toIncidentInvestigationFormValues(
+  record: IncidentInvestigation
+): IncidentInvestigationFormData {
+  return {
+    activity_id: record.activity.id,
+    investigation_date: record.investigation_date,
+    description: record.description,
+    answers: Object.fromEntries(
+      INCIDENT_INVESTIGATION_ANSWERS.map((key) => [
+        key,
+        record.answers[key] ?? '',
+      ])
+    ) as Record<IncidentInvestigationAnswer, string>,
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/incident-investigations` (FR-015): the
+ * date as typed, the occurrence trimmed and the 4 answers trimmed, keeping their
+ * inner line breaks; a blank one goes as `null`, which the API stores as absent,
+ * so the `PUT` clears an answer that was emptied. The photo has routes of its
+ * own.
+ */
+export function toIncidentInvestigationInput(
+  data: IncidentInvestigationFormData
+): IncidentInvestigationInput {
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    investigation_date: data.investigation_date,
+    description: data.description.trim(),
+    answers: Object.fromEntries(
+      INCIDENT_INVESTIGATION_ANSWERS.map(
+        (key): [IncidentInvestigationAnswer, string | null] => [
+          key,
+          data.answers[key].trim() || null,
+        ]
+      )
+    ),
   }
 }
