@@ -423,6 +423,7 @@ export const EvaluationTypeItemType = {
   change_assessment: 'change_assessment',
   procedure_assessment: 'procedure_assessment',
   incident_investigation: 'incident_investigation',
+  functional_cinesio_assessment: 'functional_cinesio_assessment',
 } as const;
 
 /**
@@ -442,6 +443,7 @@ export const EvaluationTypeItemCode = {
   AMP: 'AMP',
   AP: 'AP',
   II: 'II',
+  ACF: 'ACF',
 } as const;
 
 /**
@@ -4726,6 +4728,2533 @@ export interface IncidentInvestigationInput {
      * @nullable
      */
   answers?: IncidentInvestigationInputAnswers;
+}
+
+/**
+ * An item of the ACF listing (the Avaliação Cinesiofuncional, the Diversos tab of the legacy evaluations), all a viewer reads of an ACF. The activity is as it is now, without area nor fabric. The name, the birth date, the ID and the answers are only in the detail.
+ */
+export interface FunctionalCinesioAssessmentItem {
+  id: string;
+  /**
+     * Sequential number of the ACFs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** ACF-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Sexo
+ * @nullable
+ */
+export type FunctionalCinesioAssessmentAnswersGender = typeof FunctionalCinesioAssessmentAnswersGender[keyof typeof FunctionalCinesioAssessmentAnswersGender] | null;
+
+
+export const FunctionalCinesioAssessmentAnswersGender = {
+  masculino: 'masculino',
+  feminino: 'feminino',
+} as const;
+
+/**
+ * Estado civil
+ * @nullable
+ */
+export type FunctionalCinesioAssessmentAnswersCivilStatus = typeof FunctionalCinesioAssessmentAnswersCivilStatus[keyof typeof FunctionalCinesioAssessmentAnswersCivilStatus] | null;
+
+
+export const FunctionalCinesioAssessmentAnswersCivilStatus = {
+  casado: 'casado',
+  solteiro: 'solteiro',
+  separado: 'separado',
+  divorciado: 'divorciado',
+  viuvo: 'viuvo',
+} as const;
+
+/**
+ * The 223 answers, in the order of the form: 146 booleans, 8 numbers and 69 texts, null when absent; a stored key outside the catalog is never answered. A mark is true when marked. A Sim/Não or an Adequado/Abaixo is one boolean, also false, so it holds one option or none.
+ */
+export interface FunctionalCinesioAssessmentAnswers {
+  /**
+     * Sexo
+     * @nullable
+     */
+  gender: FunctionalCinesioAssessmentAnswersGender;
+  /**
+     * Estado civil
+     * @nullable
+     */
+  civilStatus: FunctionalCinesioAssessmentAnswersCivilStatus;
+  /**
+     * E-mail, with no check of its format
+     * @maxLength 255
+     * @nullable
+     */
+  email: string | null;
+  /**
+     * Setor de trabalho
+     * @maxLength 255
+     * @nullable
+     */
+  sector: string | null;
+  /**
+     * Turno
+     * @maxLength 255
+     * @nullable
+     */
+  turn: string | null;
+  /**
+     * Ramal
+     * @maxLength 255
+     * @nullable
+     */
+  ramal: string | null;
+  /**
+     * Ocupação atual, with the spelling of the legacy
+     * @maxLength 255
+     * @nullable
+     */
+  ocupation: string | null;
+  /**
+     * Ocupações pregressas
+     * @maxLength 255
+     * @nullable
+     */
+  previousOccupations: string | null;
+  /**
+     * Prática de atividade física: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPracticePhysicalActivities: boolean | null;
+  /**
+     * Atividades domiciliares/lazer: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPracticeLeisureActivities: boolean | null;
+  /**
+     * Toca instrumento musical: Sim (true) or Não (false)
+     * @nullable
+     */
+  isMusicalInstrument: boolean | null;
+  /**
+     * Tabagismo: Sim (true) or Não (false)
+     * @nullable
+     */
+  isSmoking: boolean | null;
+  /**
+     * Medicamentos: Sim (true) or Não (false)
+     * @nullable
+     */
+  isMedicines: boolean | null;
+  /**
+     * Tratamento anterior: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPreviousTreatment: boolean | null;
+  /**
+     * Prática de atividade física: tipo e frequência
+     * @maxLength 255
+     * @nullable
+     */
+  practicePhysicalActivities: string | null;
+  /**
+     * Atividades domiciliares/lazer: tipo
+     * @maxLength 255
+     * @nullable
+     */
+  practiceLeisureActivities: string | null;
+  /**
+     * Toca instrumento musical: tipo
+     * @maxLength 255
+     * @nullable
+     */
+  musicalInstrument: string | null;
+  /**
+     * Tabagismo: cigarros por dia
+     * @maxLength 255
+     * @nullable
+     */
+  smokingCountPerDay: string | null;
+  /**
+     * Tabagismo: anos
+     * @maxLength 255
+     * @nullable
+     */
+  smokingYears: string | null;
+  /**
+     * Medicamentos: nome
+     * @maxLength 255
+     * @nullable
+     */
+  medicines: string | null;
+  /**
+     * Tratamento anterior: quais
+     * @maxLength 255
+     * @nullable
+     */
+  previousTreatment: string | null;
+  /**
+     * Patologias associadas: Alteração PA, marked
+     * @nullable
+     */
+  isAssociatedPathologies1: boolean | null;
+  /**
+     * Patologias associadas: Diabetes, marked
+     * @nullable
+     */
+  isAssociatedPathologies2: boolean | null;
+  /**
+     * Patologias associadas: Varizes, marked
+     * @nullable
+     */
+  isAssociatedPathologies3: boolean | null;
+  /**
+     * Patologias associadas: Reumatismo, marked
+     * @nullable
+     */
+  isAssociatedPathologies4: boolean | null;
+  /**
+     * Patologias associadas: Tendinite, marked
+     * @nullable
+     */
+  isAssociatedPathologies5: boolean | null;
+  /**
+     * Patologias associadas: Luxações, marked
+     * @nullable
+     */
+  isAssociatedPathologies6: boolean | null;
+  /**
+     * Patologias associadas: Fraturas, marked
+     * @nullable
+     */
+  isAssociatedPathologies7: boolean | null;
+  /**
+     * Patologias associadas: Coluna Vertebral, marked
+     * @nullable
+     */
+  isAssociatedPathologies8: boolean | null;
+  /**
+     * Patologias associadas: Alteração PA, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies1: string | null;
+  /**
+     * Patologias associadas: Diabetes, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies2: string | null;
+  /**
+     * Patologias associadas: Varizes, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies3: string | null;
+  /**
+     * Patologias associadas: Reumatismo, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies4: string | null;
+  /**
+     * Patologias associadas: Tendinite, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies5: string | null;
+  /**
+     * Patologias associadas: Luxações, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies6: string | null;
+  /**
+     * Patologias associadas: Fraturas, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies7: string | null;
+  /**
+     * Patologias associadas: Coluna Vertebral, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies8: string | null;
+  /**
+     * Considerações sobre dores: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPain: boolean | null;
+  /**
+     * Histórico de queda nos últimos três anos: Sim (true) or Não (false)
+     * @nullable
+     */
+  hasFallHistory: boolean | null;
+  /**
+     * Exames anteriores: Sim (true) or Não (false)
+     * @nullable
+     */
+  hasPreviousExams: boolean | null;
+  /**
+     * Considerações sobre dores: localização
+     * @maxLength 255
+     * @nullable
+     */
+  painLocation: string | null;
+  /**
+     * Estágio: Aguda (< 6 semanas)
+     * @nullable
+     */
+  painStageAguda: boolean | null;
+  /**
+     * Estágio: Sub-aguda (6 a 12 semanas)
+     * @nullable
+     */
+  painStageSubAguda: boolean | null;
+  /**
+     * Estágio: Crônica (> 12 semanas)
+     * @nullable
+     */
+  painStageCronica: boolean | null;
+  /**
+     * Estágio: Recorrente
+     * @nullable
+     */
+  painStageRecorrente: boolean | null;
+  /**
+     * Intensidade da dor: an integer from 0 to 10
+     * @minimum 0
+     * @maximum 10
+     * @nullable
+     */
+  painIntensity: number | null;
+  /**
+     * Horário: Matutina
+     * @nullable
+     */
+  painMomentMatutina: boolean | null;
+  /**
+     * Horário: Vespertina
+     * @nullable
+     */
+  painMomentVespertina: boolean | null;
+  /**
+     * Horário: Noturna
+     * @nullable
+     */
+  painMomentNoturna: boolean | null;
+  /**
+     * Horário: Sem horário fixo
+     * @nullable
+     */
+  painMomentSemHorario: boolean | null;
+  /**
+     * Fatores de piora: Esforço físico
+     * @nullable
+     */
+  worseningFactorsEsforcoFisico: boolean | null;
+  /**
+     * Fatores de piora: Repouso
+     * @nullable
+     */
+  worseningFactorsRepouso: boolean | null;
+  /**
+     * Fatores de piora: Tensão Emocional
+     * @nullable
+     */
+  worseningFactorsTensaoEmocional: boolean | null;
+  /**
+     * Fatores de piora: Esporte
+     * @nullable
+     */
+  worseningFactorsEsporte: boolean | null;
+  /**
+     * Fatores de piora: Movimento
+     * @nullable
+     */
+  worseningFactorsMovimento: boolean | null;
+  /**
+     * Fatores de piora: Outro
+     * @nullable
+     */
+  worseningFactorsOutro: boolean | null;
+  /**
+     * Fatores que aliviam: Repouso
+     * @nullable
+     */
+  factorsThatAlleviateRepouso: boolean | null;
+  /**
+     * Fatores que aliviam: Calor local
+     * @nullable
+     */
+  factorsThatAlleviateCalorLocal: boolean | null;
+  /**
+     * Fatores que aliviam: Fisioterapia
+     * @nullable
+     */
+  factorsThatAlleviateFisioterapia: boolean | null;
+  /**
+     * Fatores que aliviam: Medicação
+     * @nullable
+     */
+  factorsThatAlleviateMedicacao: boolean | null;
+  /**
+     * Fatores que aliviam: Movimento
+     * @nullable
+     */
+  factorsThatAlleviateMovimento: boolean | null;
+  /**
+     * Fatores que aliviam: Exercício/alongamento
+     * @nullable
+     */
+  factorsThatAlleviateExercicioAlongamento: boolean | null;
+  /**
+     * Fatores que aliviam: Outro
+     * @nullable
+     */
+  factorsThatAlleviateOutro: boolean | null;
+  /**
+     * Histórico de queda: explicação
+     * @maxLength 5000
+     * @nullable
+     */
+  fallHistory: string | null;
+  /**
+     * Fatores que aliviam: explicação
+     * @maxLength 5000
+     * @nullable
+     */
+  factorsThatAlleviate: string | null;
+  /**
+     * Exames anteriores: descrição
+     * @maxLength 5000
+     * @nullable
+     */
+  previousExams: string | null;
+  /**
+     * HD
+     * @maxLength 5000
+     * @nullable
+     */
+  hd: string | null;
+  /**
+     * HMA
+     * @maxLength 5000
+     * @nullable
+     */
+  hma: string | null;
+  /**
+     * Peso (kg)
+     * @minimum 0
+     * @nullable
+     */
+  weight: number | null;
+  /**
+     * Estatura (cm)
+     * @minimum 0
+     * @nullable
+     */
+  stature: number | null;
+  /**
+     * FC (bpm)
+     * @minimum 0
+     * @nullable
+     */
+  fc: number | null;
+  /**
+     * FR (rpm)
+     * @minimum 0
+     * @nullable
+     */
+  fr: number | null;
+  /**
+     * PA (mmHg), free text such as 120/80
+     * @maxLength 255
+     * @nullable
+     */
+  pa: string | null;
+  /**
+     * Isquiotibiais
+     * @maxLength 255
+     * @nullable
+     */
+  isquiotibiais: string | null;
+  /**
+     * Gastrocnêmios
+     * @maxLength 255
+     * @nullable
+     */
+  gastrocnemios: string | null;
+  /**
+     * Sóleos
+     * @maxLength 255
+     * @nullable
+     */
+  soleos: string | null;
+  /**
+     * Pelvitrocantéricos
+     * @maxLength 255
+     * @nullable
+     */
+  pelvitrocantericos: string | null;
+  /**
+     * Adutores
+     * @maxLength 255
+     * @nullable
+     */
+  adutores: string | null;
+  /**
+     * Distância mãos-pés
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaMaosPes: string | null;
+  /**
+     * Distância cabeça-chão
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaCabecaChao: string | null;
+  /**
+     * Distância mãos-chão
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaMaosChao: string | null;
+  /**
+     * Ângulo Coxofemoral
+     * @maxLength 255
+     * @nullable
+     */
+  anguloCoxofemora: string | null;
+  /**
+     * Ângulo Joelhos
+     * @maxLength 255
+     * @nullable
+     */
+  anguloJoelhos: string | null;
+  /**
+     * Ângulo Tíbio-társico
+     * @maxLength 255
+     * @nullable
+     */
+  anguloTibioTarsico: string | null;
+  /**
+     * Testes funcionais gerais: Ombros, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  ombroDireito: string | null;
+  /**
+     * Testes funcionais gerais: Ombros, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  ombroEsquerdo: string | null;
+  /**
+     * Testes funcionais gerais: Cotovelo e Punhos, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  cotoveloDireito: string | null;
+  /**
+     * Testes funcionais gerais: Cotovelo e Punhos, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  cotoveloEsquerdo: string | null;
+  /**
+     * Testes funcionais gerais: Cervical, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  cervicalDireita: string | null;
+  /**
+     * Testes funcionais gerais: Cervical, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  cervicalEsquerda: string | null;
+  /**
+     * Testes funcionais gerais: Lombar, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  testeLombarDireita: string | null;
+  /**
+     * Testes funcionais gerais: Lombar, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  testeLombarEsquerda: string | null;
+  /**
+     * Testes funcionais gerais: força muscular
+     * @maxLength 5000
+     * @nullable
+     */
+  forcaMuscularGeral: string | null;
+  /**
+     * Testes funcionais gerais: ADM
+     * @maxLength 5000
+     * @nullable
+     */
+  amplitudeMovimentoGeral: string | null;
+  /**
+     * Testes funcionais específicos: Sacro-ilíaca, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  sacroIliacaDireita: string | null;
+  /**
+     * Testes funcionais específicos: Sacro-ilíaca, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  sacroIliacaEsquerda: string | null;
+  /**
+     * Testes funcionais específicos: Quadril e Membros Inferiores, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  membrosInferioresDireita: string | null;
+  /**
+     * Testes funcionais específicos: Quadril e Membros Inferiores, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  membrosInferioresEsquerda: string | null;
+  /**
+     * Testes funcionais específicos: força muscular
+     * @maxLength 5000
+     * @nullable
+     */
+  forcaMuscular: string | null;
+  /**
+     * Testes funcionais específicos: ADM
+     * @maxLength 5000
+     * @nullable
+     */
+  amplitudeMovimento: string | null;
+  /**
+     * ECOM: D
+     * @nullable
+     */
+  ecomD: boolean | null;
+  /**
+     * ECOM: E
+     * @nullable
+     */
+  ecomE: boolean | null;
+  /**
+     * ECOM: N
+     * @nullable
+     */
+  ecomN: boolean | null;
+  /**
+     * Jesus: D
+     * @nullable
+     */
+  jesusD: boolean | null;
+  /**
+     * Jesus: E
+     * @nullable
+     */
+  jesusE: boolean | null;
+  /**
+     * Jesus: N
+     * @nullable
+     */
+  jesusN: boolean | null;
+  /**
+     * Curvatura: Retificada
+     * @nullable
+     */
+  curvaturaRetificada: boolean | null;
+  /**
+     * Curvatura: N
+     * @nullable
+     */
+  curvaturaN: boolean | null;
+  /**
+     * Curvatura: Hiperlordose
+     * @nullable
+     */
+  curvaturaHiperlordose: boolean | null;
+  /**
+     * Curvatura: Hipercifose
+     * @nullable
+     */
+  curvaturaHipercifose: boolean | null;
+  /**
+     * Olhar: Horizontal
+     * @nullable
+     */
+  olharHorizontal: boolean | null;
+  /**
+     * Olhar: Olhar ↑
+     * @nullable
+     */
+  olharCima: boolean | null;
+  /**
+     * Olhar: Olhar ↓
+     * @nullable
+     */
+  olharBaixo: boolean | null;
+  /**
+     * Anteriorização: Sim (true) or Não (false)
+     * @nullable
+     */
+  anteriorizacao: boolean | null;
+  /**
+     * Anteriorização: quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  anteriorizacaoCount: string | null;
+  /**
+     * Clavículas: Oblíquas
+     * @nullable
+     */
+  claviculasObliquas: boolean | null;
+  /**
+     * Clavículas: Horizontalizadas
+     * @nullable
+     */
+  claviculasHorizontalizadas: boolean | null;
+  /**
+     * Saboneteiras: Simétricas
+     * @nullable
+     */
+  saboneteirasSimetricas: boolean | null;
+  /**
+     * Saboneteiras: Assimétricas
+     * @nullable
+     */
+  saboneteirasAssimetricas: boolean | null;
+  /**
+     * Escápulas: Alinhadas
+     * @nullable
+     */
+  escapulasAlinhadas: boolean | null;
+  /**
+     * Escápulas: D Elevada
+     * @nullable
+     */
+  escapulasDElevada: boolean | null;
+  /**
+     * Escápulas: E Elevada
+     * @nullable
+     */
+  escapulasEElevada: boolean | null;
+  /**
+     * Braços: Tocam Simétricos
+     * @nullable
+     */
+  bracosTocamSimetricos: boolean | null;
+  /**
+     * Braços: D+
+     * @nullable
+     */
+  bracosDMais: boolean | null;
+  /**
+     * Braços: E+
+     * @nullable
+     */
+  bracosEMais: boolean | null;
+  /**
+     * Antebraços: Alinhados
+     * @nullable
+     */
+  antebracosAlinhados: boolean | null;
+  /**
+     * Antebraços: Pronado
+     * @nullable
+     */
+  antebracosPronado: boolean | null;
+  /**
+     * Antebraços: Pronado — D
+     * @nullable
+     */
+  antebracosPronadoD: boolean | null;
+  /**
+     * Antebraços: Pronado — E
+     * @nullable
+     */
+  antebracosPronadoE: boolean | null;
+  /**
+     * Antebraços: Supinado
+     * @nullable
+     */
+  antebracosSupinado: boolean | null;
+  /**
+     * Antebraços: Supinado — D
+     * @nullable
+     */
+  antebracosSupinadoD: boolean | null;
+  /**
+     * Antebraços: Supinado — E
+     * @nullable
+     */
+  antebracosSupinadoE: boolean | null;
+  /**
+     * Ombro anterior: Alinhados
+     * @nullable
+     */
+  ombroAnteriorAlinhados: boolean | null;
+  /**
+     * Ombro anterior: Elevado
+     * @nullable
+     */
+  ombroAnteriorElevado: boolean | null;
+  /**
+     * Ombro anterior: Elevado — D
+     * @nullable
+     */
+  ombroAnteriorElevadoD: boolean | null;
+  /**
+     * Ombro anterior: Elevado — E
+     * @nullable
+     */
+  ombroAnteriorElevadoE: boolean | null;
+  /**
+     * Ombro anterior: Onda
+     * @nullable
+     */
+  ombroAnteriorOnda: boolean | null;
+  /**
+     * Ombro anterior: Onda — D
+     * @nullable
+     */
+  ombroAnteriorOndaD: boolean | null;
+  /**
+     * Ombro anterior: Onda — E
+     * @nullable
+     */
+  ombroAnteriorOndaE: boolean | null;
+  /**
+     * Ombro anterior: Abraço
+     * @nullable
+     */
+  ombroAnteriorAbraco: boolean | null;
+  /**
+     * Ombro anterior: Abraço — D
+     * @nullable
+     */
+  ombroAnteriorAbracoD: boolean | null;
+  /**
+     * Ombro anterior: Abraço — E
+     * @nullable
+     */
+  ombroAnteriorAbracoE: boolean | null;
+  /**
+     * Ombro lateral: Alinhados
+     * @nullable
+     */
+  ombroLateralAlinhados: boolean | null;
+  /**
+     * Ombro lateral: Enrolados
+     * @nullable
+     */
+  ombroLateralEnrolados: boolean | null;
+  /**
+     * Ombro lateral: Enrolados — D
+     * @nullable
+     */
+  ombroLateralEnroladosD: boolean | null;
+  /**
+     * Ombro lateral: Enrolados — E
+     * @nullable
+     */
+  ombroLateralEnroladosE: boolean | null;
+  /**
+     * Torácica/Dorsal: Alinhado
+     * @nullable
+     */
+  toracicaDorsalAlinhado: boolean | null;
+  /**
+     * Torácica/Dorsal: Hiperlordose
+     * @nullable
+     */
+  toracicaDorsalHiperlordose: boolean | null;
+  /**
+     * Torácica/Dorsal: Retificada
+     * @nullable
+     */
+  toracicaDorsalRetificada: boolean | null;
+  /**
+     * Torácica/Dorsal: Hipercifose
+     * @nullable
+     */
+  toracicaDorsalHipercifose: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose
+     * @nullable
+     */
+  toracicaDorsalEscoliose: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — "C"
+     * @nullable
+     */
+  toracicaDorsalEscolioseC: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — "S" Conv.
+     * @nullable
+     */
+  toracicaDorsalEscolioseS: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — D
+     * @nullable
+     */
+  toracicaDorsalEscolioseD: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — E
+     * @nullable
+     */
+  toracicaDorsalEscolioseE: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural
+     * @nullable
+     */
+  toracicaDorsalGibosidade: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural — S
+     * @nullable
+     */
+  toracicaDorsalGibosidadeS: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural — N
+     * @nullable
+     */
+  toracicaDorsalGibosidadeN: boolean | null;
+  /**
+     * Lombar: Alinhada
+     * @nullable
+     */
+  opcoesLombarAlinhada: boolean | null;
+  /**
+     * Lombar: Hiperlordose
+     * @nullable
+     */
+  opcoesLombarHiperlordose: boolean | null;
+  /**
+     * Lombar: Retificada
+     * @nullable
+     */
+  opcoesLombarRetificada: boolean | null;
+  /**
+     * Lombar: Hipercifose
+     * @nullable
+     */
+  opcoesLombarHipercifose: boolean | null;
+  /**
+     * Pelve: Alinhada
+     * @nullable
+     */
+  pelveAlinhada: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada
+     * @nullable
+     */
+  pelveCristaIliacaElevada: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada — D
+     * @nullable
+     */
+  pelveCristaD: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada — E
+     * @nullable
+     */
+  pelveCristaE: boolean | null;
+  /**
+     * Pelve: Retroversão
+     * @nullable
+     */
+  pelveRetroversao: boolean | null;
+  /**
+     * Pelve: Retroversão — D
+     * @nullable
+     */
+  pelveRetroversaoD: boolean | null;
+  /**
+     * Pelve: Retroversão — E
+     * @nullable
+     */
+  pelveRetroversaoE: boolean | null;
+  /**
+     * Pelve: Anteroversão
+     * @nullable
+     */
+  pelveAnteroversao: boolean | null;
+  /**
+     * Pelve: Anteroversão — D
+     * @nullable
+     */
+  pelveAnteroversaoD: boolean | null;
+  /**
+     * Pelve: Anteroversão — E
+     * @nullable
+     */
+  pelveAnteroversaoE: boolean | null;
+  /**
+     * Pelve: Sacro Horizontalizado
+     * @nullable
+     */
+  pelveSacroHorizontalizado: boolean | null;
+  /**
+     * Pelve: Retroversão — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveRetroversaoDireitaDedos: string | null;
+  /**
+     * Pelve: Retroversão — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveRetroversaoEsquerdaDedos: string | null;
+  /**
+     * Pelve: Anteroversão — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveAnteroversaoDireitaDedos: string | null;
+  /**
+     * Pelve: Anteroversão — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveAnteroversaoEsquerdaDedos: string | null;
+  /**
+     * Joelhos: Alinhado
+     * @nullable
+     */
+  joelhosAlinhado: boolean | null;
+  /**
+     * Joelhos: Valgo
+     * @nullable
+     */
+  joelhosValgo: boolean | null;
+  /**
+     * Joelhos: Valgo — D
+     * @nullable
+     */
+  joelhosValgoD: boolean | null;
+  /**
+     * Joelhos: Valgo — E
+     * @nullable
+     */
+  joelhosValgoE: boolean | null;
+  /**
+     * Joelhos: Varo
+     * @nullable
+     */
+  joelhosVaro: boolean | null;
+  /**
+     * Joelhos: Varo — D
+     * @nullable
+     */
+  joelhosVaroD: boolean | null;
+  /**
+     * Joelhos: Varo — E
+     * @nullable
+     */
+  joelhosVaroE: boolean | null;
+  /**
+     * Joelhos: Patela Medializada
+     * @nullable
+     */
+  joelhosPatelaMedializada: boolean | null;
+  /**
+     * Joelhos: Patela Medializada — D
+     * @nullable
+     */
+  joelhosPatelaMedializadaD: boolean | null;
+  /**
+     * Joelhos: Patela Medializada — E
+     * @nullable
+     */
+  joelhosPatelaMedializadaE: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada
+     * @nullable
+     */
+  joelhosPatelaLateralizada: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada — D
+     * @nullable
+     */
+  joelhosPatelaLateralizadaD: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada — E
+     * @nullable
+     */
+  joelhosPatelaLateralizadaE: boolean | null;
+  /**
+     * Joelhos: Flexo
+     * @nullable
+     */
+  joelhosFlexo: boolean | null;
+  /**
+     * Joelhos: Flexo — D
+     * @nullable
+     */
+  joelhosFlexoD: boolean | null;
+  /**
+     * Joelhos: Flexo — E
+     * @nullable
+     */
+  joelhosFlexoE: boolean | null;
+  /**
+     * Joelhos: Recurvatum
+     * @nullable
+     */
+  joelhosRecurvatum: boolean | null;
+  /**
+     * Joelhos: Recurvatum — D
+     * @nullable
+     */
+  joelhosRecurvatumD: boolean | null;
+  /**
+     * Joelhos: Recurvatum — E
+     * @nullable
+     */
+  joelhosRecurvatumE: boolean | null;
+  /**
+     * Joelhos: Valgo — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoValgoDireitoDedos: string | null;
+  /**
+     * Joelhos: Valgo — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoValgoEsquerdoDedos: string | null;
+  /**
+     * Joelhos: Varo — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoVaroDireitoDedos: string | null;
+  /**
+     * Joelhos: Varo — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoVaroEsquerdoDedos: string | null;
+  /**
+     * Retropé: Calcâneo Valgo
+     * @nullable
+     */
+  retropeCalcaneoValgo: boolean | null;
+  /**
+     * Retropé: Calcâneo Varo
+     * @nullable
+     */
+  retropeCalcaneoVaro: boolean | null;
+  /**
+     * Retropé: Normal
+     * @nullable
+     */
+  retropeNormal: boolean | null;
+  /**
+     * Antepé: Pronado
+     * @nullable
+     */
+  antepePronado: boolean | null;
+  /**
+     * Antepé: Supinado
+     * @nullable
+     */
+  antepeSupinado: boolean | null;
+  /**
+     * Antepé: Normal
+     * @nullable
+     */
+  antepeNormal: boolean | null;
+  /**
+     * Dedos: Alinhado
+     * @nullable
+     */
+  dedosAlinhado: boolean | null;
+  /**
+     * Dedos: Hálux Valgo
+     * @nullable
+     */
+  dedosHaluxValgo: boolean | null;
+  /**
+     * Dedos: Hálux Valgo — D
+     * @nullable
+     */
+  dedosHaluxD: boolean | null;
+  /**
+     * Dedos: Hálux Valgo — E
+     * @nullable
+     */
+  dedosHaluxE: boolean | null;
+  /**
+     * Dedos: Retraídos
+     * @nullable
+     */
+  dedosRetraidos: boolean | null;
+  /**
+     * Dedos: Retraídos — D
+     * @nullable
+     */
+  dedosRetraidosD: boolean | null;
+  /**
+     * Dedos: Retraídos — E
+     * @nullable
+     */
+  dedosRetraidosE: boolean | null;
+  /**
+     * Preensão palmar (kg)
+     * @minimum 0
+     * @nullable
+     */
+  preensaoPalmarKg: number | null;
+  /**
+     * Escapular (kg)
+     * @minimum 0
+     * @nullable
+     */
+  escapularKg: number | null;
+  /**
+     * Lombar (kg)
+     * @minimum 0
+     * @nullable
+     */
+  lombarKg: number | null;
+  /**
+     * Preensão palmar: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  preensaoPalmarAdequado: boolean | null;
+  /**
+     * Escapular: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  escapularAdequado: boolean | null;
+  /**
+     * Lombar: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  lombarAdequado: boolean | null;
+  /**
+     * Teste Banco de Wells: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  testeBancoWellsAdequado: boolean | null;
+  /**
+     * Teste Banco de Wells: valor, free text
+     * @maxLength 255
+     * @nullable
+     */
+  valorTesteBancoWells: string | null;
+  /**
+     * Avaliador
+     * @maxLength 255
+     * @nullable
+     */
+  valuer: string | null;
+  /**
+     * Avaliado; not an electronic signature
+     * @maxLength 255
+     * @nullable
+     */
+  evaluatedSignature: string | null;
+}
+
+/**
+ * An ACF with the person evaluated and its 223 answers: health data of an identified person, read only by user and admin. The activity is only id, code and name, without area nor fabric. There is no age, derived by the interface, and no photo.
+ */
+export interface FunctionalCinesioAssessment {
+  id: string;
+  /**
+     * Sequential number of the ACFs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** ACF-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  /**
+     * The name of the person evaluated ('Nome')
+     * @maxLength 255
+     */
+  evaluated: string;
+  /** Calendar day, YYYY-MM-DD ('Data de nascimento'), never after assessment_date */
+  birth_date: string;
+  /**
+     * The ID of the person evaluated ('ID')
+     * @maxLength 255
+     */
+  registry: string;
+  created_at: string;
+  updated_at: string;
+  answers: FunctionalCinesioAssessmentAnswers;
+}
+
+/**
+ * Sexo
+ * @nullable
+ */
+export type FunctionalCinesioAssessmentInputAnswersGender = typeof FunctionalCinesioAssessmentInputAnswersGender[keyof typeof FunctionalCinesioAssessmentInputAnswersGender] | null;
+
+
+export const FunctionalCinesioAssessmentInputAnswersGender = {
+  masculino: 'masculino',
+  feminino: 'feminino',
+} as const;
+
+/**
+ * Estado civil
+ * @nullable
+ */
+export type FunctionalCinesioAssessmentInputAnswersCivilStatus = typeof FunctionalCinesioAssessmentInputAnswersCivilStatus[keyof typeof FunctionalCinesioAssessmentInputAnswersCivilStatus] | null;
+
+
+export const FunctionalCinesioAssessmentInputAnswersCivilStatus = {
+  casado: 'casado',
+  solteiro: 'solteiro',
+  separado: 'separado',
+  divorciado: 'divorciado',
+  viuvo: 'viuvo',
+} as const;
+
+/**
+ * The answers, all optional, with the 223 keys of the catalog: a key outside it is refused, null and an empty text are stored as absent, and texts are trimmed, keeping their line breaks. A line break in a text of 255 is not refused here, the single line is the web field's.
+ * @nullable
+ */
+export type FunctionalCinesioAssessmentInputAnswers = {
+  /**
+     * Sexo
+     * @nullable
+     */
+  gender?: FunctionalCinesioAssessmentInputAnswersGender;
+  /**
+     * Estado civil
+     * @nullable
+     */
+  civilStatus?: FunctionalCinesioAssessmentInputAnswersCivilStatus;
+  /**
+     * E-mail, with no check of its format
+     * @maxLength 255
+     * @nullable
+     */
+  email?: string | null;
+  /**
+     * Setor de trabalho
+     * @maxLength 255
+     * @nullable
+     */
+  sector?: string | null;
+  /**
+     * Turno
+     * @maxLength 255
+     * @nullable
+     */
+  turn?: string | null;
+  /**
+     * Ramal
+     * @maxLength 255
+     * @nullable
+     */
+  ramal?: string | null;
+  /**
+     * Ocupação atual, with the spelling of the legacy
+     * @maxLength 255
+     * @nullable
+     */
+  ocupation?: string | null;
+  /**
+     * Ocupações pregressas
+     * @maxLength 255
+     * @nullable
+     */
+  previousOccupations?: string | null;
+  /**
+     * Prática de atividade física: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPracticePhysicalActivities?: boolean | null;
+  /**
+     * Atividades domiciliares/lazer: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPracticeLeisureActivities?: boolean | null;
+  /**
+     * Toca instrumento musical: Sim (true) or Não (false)
+     * @nullable
+     */
+  isMusicalInstrument?: boolean | null;
+  /**
+     * Tabagismo: Sim (true) or Não (false)
+     * @nullable
+     */
+  isSmoking?: boolean | null;
+  /**
+     * Medicamentos: Sim (true) or Não (false)
+     * @nullable
+     */
+  isMedicines?: boolean | null;
+  /**
+     * Tratamento anterior: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPreviousTreatment?: boolean | null;
+  /**
+     * Prática de atividade física: tipo e frequência
+     * @maxLength 255
+     * @nullable
+     */
+  practicePhysicalActivities?: string | null;
+  /**
+     * Atividades domiciliares/lazer: tipo
+     * @maxLength 255
+     * @nullable
+     */
+  practiceLeisureActivities?: string | null;
+  /**
+     * Toca instrumento musical: tipo
+     * @maxLength 255
+     * @nullable
+     */
+  musicalInstrument?: string | null;
+  /**
+     * Tabagismo: cigarros por dia
+     * @maxLength 255
+     * @nullable
+     */
+  smokingCountPerDay?: string | null;
+  /**
+     * Tabagismo: anos
+     * @maxLength 255
+     * @nullable
+     */
+  smokingYears?: string | null;
+  /**
+     * Medicamentos: nome
+     * @maxLength 255
+     * @nullable
+     */
+  medicines?: string | null;
+  /**
+     * Tratamento anterior: quais
+     * @maxLength 255
+     * @nullable
+     */
+  previousTreatment?: string | null;
+  /**
+     * Patologias associadas: Alteração PA, marked
+     * @nullable
+     */
+  isAssociatedPathologies1?: boolean | null;
+  /**
+     * Patologias associadas: Diabetes, marked
+     * @nullable
+     */
+  isAssociatedPathologies2?: boolean | null;
+  /**
+     * Patologias associadas: Varizes, marked
+     * @nullable
+     */
+  isAssociatedPathologies3?: boolean | null;
+  /**
+     * Patologias associadas: Reumatismo, marked
+     * @nullable
+     */
+  isAssociatedPathologies4?: boolean | null;
+  /**
+     * Patologias associadas: Tendinite, marked
+     * @nullable
+     */
+  isAssociatedPathologies5?: boolean | null;
+  /**
+     * Patologias associadas: Luxações, marked
+     * @nullable
+     */
+  isAssociatedPathologies6?: boolean | null;
+  /**
+     * Patologias associadas: Fraturas, marked
+     * @nullable
+     */
+  isAssociatedPathologies7?: boolean | null;
+  /**
+     * Patologias associadas: Coluna Vertebral, marked
+     * @nullable
+     */
+  isAssociatedPathologies8?: boolean | null;
+  /**
+     * Patologias associadas: Alteração PA, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies1?: string | null;
+  /**
+     * Patologias associadas: Diabetes, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies2?: string | null;
+  /**
+     * Patologias associadas: Varizes, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies3?: string | null;
+  /**
+     * Patologias associadas: Reumatismo, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies4?: string | null;
+  /**
+     * Patologias associadas: Tendinite, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies5?: string | null;
+  /**
+     * Patologias associadas: Luxações, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies6?: string | null;
+  /**
+     * Patologias associadas: Fraturas, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies7?: string | null;
+  /**
+     * Patologias associadas: Coluna Vertebral, text
+     * @maxLength 255
+     * @nullable
+     */
+  associatedPathologies8?: string | null;
+  /**
+     * Considerações sobre dores: Sim (true) or Não (false)
+     * @nullable
+     */
+  isPain?: boolean | null;
+  /**
+     * Histórico de queda nos últimos três anos: Sim (true) or Não (false)
+     * @nullable
+     */
+  hasFallHistory?: boolean | null;
+  /**
+     * Exames anteriores: Sim (true) or Não (false)
+     * @nullable
+     */
+  hasPreviousExams?: boolean | null;
+  /**
+     * Considerações sobre dores: localização
+     * @maxLength 255
+     * @nullable
+     */
+  painLocation?: string | null;
+  /**
+     * Estágio: Aguda (< 6 semanas)
+     * @nullable
+     */
+  painStageAguda?: boolean | null;
+  /**
+     * Estágio: Sub-aguda (6 a 12 semanas)
+     * @nullable
+     */
+  painStageSubAguda?: boolean | null;
+  /**
+     * Estágio: Crônica (> 12 semanas)
+     * @nullable
+     */
+  painStageCronica?: boolean | null;
+  /**
+     * Estágio: Recorrente
+     * @nullable
+     */
+  painStageRecorrente?: boolean | null;
+  /**
+     * Intensidade da dor: an integer from 0 to 10
+     * @minimum 0
+     * @maximum 10
+     * @nullable
+     */
+  painIntensity?: number | null;
+  /**
+     * Horário: Matutina
+     * @nullable
+     */
+  painMomentMatutina?: boolean | null;
+  /**
+     * Horário: Vespertina
+     * @nullable
+     */
+  painMomentVespertina?: boolean | null;
+  /**
+     * Horário: Noturna
+     * @nullable
+     */
+  painMomentNoturna?: boolean | null;
+  /**
+     * Horário: Sem horário fixo
+     * @nullable
+     */
+  painMomentSemHorario?: boolean | null;
+  /**
+     * Fatores de piora: Esforço físico
+     * @nullable
+     */
+  worseningFactorsEsforcoFisico?: boolean | null;
+  /**
+     * Fatores de piora: Repouso
+     * @nullable
+     */
+  worseningFactorsRepouso?: boolean | null;
+  /**
+     * Fatores de piora: Tensão Emocional
+     * @nullable
+     */
+  worseningFactorsTensaoEmocional?: boolean | null;
+  /**
+     * Fatores de piora: Esporte
+     * @nullable
+     */
+  worseningFactorsEsporte?: boolean | null;
+  /**
+     * Fatores de piora: Movimento
+     * @nullable
+     */
+  worseningFactorsMovimento?: boolean | null;
+  /**
+     * Fatores de piora: Outro
+     * @nullable
+     */
+  worseningFactorsOutro?: boolean | null;
+  /**
+     * Fatores que aliviam: Repouso
+     * @nullable
+     */
+  factorsThatAlleviateRepouso?: boolean | null;
+  /**
+     * Fatores que aliviam: Calor local
+     * @nullable
+     */
+  factorsThatAlleviateCalorLocal?: boolean | null;
+  /**
+     * Fatores que aliviam: Fisioterapia
+     * @nullable
+     */
+  factorsThatAlleviateFisioterapia?: boolean | null;
+  /**
+     * Fatores que aliviam: Medicação
+     * @nullable
+     */
+  factorsThatAlleviateMedicacao?: boolean | null;
+  /**
+     * Fatores que aliviam: Movimento
+     * @nullable
+     */
+  factorsThatAlleviateMovimento?: boolean | null;
+  /**
+     * Fatores que aliviam: Exercício/alongamento
+     * @nullable
+     */
+  factorsThatAlleviateExercicioAlongamento?: boolean | null;
+  /**
+     * Fatores que aliviam: Outro
+     * @nullable
+     */
+  factorsThatAlleviateOutro?: boolean | null;
+  /**
+     * Histórico de queda: explicação
+     * @maxLength 5000
+     * @nullable
+     */
+  fallHistory?: string | null;
+  /**
+     * Fatores que aliviam: explicação
+     * @maxLength 5000
+     * @nullable
+     */
+  factorsThatAlleviate?: string | null;
+  /**
+     * Exames anteriores: descrição
+     * @maxLength 5000
+     * @nullable
+     */
+  previousExams?: string | null;
+  /**
+     * HD
+     * @maxLength 5000
+     * @nullable
+     */
+  hd?: string | null;
+  /**
+     * HMA
+     * @maxLength 5000
+     * @nullable
+     */
+  hma?: string | null;
+  /**
+     * Peso (kg)
+     * @minimum 0
+     * @nullable
+     */
+  weight?: number | null;
+  /**
+     * Estatura (cm)
+     * @minimum 0
+     * @nullable
+     */
+  stature?: number | null;
+  /**
+     * FC (bpm)
+     * @minimum 0
+     * @nullable
+     */
+  fc?: number | null;
+  /**
+     * FR (rpm)
+     * @minimum 0
+     * @nullable
+     */
+  fr?: number | null;
+  /**
+     * PA (mmHg), free text such as 120/80
+     * @maxLength 255
+     * @nullable
+     */
+  pa?: string | null;
+  /**
+     * Isquiotibiais
+     * @maxLength 255
+     * @nullable
+     */
+  isquiotibiais?: string | null;
+  /**
+     * Gastrocnêmios
+     * @maxLength 255
+     * @nullable
+     */
+  gastrocnemios?: string | null;
+  /**
+     * Sóleos
+     * @maxLength 255
+     * @nullable
+     */
+  soleos?: string | null;
+  /**
+     * Pelvitrocantéricos
+     * @maxLength 255
+     * @nullable
+     */
+  pelvitrocantericos?: string | null;
+  /**
+     * Adutores
+     * @maxLength 255
+     * @nullable
+     */
+  adutores?: string | null;
+  /**
+     * Distância mãos-pés
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaMaosPes?: string | null;
+  /**
+     * Distância cabeça-chão
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaCabecaChao?: string | null;
+  /**
+     * Distância mãos-chão
+     * @maxLength 255
+     * @nullable
+     */
+  distanciaMaosChao?: string | null;
+  /**
+     * Ângulo Coxofemoral
+     * @maxLength 255
+     * @nullable
+     */
+  anguloCoxofemora?: string | null;
+  /**
+     * Ângulo Joelhos
+     * @maxLength 255
+     * @nullable
+     */
+  anguloJoelhos?: string | null;
+  /**
+     * Ângulo Tíbio-társico
+     * @maxLength 255
+     * @nullable
+     */
+  anguloTibioTarsico?: string | null;
+  /**
+     * Testes funcionais gerais: Ombros, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  ombroDireito?: string | null;
+  /**
+     * Testes funcionais gerais: Ombros, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  ombroEsquerdo?: string | null;
+  /**
+     * Testes funcionais gerais: Cotovelo e Punhos, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  cotoveloDireito?: string | null;
+  /**
+     * Testes funcionais gerais: Cotovelo e Punhos, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  cotoveloEsquerdo?: string | null;
+  /**
+     * Testes funcionais gerais: Cervical, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  cervicalDireita?: string | null;
+  /**
+     * Testes funcionais gerais: Cervical, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  cervicalEsquerda?: string | null;
+  /**
+     * Testes funcionais gerais: Lombar, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  testeLombarDireita?: string | null;
+  /**
+     * Testes funcionais gerais: Lombar, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  testeLombarEsquerda?: string | null;
+  /**
+     * Testes funcionais gerais: força muscular
+     * @maxLength 5000
+     * @nullable
+     */
+  forcaMuscularGeral?: string | null;
+  /**
+     * Testes funcionais gerais: ADM
+     * @maxLength 5000
+     * @nullable
+     */
+  amplitudeMovimentoGeral?: string | null;
+  /**
+     * Testes funcionais específicos: Sacro-ilíaca, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  sacroIliacaDireita?: string | null;
+  /**
+     * Testes funcionais específicos: Sacro-ilíaca, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  sacroIliacaEsquerda?: string | null;
+  /**
+     * Testes funcionais específicos: Quadril e Membros Inferiores, lado direito
+     * @maxLength 5000
+     * @nullable
+     */
+  membrosInferioresDireita?: string | null;
+  /**
+     * Testes funcionais específicos: Quadril e Membros Inferiores, lado esquerdo
+     * @maxLength 5000
+     * @nullable
+     */
+  membrosInferioresEsquerda?: string | null;
+  /**
+     * Testes funcionais específicos: força muscular
+     * @maxLength 5000
+     * @nullable
+     */
+  forcaMuscular?: string | null;
+  /**
+     * Testes funcionais específicos: ADM
+     * @maxLength 5000
+     * @nullable
+     */
+  amplitudeMovimento?: string | null;
+  /**
+     * ECOM: D
+     * @nullable
+     */
+  ecomD?: boolean | null;
+  /**
+     * ECOM: E
+     * @nullable
+     */
+  ecomE?: boolean | null;
+  /**
+     * ECOM: N
+     * @nullable
+     */
+  ecomN?: boolean | null;
+  /**
+     * Jesus: D
+     * @nullable
+     */
+  jesusD?: boolean | null;
+  /**
+     * Jesus: E
+     * @nullable
+     */
+  jesusE?: boolean | null;
+  /**
+     * Jesus: N
+     * @nullable
+     */
+  jesusN?: boolean | null;
+  /**
+     * Curvatura: Retificada
+     * @nullable
+     */
+  curvaturaRetificada?: boolean | null;
+  /**
+     * Curvatura: N
+     * @nullable
+     */
+  curvaturaN?: boolean | null;
+  /**
+     * Curvatura: Hiperlordose
+     * @nullable
+     */
+  curvaturaHiperlordose?: boolean | null;
+  /**
+     * Curvatura: Hipercifose
+     * @nullable
+     */
+  curvaturaHipercifose?: boolean | null;
+  /**
+     * Olhar: Horizontal
+     * @nullable
+     */
+  olharHorizontal?: boolean | null;
+  /**
+     * Olhar: Olhar ↑
+     * @nullable
+     */
+  olharCima?: boolean | null;
+  /**
+     * Olhar: Olhar ↓
+     * @nullable
+     */
+  olharBaixo?: boolean | null;
+  /**
+     * Anteriorização: Sim (true) or Não (false)
+     * @nullable
+     */
+  anteriorizacao?: boolean | null;
+  /**
+     * Anteriorização: quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  anteriorizacaoCount?: string | null;
+  /**
+     * Clavículas: Oblíquas
+     * @nullable
+     */
+  claviculasObliquas?: boolean | null;
+  /**
+     * Clavículas: Horizontalizadas
+     * @nullable
+     */
+  claviculasHorizontalizadas?: boolean | null;
+  /**
+     * Saboneteiras: Simétricas
+     * @nullable
+     */
+  saboneteirasSimetricas?: boolean | null;
+  /**
+     * Saboneteiras: Assimétricas
+     * @nullable
+     */
+  saboneteirasAssimetricas?: boolean | null;
+  /**
+     * Escápulas: Alinhadas
+     * @nullable
+     */
+  escapulasAlinhadas?: boolean | null;
+  /**
+     * Escápulas: D Elevada
+     * @nullable
+     */
+  escapulasDElevada?: boolean | null;
+  /**
+     * Escápulas: E Elevada
+     * @nullable
+     */
+  escapulasEElevada?: boolean | null;
+  /**
+     * Braços: Tocam Simétricos
+     * @nullable
+     */
+  bracosTocamSimetricos?: boolean | null;
+  /**
+     * Braços: D+
+     * @nullable
+     */
+  bracosDMais?: boolean | null;
+  /**
+     * Braços: E+
+     * @nullable
+     */
+  bracosEMais?: boolean | null;
+  /**
+     * Antebraços: Alinhados
+     * @nullable
+     */
+  antebracosAlinhados?: boolean | null;
+  /**
+     * Antebraços: Pronado
+     * @nullable
+     */
+  antebracosPronado?: boolean | null;
+  /**
+     * Antebraços: Pronado — D
+     * @nullable
+     */
+  antebracosPronadoD?: boolean | null;
+  /**
+     * Antebraços: Pronado — E
+     * @nullable
+     */
+  antebracosPronadoE?: boolean | null;
+  /**
+     * Antebraços: Supinado
+     * @nullable
+     */
+  antebracosSupinado?: boolean | null;
+  /**
+     * Antebraços: Supinado — D
+     * @nullable
+     */
+  antebracosSupinadoD?: boolean | null;
+  /**
+     * Antebraços: Supinado — E
+     * @nullable
+     */
+  antebracosSupinadoE?: boolean | null;
+  /**
+     * Ombro anterior: Alinhados
+     * @nullable
+     */
+  ombroAnteriorAlinhados?: boolean | null;
+  /**
+     * Ombro anterior: Elevado
+     * @nullable
+     */
+  ombroAnteriorElevado?: boolean | null;
+  /**
+     * Ombro anterior: Elevado — D
+     * @nullable
+     */
+  ombroAnteriorElevadoD?: boolean | null;
+  /**
+     * Ombro anterior: Elevado — E
+     * @nullable
+     */
+  ombroAnteriorElevadoE?: boolean | null;
+  /**
+     * Ombro anterior: Onda
+     * @nullable
+     */
+  ombroAnteriorOnda?: boolean | null;
+  /**
+     * Ombro anterior: Onda — D
+     * @nullable
+     */
+  ombroAnteriorOndaD?: boolean | null;
+  /**
+     * Ombro anterior: Onda — E
+     * @nullable
+     */
+  ombroAnteriorOndaE?: boolean | null;
+  /**
+     * Ombro anterior: Abraço
+     * @nullable
+     */
+  ombroAnteriorAbraco?: boolean | null;
+  /**
+     * Ombro anterior: Abraço — D
+     * @nullable
+     */
+  ombroAnteriorAbracoD?: boolean | null;
+  /**
+     * Ombro anterior: Abraço — E
+     * @nullable
+     */
+  ombroAnteriorAbracoE?: boolean | null;
+  /**
+     * Ombro lateral: Alinhados
+     * @nullable
+     */
+  ombroLateralAlinhados?: boolean | null;
+  /**
+     * Ombro lateral: Enrolados
+     * @nullable
+     */
+  ombroLateralEnrolados?: boolean | null;
+  /**
+     * Ombro lateral: Enrolados — D
+     * @nullable
+     */
+  ombroLateralEnroladosD?: boolean | null;
+  /**
+     * Ombro lateral: Enrolados — E
+     * @nullable
+     */
+  ombroLateralEnroladosE?: boolean | null;
+  /**
+     * Torácica/Dorsal: Alinhado
+     * @nullable
+     */
+  toracicaDorsalAlinhado?: boolean | null;
+  /**
+     * Torácica/Dorsal: Hiperlordose
+     * @nullable
+     */
+  toracicaDorsalHiperlordose?: boolean | null;
+  /**
+     * Torácica/Dorsal: Retificada
+     * @nullable
+     */
+  toracicaDorsalRetificada?: boolean | null;
+  /**
+     * Torácica/Dorsal: Hipercifose
+     * @nullable
+     */
+  toracicaDorsalHipercifose?: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose
+     * @nullable
+     */
+  toracicaDorsalEscoliose?: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — "C"
+     * @nullable
+     */
+  toracicaDorsalEscolioseC?: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — "S" Conv.
+     * @nullable
+     */
+  toracicaDorsalEscolioseS?: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — D
+     * @nullable
+     */
+  toracicaDorsalEscolioseD?: boolean | null;
+  /**
+     * Torácica/Dorsal: Escoliose — E
+     * @nullable
+     */
+  toracicaDorsalEscolioseE?: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural
+     * @nullable
+     */
+  toracicaDorsalGibosidade?: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural — S
+     * @nullable
+     */
+  toracicaDorsalGibosidadeS?: boolean | null;
+  /**
+     * Torácica/Dorsal: Gibosidade Estrutural — N
+     * @nullable
+     */
+  toracicaDorsalGibosidadeN?: boolean | null;
+  /**
+     * Lombar: Alinhada
+     * @nullable
+     */
+  opcoesLombarAlinhada?: boolean | null;
+  /**
+     * Lombar: Hiperlordose
+     * @nullable
+     */
+  opcoesLombarHiperlordose?: boolean | null;
+  /**
+     * Lombar: Retificada
+     * @nullable
+     */
+  opcoesLombarRetificada?: boolean | null;
+  /**
+     * Lombar: Hipercifose
+     * @nullable
+     */
+  opcoesLombarHipercifose?: boolean | null;
+  /**
+     * Pelve: Alinhada
+     * @nullable
+     */
+  pelveAlinhada?: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada
+     * @nullable
+     */
+  pelveCristaIliacaElevada?: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada — D
+     * @nullable
+     */
+  pelveCristaD?: boolean | null;
+  /**
+     * Pelve: Crista Ilíaca Elevada — E
+     * @nullable
+     */
+  pelveCristaE?: boolean | null;
+  /**
+     * Pelve: Retroversão
+     * @nullable
+     */
+  pelveRetroversao?: boolean | null;
+  /**
+     * Pelve: Retroversão — D
+     * @nullable
+     */
+  pelveRetroversaoD?: boolean | null;
+  /**
+     * Pelve: Retroversão — E
+     * @nullable
+     */
+  pelveRetroversaoE?: boolean | null;
+  /**
+     * Pelve: Anteroversão
+     * @nullable
+     */
+  pelveAnteroversao?: boolean | null;
+  /**
+     * Pelve: Anteroversão — D
+     * @nullable
+     */
+  pelveAnteroversaoD?: boolean | null;
+  /**
+     * Pelve: Anteroversão — E
+     * @nullable
+     */
+  pelveAnteroversaoE?: boolean | null;
+  /**
+     * Pelve: Sacro Horizontalizado
+     * @nullable
+     */
+  pelveSacroHorizontalizado?: boolean | null;
+  /**
+     * Pelve: Retroversão — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveRetroversaoDireitaDedos?: string | null;
+  /**
+     * Pelve: Retroversão — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveRetroversaoEsquerdaDedos?: string | null;
+  /**
+     * Pelve: Anteroversão — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveAnteroversaoDireitaDedos?: string | null;
+  /**
+     * Pelve: Anteroversão — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  pelveAnteroversaoEsquerdaDedos?: string | null;
+  /**
+     * Joelhos: Alinhado
+     * @nullable
+     */
+  joelhosAlinhado?: boolean | null;
+  /**
+     * Joelhos: Valgo
+     * @nullable
+     */
+  joelhosValgo?: boolean | null;
+  /**
+     * Joelhos: Valgo — D
+     * @nullable
+     */
+  joelhosValgoD?: boolean | null;
+  /**
+     * Joelhos: Valgo — E
+     * @nullable
+     */
+  joelhosValgoE?: boolean | null;
+  /**
+     * Joelhos: Varo
+     * @nullable
+     */
+  joelhosVaro?: boolean | null;
+  /**
+     * Joelhos: Varo — D
+     * @nullable
+     */
+  joelhosVaroD?: boolean | null;
+  /**
+     * Joelhos: Varo — E
+     * @nullable
+     */
+  joelhosVaroE?: boolean | null;
+  /**
+     * Joelhos: Patela Medializada
+     * @nullable
+     */
+  joelhosPatelaMedializada?: boolean | null;
+  /**
+     * Joelhos: Patela Medializada — D
+     * @nullable
+     */
+  joelhosPatelaMedializadaD?: boolean | null;
+  /**
+     * Joelhos: Patela Medializada — E
+     * @nullable
+     */
+  joelhosPatelaMedializadaE?: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada
+     * @nullable
+     */
+  joelhosPatelaLateralizada?: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada — D
+     * @nullable
+     */
+  joelhosPatelaLateralizadaD?: boolean | null;
+  /**
+     * Joelhos: Patela Lateralizada — E
+     * @nullable
+     */
+  joelhosPatelaLateralizadaE?: boolean | null;
+  /**
+     * Joelhos: Flexo
+     * @nullable
+     */
+  joelhosFlexo?: boolean | null;
+  /**
+     * Joelhos: Flexo — D
+     * @nullable
+     */
+  joelhosFlexoD?: boolean | null;
+  /**
+     * Joelhos: Flexo — E
+     * @nullable
+     */
+  joelhosFlexoE?: boolean | null;
+  /**
+     * Joelhos: Recurvatum
+     * @nullable
+     */
+  joelhosRecurvatum?: boolean | null;
+  /**
+     * Joelhos: Recurvatum — D
+     * @nullable
+     */
+  joelhosRecurvatumD?: boolean | null;
+  /**
+     * Joelhos: Recurvatum — E
+     * @nullable
+     */
+  joelhosRecurvatumE?: boolean | null;
+  /**
+     * Joelhos: Valgo — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoValgoDireitoDedos?: string | null;
+  /**
+     * Joelhos: Valgo — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoValgoEsquerdoDedos?: string | null;
+  /**
+     * Joelhos: Varo — D, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoVaroDireitoDedos?: string | null;
+  /**
+     * Joelhos: Varo — E, quantidade de dedos
+     * @maxLength 255
+     * @nullable
+     */
+  joelhoVaroEsquerdoDedos?: string | null;
+  /**
+     * Retropé: Calcâneo Valgo
+     * @nullable
+     */
+  retropeCalcaneoValgo?: boolean | null;
+  /**
+     * Retropé: Calcâneo Varo
+     * @nullable
+     */
+  retropeCalcaneoVaro?: boolean | null;
+  /**
+     * Retropé: Normal
+     * @nullable
+     */
+  retropeNormal?: boolean | null;
+  /**
+     * Antepé: Pronado
+     * @nullable
+     */
+  antepePronado?: boolean | null;
+  /**
+     * Antepé: Supinado
+     * @nullable
+     */
+  antepeSupinado?: boolean | null;
+  /**
+     * Antepé: Normal
+     * @nullable
+     */
+  antepeNormal?: boolean | null;
+  /**
+     * Dedos: Alinhado
+     * @nullable
+     */
+  dedosAlinhado?: boolean | null;
+  /**
+     * Dedos: Hálux Valgo
+     * @nullable
+     */
+  dedosHaluxValgo?: boolean | null;
+  /**
+     * Dedos: Hálux Valgo — D
+     * @nullable
+     */
+  dedosHaluxD?: boolean | null;
+  /**
+     * Dedos: Hálux Valgo — E
+     * @nullable
+     */
+  dedosHaluxE?: boolean | null;
+  /**
+     * Dedos: Retraídos
+     * @nullable
+     */
+  dedosRetraidos?: boolean | null;
+  /**
+     * Dedos: Retraídos — D
+     * @nullable
+     */
+  dedosRetraidosD?: boolean | null;
+  /**
+     * Dedos: Retraídos — E
+     * @nullable
+     */
+  dedosRetraidosE?: boolean | null;
+  /**
+     * Preensão palmar (kg)
+     * @minimum 0
+     * @nullable
+     */
+  preensaoPalmarKg?: number | null;
+  /**
+     * Escapular (kg)
+     * @minimum 0
+     * @nullable
+     */
+  escapularKg?: number | null;
+  /**
+     * Lombar (kg)
+     * @minimum 0
+     * @nullable
+     */
+  lombarKg?: number | null;
+  /**
+     * Preensão palmar: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  preensaoPalmarAdequado?: boolean | null;
+  /**
+     * Escapular: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  escapularAdequado?: boolean | null;
+  /**
+     * Lombar: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  lombarAdequado?: boolean | null;
+  /**
+     * Teste Banco de Wells: Adequado (true) or Abaixo (false)
+     * @nullable
+     */
+  testeBancoWellsAdequado?: boolean | null;
+  /**
+     * Teste Banco de Wells: valor, free text
+     * @maxLength 255
+     * @nullable
+     */
+  valorTesteBancoWells?: string | null;
+  /**
+     * Avaliador
+     * @maxLength 255
+     * @nullable
+     */
+  valuer?: string | null;
+  /**
+     * Avaliado; not an electronic signature
+     * @maxLength 255
+     * @nullable
+     */
+  evaluatedSignature?: string | null;
+} | null;
+
+/**
+ * The fields of an ACF creation or update, as JSON. Any other top-level field (id, number, code, age, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface FunctionalCinesioAssessmentInput {
+  /** An existing activity (see GET /evaluations/functional-cinesio-assessments/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  assessment_date: string;
+  /**
+     * Required ('Nome'): trimmed, not empty, at most 255 characters (code points)
+     * @maxLength 255
+     */
+  evaluated: string;
+  /** Required ('Data de nascimento'): a real calendar day, YYYY-MM-DD, not after assessment_date; the same day is accepted */
+  birth_date: string;
+  /**
+     * Required ('ID'): trimmed, not empty, at most 255 characters (code points)
+     * @maxLength 255
+     */
+  registry: string;
+  /**
+     * The answers, all optional, with the 223 keys of the catalog: a key outside it is refused, null and an empty text are stored as absent, and texts are trimmed, keeping their line breaks. A line break in a text of 255 is not refused here, the single line is the web field's.
+     * @nullable
+     */
+  answers?: FunctionalCinesioAssessmentInputAnswers;
 }
 
 export type PostSessionsBody = {
@@ -22753,4 +25282,748 @@ export const useDeleteEvaluationsIncidentInvestigationsIdPhoto = <TError = Error
         TContext
       > => {
       return useMutation(getDeleteEvaluationsIncidentInvestigationsIdPhotoMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsFunctionalCinesioAssessmentsResponse200 = {
+  data: FunctionalCinesioAssessmentItem[]
+  status: 200
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsResponseSuccess = (getEvaluationsFunctionalCinesioAssessmentsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsFunctionalCinesioAssessmentsResponseError = (getEvaluationsFunctionalCinesioAssessmentsResponse401 | getEvaluationsFunctionalCinesioAssessmentsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsFunctionalCinesioAssessmentsResponse = (getEvaluationsFunctionalCinesioAssessmentsResponseSuccess | getEvaluationsFunctionalCinesioAssessmentsResponseError)
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments`
+}
+
+/**
+ * Every ACF of the installation (the Avaliação Cinesiofuncional, the Diversos tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The name, the birth date, the ID and the answers are health data of an identified person, only in the detail, so they are never in the listing. Requires only an authenticated user, so any role, the viewer included, and functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary List functional cinesio assessments (ACF)
+ */
+export const getEvaluationsFunctionalCinesioAssessments = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsFunctionalCinesioAssessmentsResponse> => {
+
+  return customFetch<getEvaluationsFunctionalCinesioAssessmentsResponse>(getGetEvaluationsFunctionalCinesioAssessmentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsQueryKey = () => {
+    return [
+    `/evaluations/functional-cinesio-assessments`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsFunctionalCinesioAssessmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>> = ({ signal }) => getEvaluationsFunctionalCinesioAssessments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsFunctionalCinesioAssessmentsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>>
+export type GetEvaluationsFunctionalCinesioAssessmentsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsFunctionalCinesioAssessments<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessments<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessments<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List functional cinesio assessments (ACF)
+ */
+
+export function useGetEvaluationsFunctionalCinesioAssessments<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsFunctionalCinesioAssessmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse201 = {
+  data: FunctionalCinesioAssessment
+  status: 201
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponseSuccess = (postEvaluationsFunctionalCinesioAssessmentsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsFunctionalCinesioAssessmentsResponseError = (postEvaluationsFunctionalCinesioAssessmentsResponse400 | postEvaluationsFunctionalCinesioAssessmentsResponse401 | postEvaluationsFunctionalCinesioAssessmentsResponse403 | postEvaluationsFunctionalCinesioAssessmentsResponse404 | postEvaluationsFunctionalCinesioAssessmentsResponse413) & {
+  headers: Headers;
+};
+
+export type postEvaluationsFunctionalCinesioAssessmentsResponse = (postEvaluationsFunctionalCinesioAssessmentsResponseSuccess | postEvaluationsFunctionalCinesioAssessmentsResponseError)
+
+export const getPostEvaluationsFunctionalCinesioAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments`
+}
+
+/**
+ * Creates an ACF from a JSON body. The number is the next one of the ACF sequence, taken inside the INSERT, and is never handed out again, not even after the ACF is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new ACF (409 there) or finished first (400 here), never a foreign key violation. The answers are all optional and are never compared with one another: no text depends on its Sim/Não, and no mark on its condition. The date is never compared with the periods. Answers the same body as GET /evaluations/functional-cinesio-assessments/{id}. Not idempotent: sending it again creates another ACF. Requires the user or admin role and functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary Create functional cinesio assessment (ACF)
+ */
+export const postEvaluationsFunctionalCinesioAssessments = async (functionalCinesioAssessmentInput: FunctionalCinesioAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsFunctionalCinesioAssessmentsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsFunctionalCinesioAssessmentsResponse>(getPostEvaluationsFunctionalCinesioAssessmentsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(functionalCinesioAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsFunctionalCinesioAssessmentsMutationKey = () => ['postEvaluationsFunctionalCinesioAssessments'] as const;
+
+export const getPostEvaluationsFunctionalCinesioAssessmentsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>, TError,PostEvaluationsFunctionalCinesioAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>, TError,PostEvaluationsFunctionalCinesioAssessmentsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsFunctionalCinesioAssessmentsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>, PostEvaluationsFunctionalCinesioAssessmentsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsFunctionalCinesioAssessments(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsFunctionalCinesioAssessmentsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>>
+    export type PostEvaluationsFunctionalCinesioAssessmentsMutationBody = FunctionalCinesioAssessmentInput
+    export type PostEvaluationsFunctionalCinesioAssessmentsMutationError = ErrorResponse
+    export type PostEvaluationsFunctionalCinesioAssessmentsMutationVariables = {data: FunctionalCinesioAssessmentInput}
+
+    /**
+ * @summary Create functional cinesio assessment (ACF)
+ */
+export const usePostEvaluationsFunctionalCinesioAssessments = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>, TError,PostEvaluationsFunctionalCinesioAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsFunctionalCinesioAssessments>>,
+        TError,
+        PostEvaluationsFunctionalCinesioAssessmentsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsFunctionalCinesioAssessmentsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponseSuccess = (getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponseError = (getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse401 | getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse = (getEvaluationsFunctionalCinesioAssessmentsActivitiesResponseSuccess | getEvaluationsFunctionalCinesioAssessmentsActivitiesResponseError)
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Avaliação Cinesiofuncional form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary List the activities an ACF can belong to
+ */
+export const getEvaluationsFunctionalCinesioAssessmentsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsFunctionalCinesioAssessmentsActivitiesResponse>(getGetEvaluationsFunctionalCinesioAssessmentsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/functional-cinesio-assessments/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>> = ({ signal }) => getEvaluationsFunctionalCinesioAssessmentsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>>
+export type GetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsFunctionalCinesioAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities an ACF can belong to
+ */
+
+export function useGetEvaluationsFunctionalCinesioAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsFunctionalCinesioAssessmentsActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponse200 = {
+  data: FunctionalCinesioAssessment
+  status: 200
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess = (getEvaluationsFunctionalCinesioAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponseError = (getEvaluationsFunctionalCinesioAssessmentsIdResponse401 | getEvaluationsFunctionalCinesioAssessmentsIdResponse403 | getEvaluationsFunctionalCinesioAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsFunctionalCinesioAssessmentsIdResponse = (getEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess | getEvaluationsFunctionalCinesioAssessmentsIdResponseError)
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments/${id}`
+}
+
+/**
+ * Requires user or admin. One ACF: the item of the listing plus the name, the birth date and the ID, at their place in the header, and its 223 answers. These are health data of an identified person, so the viewer never reads them: the role is checked before the search of the record, and a viewer gets 403 even for an id that does not exist. Every key of the catalog is answered, null when absent or stored with a value of the wrong kind; a stored key outside the catalog is never answered. The activity is only id, code and name, without its area nor fabric. The age is not answered: it is derived by the interface. Also requires functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary Get functional cinesio assessment (ACF)
+ */
+export const getEvaluationsFunctionalCinesioAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsFunctionalCinesioAssessmentsIdResponse> => {
+
+  return customFetch<getEvaluationsFunctionalCinesioAssessmentsIdResponse>(getGetEvaluationsFunctionalCinesioAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/functional-cinesio-assessments/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsFunctionalCinesioAssessmentsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsFunctionalCinesioAssessmentsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>> = ({ signal }) => getEvaluationsFunctionalCinesioAssessmentsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsFunctionalCinesioAssessmentsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>>
+export type GetEvaluationsFunctionalCinesioAssessmentsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsFunctionalCinesioAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsFunctionalCinesioAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get functional cinesio assessment (ACF)
+ */
+
+export function useGetEvaluationsFunctionalCinesioAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsFunctionalCinesioAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsFunctionalCinesioAssessmentsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse200 = {
+  data: FunctionalCinesioAssessment
+  status: 200
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess = (putEvaluationsFunctionalCinesioAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponseError = (putEvaluationsFunctionalCinesioAssessmentsIdResponse400 | putEvaluationsFunctionalCinesioAssessmentsIdResponse401 | putEvaluationsFunctionalCinesioAssessmentsIdResponse403 | putEvaluationsFunctionalCinesioAssessmentsIdResponse404 | putEvaluationsFunctionalCinesioAssessmentsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsFunctionalCinesioAssessmentsIdResponse = (putEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess | putEvaluationsFunctionalCinesioAssessmentsIdResponseError)
+
+export const getPutEvaluationsFunctionalCinesioAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments/${id}`
+}
+
+/**
+ * Replaces the activity, the header and every answer of an ACF with the JSON body: the activity may change, and an answer left out of answers goes back to null (absent answers empties them all). number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the ACF will point at is locked (shared) and then the ACF's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/functional-cinesio-assessments/{id}. Requires the user or admin role and functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary Update functional cinesio assessment (ACF)
+ */
+export const putEvaluationsFunctionalCinesioAssessmentsId = async (id: string,
+    functionalCinesioAssessmentInput: FunctionalCinesioAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsFunctionalCinesioAssessmentsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsFunctionalCinesioAssessmentsIdResponse>(getPutEvaluationsFunctionalCinesioAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(functionalCinesioAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsFunctionalCinesioAssessmentsIdMutationKey = () => ['putEvaluationsFunctionalCinesioAssessmentsId'] as const;
+
+export const getPutEvaluationsFunctionalCinesioAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>, TError,PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>, TError,PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsFunctionalCinesioAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>, PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsFunctionalCinesioAssessmentsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsFunctionalCinesioAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>>
+    export type PutEvaluationsFunctionalCinesioAssessmentsIdMutationBody = FunctionalCinesioAssessmentInput
+    export type PutEvaluationsFunctionalCinesioAssessmentsIdMutationError = ErrorResponse
+    export type PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables = {id: string;data: FunctionalCinesioAssessmentInput}
+
+    /**
+ * @summary Update functional cinesio assessment (ACF)
+ */
+export const usePutEvaluationsFunctionalCinesioAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>, TError,PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsFunctionalCinesioAssessmentsId>>,
+        TError,
+        PutEvaluationsFunctionalCinesioAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsFunctionalCinesioAssessmentsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess = (deleteEvaluationsFunctionalCinesioAssessmentsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponseError = (deleteEvaluationsFunctionalCinesioAssessmentsIdResponse401 | deleteEvaluationsFunctionalCinesioAssessmentsIdResponse403 | deleteEvaluationsFunctionalCinesioAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsFunctionalCinesioAssessmentsIdResponse = (deleteEvaluationsFunctionalCinesioAssessmentsIdResponseSuccess | deleteEvaluationsFunctionalCinesioAssessmentsIdResponseError)
+
+export const getDeleteEvaluationsFunctionalCinesioAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/functional-cinesio-assessments/${id}`
+}
+
+/**
+ * Deletes an ACF permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same ACF again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and functional_cinesio_assessment enabled by EVALUATION_TYPES.
+ * @summary Delete functional cinesio assessment (ACF)
+ */
+export const deleteEvaluationsFunctionalCinesioAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsFunctionalCinesioAssessmentsIdResponse> => {
+
+  return customFetch<deleteEvaluationsFunctionalCinesioAssessmentsIdResponse>(getDeleteEvaluationsFunctionalCinesioAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsFunctionalCinesioAssessmentsIdMutationKey = () => ['deleteEvaluationsFunctionalCinesioAssessmentsId'] as const;
+
+export const getDeleteEvaluationsFunctionalCinesioAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>, TError,DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>, TError,DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsFunctionalCinesioAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>, DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsFunctionalCinesioAssessmentsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>>
+
+    export type DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete functional cinesio assessment (ACF)
+ */
+export const useDeleteEvaluationsFunctionalCinesioAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>, TError,DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsFunctionalCinesioAssessmentsId>>,
+        TError,
+        DeleteEvaluationsFunctionalCinesioAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsFunctionalCinesioAssessmentsIdMutationOptions(options), queryClient);
     }
