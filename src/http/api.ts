@@ -422,6 +422,7 @@ export const EvaluationTypeItemType = {
   ergonomic_work_analysis: 'ergonomic_work_analysis',
   change_assessment: 'change_assessment',
   procedure_assessment: 'procedure_assessment',
+  incident_investigation: 'incident_investigation',
 } as const;
 
 /**
@@ -440,6 +441,7 @@ export const EvaluationTypeItemCode = {
   AETA: 'AETA',
   AMP: 'AMP',
   AP: 'AP',
+  II: 'II',
 } as const;
 
 /**
@@ -4599,6 +4601,133 @@ export interface ProcedureAssessmentInput {
   answers?: ProcedureAssessmentInputAnswers;
 }
 
+/**
+ * An item of the II listing (the Avaliação de Incidente / Acidente, the Diversos tab of the legacy evaluations). The activity is the one shown for projects: as it is now, without area nor fabric. The description, the answers and the photo are only in the detail.
+ */
+export interface IncidentInvestigationItem {
+  id: string;
+  /**
+     * Sequential number of the IIs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** II-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  investigation_date: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * The four answers. Plain text with its line breaks, null when absent; a stored key outside the catalog is never answered.
+ */
+export interface IncidentInvestigationAnswers {
+  /**
+     * 'Setor'
+     * @maxLength 255
+     * @nullable
+     */
+  sector: string | null;
+  /**
+     * 'Funcionário': answered to every role that reads the II, the viewer included, and never in the listing
+     * @maxLength 255
+     * @nullable
+     */
+  employee: string | null;
+  /**
+     * 'Fatores de Risco Ergonômico'
+     * @maxLength 5000
+     * @nullable
+     */
+  ergonomicRiskFactors: string | null;
+  /**
+     * 'Comentários'
+     * @maxLength 5000
+     * @nullable
+     */
+  comments: string | null;
+}
+
+/**
+ * An II with its description, its 4 answers and its photo, right after the answers. The activity is only id, code and name, without area nor fabric.
+ */
+export interface IncidentInvestigation {
+  id: string;
+  /**
+     * Sequential number of the IIs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** II-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  investigation_date: string;
+  /**
+     * The 'Ocorrência': plain text, line breaks kept, no markup interpreted
+     * @maxLength 5000
+     */
+  description: string;
+  created_at: string;
+  updated_at: string;
+  answers: IncidentInvestigationAnswers;
+  /** The photo ('Imagem'), or null when there is none. Its file is downloaded from GET /evaluations/incident-investigations/{id}/photo */
+  photo: EvaluationPhoto | null;
+}
+
+/**
+ * Absent or null is the same as {}: no answer at all. Each answer is a string or null, trimmed, empty or null stored as absent, at most 255 characters (code points) for the sector and the employee and 5000 for the others. A key outside the 4 of the catalog or a value of the wrong kind is refused
+ * @nullable
+ */
+export type IncidentInvestigationInputAnswers = {
+  /**
+     * 'Setor': plain text, trimmed, at most 255 characters (code points); a line break is not refused here, the single line is the web field's; null when absent
+     * @maxLength 255
+     * @nullable
+     */
+  sector?: string | null;
+  /**
+     * 'Funcionário': plain text, trimmed, at most 255 characters (code points); a line break is not refused here, the single line is the web field's; null when absent
+     * @maxLength 255
+     * @nullable
+     */
+  employee?: string | null;
+  /**
+     * 'Fatores de Risco Ergonômico': one plain text, line breaks kept, no markup interpreted; the six labels beside it are only shown by the web; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  ergonomicRiskFactors?: string | null;
+  /**
+     * 'Comentários': plain text, line breaks kept, no markup interpreted; null when absent
+     * @maxLength 5000
+     * @nullable
+     */
+  comments?: string | null;
+} | null;
+
+/**
+ * The fields of an II creation or update, as JSON. Any other top-level field (id, number, code, photo, photo_key, photo_name, created_at, created_by...) is ignored; the number comes from the sequence, the authorship from the token, and the photo has routes of its own.
+ */
+export interface IncidentInvestigationInput {
+  /** An existing activity (see GET /evaluations/incident-investigations/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  investigation_date: string;
+  /**
+     * Required: the 'Ocorrência', plain text, trimmed, not empty, at most 5000 characters (code points), line breaks kept
+     * @maxLength 5000
+     */
+  description: string;
+  /**
+     * Absent or null is the same as {}: no answer at all. Each answer is a string or null, trimmed, empty or null stored as absent, at most 255 characters (code points) for the sector and the employee and 5000 for the others. A key outside the 4 of the catalog or a value of the wrong kind is refused
+     * @nullable
+     */
+  answers?: IncidentInvestigationInputAnswers;
+}
+
 export type PostSessionsBody = {
   email: string;
   password: string;
@@ -4684,6 +4813,11 @@ export type PutEvaluationsErgonomicWorkAnalysesAdvancedIdPhotoBody = {
 };
 
 export type PutEvaluationsErgonomicWorkAnalysesIdPhotoBody = {
+  /** The photo: .jpg, .jpeg or .png, at most 10 MB */
+  photo: Blob | File;
+};
+
+export type PutEvaluationsIncidentInvestigationsIdPhotoBody = {
   /** The photo: .jpg, .jpeg or .png, at most 10 MB */
   photo: Blob | File;
 };
@@ -21523,4 +21657,1100 @@ export const useDeleteEvaluationsProcedureAssessmentsId = <TError = ErrorRespons
         TContext
       > => {
       return useMutation(getDeleteEvaluationsProcedureAssessmentsIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsIncidentInvestigationsResponse200 = {
+  data: IncidentInvestigationItem[]
+  status: 200
+}
+
+export type getEvaluationsIncidentInvestigationsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsIncidentInvestigationsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsIncidentInvestigationsResponseSuccess = (getEvaluationsIncidentInvestigationsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsIncidentInvestigationsResponseError = (getEvaluationsIncidentInvestigationsResponse401 | getEvaluationsIncidentInvestigationsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsIncidentInvestigationsResponse = (getEvaluationsIncidentInvestigationsResponseSuccess | getEvaluationsIncidentInvestigationsResponseError)
+
+export const getGetEvaluationsIncidentInvestigationsUrl = () => {
+
+
+
+
+  return `/evaluations/incident-investigations`
+}
+
+/**
+ * Every II of the installation (the Avaliação de Incidente / Acidente, the Diversos tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The description, the answers and the photo are only in the detail, so the employee is never in the listing, and the listing never reads the storage. Requires only an authenticated user, so any role, and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary List incident investigations (II)
+ */
+export const getEvaluationsIncidentInvestigations = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsIncidentInvestigationsResponse> => {
+
+  return customFetch<getEvaluationsIncidentInvestigationsResponse>(getGetEvaluationsIncidentInvestigationsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsIncidentInvestigationsQueryKey = () => {
+    return [
+    `/evaluations/incident-investigations`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsIncidentInvestigationsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsIncidentInvestigationsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>> = ({ signal }) => getEvaluationsIncidentInvestigations({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsIncidentInvestigationsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>>
+export type GetEvaluationsIncidentInvestigationsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsIncidentInvestigations<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigations<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigations<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List incident investigations (II)
+ */
+
+export function useGetEvaluationsIncidentInvestigations<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigations>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsIncidentInvestigationsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsIncidentInvestigationsResponse201 = {
+  data: IncidentInvestigation
+  status: 201
+}
+
+export type postEvaluationsIncidentInvestigationsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsIncidentInvestigationsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsIncidentInvestigationsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsIncidentInvestigationsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsIncidentInvestigationsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postEvaluationsIncidentInvestigationsResponseSuccess = (postEvaluationsIncidentInvestigationsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsIncidentInvestigationsResponseError = (postEvaluationsIncidentInvestigationsResponse400 | postEvaluationsIncidentInvestigationsResponse401 | postEvaluationsIncidentInvestigationsResponse403 | postEvaluationsIncidentInvestigationsResponse404 | postEvaluationsIncidentInvestigationsResponse413) & {
+  headers: Headers;
+};
+
+export type postEvaluationsIncidentInvestigationsResponse = (postEvaluationsIncidentInvestigationsResponseSuccess | postEvaluationsIncidentInvestigationsResponseError)
+
+export const getPostEvaluationsIncidentInvestigationsUrl = () => {
+
+
+
+
+  return `/evaluations/incident-investigations`
+}
+
+/**
+ * Creates an II from a JSON body, always without a photo: the photo is sent afterwards to PUT /evaluations/incident-investigations/{id}/photo. The number is the next one of the II sequence, taken inside the INSERT, and is never handed out again, not even after the II is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new II (409 there) or finished first (400 here), never a foreign key violation. The description and the answers are trimmed and keep their line breaks, and an empty answer or a null is stored as absent. Answers the same body as GET /evaluations/incident-investigations/{id}, with photo null. Not idempotent: sending it again creates another II. Requires the user or admin role and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Create incident investigation (II)
+ */
+export const postEvaluationsIncidentInvestigations = async (incidentInvestigationInput: IncidentInvestigationInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsIncidentInvestigationsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsIncidentInvestigationsResponse>(getPostEvaluationsIncidentInvestigationsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(incidentInvestigationInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsIncidentInvestigationsMutationKey = () => ['postEvaluationsIncidentInvestigations'] as const;
+
+export const getPostEvaluationsIncidentInvestigationsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>, TError,PostEvaluationsIncidentInvestigationsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>, TError,PostEvaluationsIncidentInvestigationsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsIncidentInvestigationsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>, PostEvaluationsIncidentInvestigationsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsIncidentInvestigations(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsIncidentInvestigationsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>>
+    export type PostEvaluationsIncidentInvestigationsMutationBody = IncidentInvestigationInput
+    export type PostEvaluationsIncidentInvestigationsMutationError = ErrorResponse
+    export type PostEvaluationsIncidentInvestigationsMutationVariables = {data: IncidentInvestigationInput}
+
+    /**
+ * @summary Create incident investigation (II)
+ */
+export const usePostEvaluationsIncidentInvestigations = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>, TError,PostEvaluationsIncidentInvestigationsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsIncidentInvestigations>>,
+        TError,
+        PostEvaluationsIncidentInvestigationsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsIncidentInvestigationsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsIncidentInvestigationsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsIncidentInvestigationsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsIncidentInvestigationsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsIncidentInvestigationsActivitiesResponseSuccess = (getEvaluationsIncidentInvestigationsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsIncidentInvestigationsActivitiesResponseError = (getEvaluationsIncidentInvestigationsActivitiesResponse401 | getEvaluationsIncidentInvestigationsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsIncidentInvestigationsActivitiesResponse = (getEvaluationsIncidentInvestigationsActivitiesResponseSuccess | getEvaluationsIncidentInvestigationsActivitiesResponseError)
+
+export const getGetEvaluationsIncidentInvestigationsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/incident-investigations/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Avaliação de Incidente / Acidente form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary List the activities an II can belong to
+ */
+export const getEvaluationsIncidentInvestigationsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsIncidentInvestigationsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsIncidentInvestigationsActivitiesResponse>(getGetEvaluationsIncidentInvestigationsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsIncidentInvestigationsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/incident-investigations/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsIncidentInvestigationsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsIncidentInvestigationsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>> = ({ signal }) => getEvaluationsIncidentInvestigationsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsIncidentInvestigationsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>>
+export type GetEvaluationsIncidentInvestigationsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsIncidentInvestigationsActivities<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsActivities<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsActivities<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities an II can belong to
+ */
+
+export function useGetEvaluationsIncidentInvestigationsActivities<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsIncidentInvestigationsActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsIncidentInvestigationsIdResponse200 = {
+  data: IncidentInvestigation
+  status: 200
+}
+
+export type getEvaluationsIncidentInvestigationsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsIncidentInvestigationsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsIncidentInvestigationsIdResponseSuccess = (getEvaluationsIncidentInvestigationsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsIncidentInvestigationsIdResponseError = (getEvaluationsIncidentInvestigationsIdResponse401 | getEvaluationsIncidentInvestigationsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsIncidentInvestigationsIdResponse = (getEvaluationsIncidentInvestigationsIdResponseSuccess | getEvaluationsIncidentInvestigationsIdResponseError)
+
+export const getGetEvaluationsIncidentInvestigationsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}`
+}
+
+/**
+ * One II: the item of the listing plus its description, at its place in the header, its 4 answers and its photo. Every key of the catalog is answered, null when absent or stored with a value of the wrong kind; a stored key outside the catalog is never answered. The employee is answered to every role that reads the II, the viewer included. The activity is only id, code and name, without its area nor fabric. The photo answers its original name and MIME type, never its storage key, and the detail never reads the storage. Requires only an authenticated user, so any role, and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Get incident investigation (II)
+ */
+export const getEvaluationsIncidentInvestigationsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsIncidentInvestigationsIdResponse> => {
+
+  return customFetch<getEvaluationsIncidentInvestigationsIdResponse>(getGetEvaluationsIncidentInvestigationsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsIncidentInvestigationsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/incident-investigations/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsIncidentInvestigationsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsIncidentInvestigationsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>> = ({ signal }) => getEvaluationsIncidentInvestigationsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsIncidentInvestigationsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>>
+export type GetEvaluationsIncidentInvestigationsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsIncidentInvestigationsId<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsId<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsId<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get incident investigation (II)
+ */
+
+export function useGetEvaluationsIncidentInvestigationsId<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsIncidentInvestigationsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsIncidentInvestigationsIdResponse200 = {
+  data: IncidentInvestigation
+  status: 200
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsIncidentInvestigationsIdResponseSuccess = (putEvaluationsIncidentInvestigationsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsIncidentInvestigationsIdResponseError = (putEvaluationsIncidentInvestigationsIdResponse400 | putEvaluationsIncidentInvestigationsIdResponse401 | putEvaluationsIncidentInvestigationsIdResponse403 | putEvaluationsIncidentInvestigationsIdResponse404 | putEvaluationsIncidentInvestigationsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsIncidentInvestigationsIdResponse = (putEvaluationsIncidentInvestigationsIdResponseSuccess | putEvaluationsIncidentInvestigationsIdResponseError)
+
+export const getPutEvaluationsIncidentInvestigationsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}`
+}
+
+/**
+ * Replaces the activity, the date, the description and every answer of an II with the JSON body: the activity may change, and an answer left out of answers goes back to null (absent answers empties them all). The photo never changes here, whatever the body carries (photo, photo_key or photo_name are ignored): it has routes of its own. number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the II will point at is locked (shared) and then the II's row (for update), so two updates serialize and the last one wins, and an update never undoes a concurrent photo upload. Answers the same body as GET /evaluations/incident-investigations/{id}. Requires the user or admin role and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Update incident investigation (II)
+ */
+export const putEvaluationsIncidentInvestigationsId = async (id: string,
+    incidentInvestigationInput: IncidentInvestigationInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsIncidentInvestigationsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsIncidentInvestigationsIdResponse>(getPutEvaluationsIncidentInvestigationsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(incidentInvestigationInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsIncidentInvestigationsIdMutationKey = () => ['putEvaluationsIncidentInvestigationsId'] as const;
+
+export const getPutEvaluationsIncidentInvestigationsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>, TError,PutEvaluationsIncidentInvestigationsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>, TError,PutEvaluationsIncidentInvestigationsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsIncidentInvestigationsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>, PutEvaluationsIncidentInvestigationsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsIncidentInvestigationsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsIncidentInvestigationsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>>
+    export type PutEvaluationsIncidentInvestigationsIdMutationBody = IncidentInvestigationInput
+    export type PutEvaluationsIncidentInvestigationsIdMutationError = ErrorResponse
+    export type PutEvaluationsIncidentInvestigationsIdMutationVariables = {id: string;data: IncidentInvestigationInput}
+
+    /**
+ * @summary Update incident investigation (II)
+ */
+export const usePutEvaluationsIncidentInvestigationsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>, TError,PutEvaluationsIncidentInvestigationsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsId>>,
+        TError,
+        PutEvaluationsIncidentInvestigationsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsIncidentInvestigationsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsIncidentInvestigationsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdResponseSuccess = (deleteEvaluationsIncidentInvestigationsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsIncidentInvestigationsIdResponseError = (deleteEvaluationsIncidentInvestigationsIdResponse401 | deleteEvaluationsIncidentInvestigationsIdResponse403 | deleteEvaluationsIncidentInvestigationsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsIncidentInvestigationsIdResponse = (deleteEvaluationsIncidentInvestigationsIdResponseSuccess | deleteEvaluationsIncidentInvestigationsIdResponseError)
+
+export const getDeleteEvaluationsIncidentInvestigationsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}`
+}
+
+/**
+ * Deletes an II permanently; there is no soft delete. Its photo is removed from the storage after the commit; a failure to remove it is logged with its key and the deletion still answers 204. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same II again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Delete incident investigation (II)
+ */
+export const deleteEvaluationsIncidentInvestigationsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsIncidentInvestigationsIdResponse> => {
+
+  return customFetch<deleteEvaluationsIncidentInvestigationsIdResponse>(getDeleteEvaluationsIncidentInvestigationsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsIncidentInvestigationsIdMutationKey = () => ['deleteEvaluationsIncidentInvestigationsId'] as const;
+
+export const getDeleteEvaluationsIncidentInvestigationsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>, TError,DeleteEvaluationsIncidentInvestigationsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>, TError,DeleteEvaluationsIncidentInvestigationsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsIncidentInvestigationsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>, DeleteEvaluationsIncidentInvestigationsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsIncidentInvestigationsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsIncidentInvestigationsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>>
+
+    export type DeleteEvaluationsIncidentInvestigationsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsIncidentInvestigationsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete incident investigation (II)
+ */
+export const useDeleteEvaluationsIncidentInvestigationsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>, TError,DeleteEvaluationsIncidentInvestigationsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsId>>,
+        TError,
+        DeleteEvaluationsIncidentInvestigationsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsIncidentInvestigationsIdMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse200ImageJpeg = {
+  data: Blob
+  status: 200
+}
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse200ImagePng = {
+  data: Blob
+  status: 200
+}
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse500 = {
+  data: ErrorResponse
+  status: 500
+}
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponseSuccess = (getEvaluationsIncidentInvestigationsIdPhotoResponse200ImageJpeg | getEvaluationsIncidentInvestigationsIdPhotoResponse200ImagePng) & {
+  headers: Headers;
+};
+export type getEvaluationsIncidentInvestigationsIdPhotoResponseError = (getEvaluationsIncidentInvestigationsIdPhotoResponse401 | getEvaluationsIncidentInvestigationsIdPhotoResponse404 | getEvaluationsIncidentInvestigationsIdPhotoResponse500) & {
+  headers: Headers;
+};
+
+export type getEvaluationsIncidentInvestigationsIdPhotoResponse = (getEvaluationsIncidentInvestigationsIdPhotoResponseSuccess | getEvaluationsIncidentInvestigationsIdPhotoResponseError)
+
+export const getGetEvaluationsIncidentInvestigationsIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}/photo`
+}
+
+/**
+ * Streams the photo of an II ('Imagem') to an authenticated user, with the MIME type of the server's map, the original file name in Content-Disposition (RFC 6266/8187) and X-Content-Type-Options: nosniff, so nothing is rendered on the API's origin. The photo may show people and injuries, and there is no other way to reach it: no static route, no signed URL and no public object. Requires only an authenticated user, so any role, and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Download the photo of an II
+ */
+export const getEvaluationsIncidentInvestigationsIdPhoto = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsIncidentInvestigationsIdPhotoResponse> => {
+
+  return customFetch<getEvaluationsIncidentInvestigationsIdPhotoResponse>(getGetEvaluationsIncidentInvestigationsIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsIncidentInvestigationsIdPhotoQueryKey = (id: string,) => {
+    return [
+    `/evaluations/incident-investigations/${id}/photo`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsIncidentInvestigationsIdPhotoQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsIncidentInvestigationsIdPhotoQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>> = ({ signal }) => getEvaluationsIncidentInvestigationsIdPhoto(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsIncidentInvestigationsIdPhotoQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>>
+export type GetEvaluationsIncidentInvestigationsIdPhotoQueryError = ErrorResponse
+
+
+export function useGetEvaluationsIncidentInvestigationsIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsIncidentInvestigationsIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Download the photo of an II
+ */
+
+export function useGetEvaluationsIncidentInvestigationsIdPhoto<TData = Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsIncidentInvestigationsIdPhoto>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsIncidentInvestigationsIdPhotoQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse200 = {
+  data: IncidentInvestigation
+  status: 200
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponseSuccess = (putEvaluationsIncidentInvestigationsIdPhotoResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsIncidentInvestigationsIdPhotoResponseError = (putEvaluationsIncidentInvestigationsIdPhotoResponse400 | putEvaluationsIncidentInvestigationsIdPhotoResponse401 | putEvaluationsIncidentInvestigationsIdPhotoResponse403 | putEvaluationsIncidentInvestigationsIdPhotoResponse404 | putEvaluationsIncidentInvestigationsIdPhotoResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsIncidentInvestigationsIdPhotoResponse = (putEvaluationsIncidentInvestigationsIdPhotoResponseSuccess | putEvaluationsIncidentInvestigationsIdPhotoResponseError)
+
+export const getPutEvaluationsIncidentInvestigationsIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}/photo`
+}
+
+/**
+ * Sends the photo of an II, or replaces the one it has, as the multipart part photo: one JPEG or PNG of at most 10 MB (10485760 bytes, inclusive), accepted by its extension, case-insensitively, never by the Content-Type the client sent, and with no limit of pixels. The server names the stored object; the original name is kept for display and for the download. The object is stored first, then the II's row is locked and only the photo and updated_by are written, and the previous object is removed only after the commit; when anything fails after the object was stored, it is removed. An II has at most one photo. Answers 200 with the same body as GET /evaluations/incident-investigations/{id}. Requires the user or admin role and incident_investigation enabled by EVALUATION_TYPES; the role is checked before the upload is read, so a viewer never makes the server write a byte.
+ * @summary Send or replace the photo of an II
+ */
+export const putEvaluationsIncidentInvestigationsIdPhoto = async (id: string,
+    putEvaluationsIncidentInvestigationsIdPhotoBody: PutEvaluationsIncidentInvestigationsIdPhotoBody, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsIncidentInvestigationsIdPhotoResponse> => {
+    const formData = new FormData();
+formData.append(`photo`, putEvaluationsIncidentInvestigationsIdPhotoBody.photo);
+
+  return customFetch<putEvaluationsIncidentInvestigationsIdPhotoResponse>(getPutEvaluationsIncidentInvestigationsIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsIncidentInvestigationsIdPhotoMutationKey = () => ['putEvaluationsIncidentInvestigationsIdPhoto'] as const;
+
+export const getPutEvaluationsIncidentInvestigationsIdPhotoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>, TError,PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>, TError,PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsIncidentInvestigationsIdPhotoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>, PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsIncidentInvestigationsIdPhoto(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsIncidentInvestigationsIdPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>>
+    export type PutEvaluationsIncidentInvestigationsIdPhotoMutationBody = PutEvaluationsIncidentInvestigationsIdPhotoBody
+    export type PutEvaluationsIncidentInvestigationsIdPhotoMutationError = ErrorResponse
+    export type PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables = {id: string;data: PutEvaluationsIncidentInvestigationsIdPhotoBody}
+
+    /**
+ * @summary Send or replace the photo of an II
+ */
+export const usePutEvaluationsIncidentInvestigationsIdPhoto = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>, TError,PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsIncidentInvestigationsIdPhoto>>,
+        TError,
+        PutEvaluationsIncidentInvestigationsIdPhotoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsIncidentInvestigationsIdPhotoMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponse200 = {
+  data: IncidentInvestigation
+  status: 200
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponseSuccess = (deleteEvaluationsIncidentInvestigationsIdPhotoResponse200) & {
+  headers: Headers;
+};
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponseError = (deleteEvaluationsIncidentInvestigationsIdPhotoResponse401 | deleteEvaluationsIncidentInvestigationsIdPhotoResponse403 | deleteEvaluationsIncidentInvestigationsIdPhotoResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsIncidentInvestigationsIdPhotoResponse = (deleteEvaluationsIncidentInvestigationsIdPhotoResponseSuccess | deleteEvaluationsIncidentInvestigationsIdPhotoResponseError)
+
+export const getDeleteEvaluationsIncidentInvestigationsIdPhotoUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/incident-investigations/${id}/photo`
+}
+
+/**
+ * Removes the photo of an II and keeps the II, which starts answering photo: null. Answers 200 with the updated II, and not 204, because the resource still exists and changed. An II without a photo answers 404 'Evaluation photo not found.', which makes a second call observable. Inside the transaction the row is locked and only the photo and updated_by are written; the object is removed only after the commit, and a failure to remove it is logged with its key and does not change the answer. The confirmation is the interface's responsibility. Requires the user or admin role and incident_investigation enabled by EVALUATION_TYPES.
+ * @summary Remove the photo of an II
+ */
+export const deleteEvaluationsIncidentInvestigationsIdPhoto = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsIncidentInvestigationsIdPhotoResponse> => {
+
+  return customFetch<deleteEvaluationsIncidentInvestigationsIdPhotoResponse>(getDeleteEvaluationsIncidentInvestigationsIdPhotoUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsIncidentInvestigationsIdPhotoMutationKey = () => ['deleteEvaluationsIncidentInvestigationsIdPhoto'] as const;
+
+export const getDeleteEvaluationsIncidentInvestigationsIdPhotoMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>, TError,DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>, TError,DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsIncidentInvestigationsIdPhotoMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>, DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsIncidentInvestigationsIdPhoto(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsIncidentInvestigationsIdPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>>
+
+    export type DeleteEvaluationsIncidentInvestigationsIdPhotoMutationError = ErrorResponse
+    export type DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables = {id: string}
+
+    /**
+ * @summary Remove the photo of an II
+ */
+export const useDeleteEvaluationsIncidentInvestigationsIdPhoto = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>, TError,DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsIncidentInvestigationsIdPhoto>>,
+        TError,
+        DeleteEvaluationsIncidentInvestigationsIdPhotoMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsIncidentInvestigationsIdPhotoMutationOptions(options), queryClient);
     }
