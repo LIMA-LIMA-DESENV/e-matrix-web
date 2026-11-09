@@ -268,6 +268,12 @@ export interface EvaluationWebDefinition<
   fileBaseName: string
   /** The photo of the record, for the types that have one (FR-020). */
   photo?: EvaluationPhotoDefinition<TDetail>
+  /**
+   * Only who may edit reads a record (FR-016): for the others the listing has
+   * no row actions, only "PDF em branco", and the view never requests the
+   * detail and goes back to the tab. The API refuses the detail anyway.
+   */
+  restrictedRead?: true
 }
 
 /** Adapts a generated read query to `EvaluationQueryState`. */

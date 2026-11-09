@@ -329,6 +329,28 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
     'incidentInvestigationDescriptionTooLong',
   'Invalid incident investigation answers.':
     'incidentInvestigationAnswersInvalid',
+  'Functional cinesio assessment not found.':
+    'functionalCinesioAssessmentNotFound',
+  'Functional cinesio assessment activity is required.':
+    'functionalCinesioAssessmentActivityRequired',
+  'Functional cinesio assessment activity not found.':
+    'functionalCinesioAssessmentActivityNotFound',
+  'Invalid functional cinesio assessment date.':
+    'functionalCinesioAssessmentDateInvalid',
+  'Functional cinesio assessment evaluated is required.':
+    'functionalCinesioAssessmentEvaluatedRequired',
+  'Functional cinesio assessment evaluated is too long.':
+    'functionalCinesioAssessmentEvaluatedTooLong',
+  'Invalid functional cinesio assessment birth date.':
+    'functionalCinesioAssessmentBirthDateInvalid',
+  'Functional cinesio assessment birth date cannot be after the assessment date.':
+    'functionalCinesioAssessmentBirthDateAfterAssessment',
+  'Functional cinesio assessment registry is required.':
+    'functionalCinesioAssessmentRegistryRequired',
+  'Functional cinesio assessment registry is too long.':
+    'functionalCinesioAssessmentRegistryTooLong',
+  'Invalid functional cinesio assessment answers.':
+    'functionalCinesioAssessmentAnswersInvalid',
   // The photo of any evaluation type that has one (D-3).
   'Evaluation photo is required.': 'evaluationPhotoRequired',
   'Evaluation photo type not allowed.': 'evaluationPhotoTypeNotAllowed',

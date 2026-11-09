@@ -9,8 +9,8 @@ export type EvaluationType = EvaluationTypeItemType
  * ones (`ergonomic_analysis_in_loco`, `risk_factor`,
  * `ergonomic_work_analysis_advanced`, `priority_criterion`, `hit_list`,
  * `checklist`, `ergonomic_work_analysis`, `change_assessment`,
- * `procedure_assessment`, `incident_investigation`, the order of the legacy
- * tabs):
+ * `procedure_assessment`, `incident_investigation`,
+ * `functional_cinesio_assessment`, the order of the legacy tabs):
  * `/avaliacoes` opens on the first enabled.
  */
 export const EVALUATION_TYPE_HREFS = {
@@ -26,6 +26,7 @@ export const EVALUATION_TYPE_HREFS = {
   change_assessment: '/avaliacoes/avaliacao-de-mudancas',
   procedure_assessment: '/avaliacoes/avaliacao-de-risco-ergonomico-de-tarefas',
   incident_investigation: '/avaliacoes/avaliacao-de-incidente-acidente',
+  functional_cinesio_assessment: '/avaliacoes/avaliacao-cinesiofuncional',
 } as const satisfies Record<EvaluationType, string>
 
 const EMPTY_TYPES: readonly EvaluationType[] = []
