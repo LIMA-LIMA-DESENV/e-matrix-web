@@ -176,7 +176,9 @@ export function ThreeStateAnswer({
  * each option shown as "( n ) label", n its points, as in the legacy. There
  * is no "no answer" option: a new record starts with none checked, and once
  * an option is chosen only another can replace it. The value of an option is
- * its points as a string; `''` is no choice yet.
+ * its points as a string; `''` is no choice yet. With `hidePoints` the option
+ * shows only its label, for values that mean nothing to who fills it in, like
+ * the `1` and `0` of the AP (AP FR-015).
  */
 export function ChoiceAnswer({
   id,
@@ -184,12 +186,14 @@ export function ChoiceAnswer({
   registration,
   options,
   error,
+  hidePoints,
 }: {
   id: string
   legend: ReactNode
   registration: UseFormRegisterReturn
   options: readonly { points: number; label: string }[]
   error?: string
+  hidePoints?: true
 }) {
   const legendId = `${id}-legend`
   const errorId = `${id}-error`
@@ -227,7 +231,13 @@ export function ChoiceAnswer({
                 {...registration}
               />
               <span>
-                <span className="tabular-nums">( {option.points} )</span>{' '}
+                {!hidePoints && (
+                  <>
+                    <span className="tabular-nums">
+                      ( {option.points} )
+                    </span>{' '}
+                  </>
+                )}
                 {option.label}
               </span>
             </label>

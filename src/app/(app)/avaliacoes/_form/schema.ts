@@ -20,6 +20,9 @@ import type {
   PriorityCriterion,
   PriorityCriterionInput,
   PriorityCriterionInputAnswers,
+  ProcedureAssessment,
+  ProcedureAssessmentInput,
+  ProcedureAssessmentInputAnswers,
   RiskFactor,
   RiskFactorInput,
   RiskFactorInputAnswers,
@@ -64,6 +67,12 @@ import {
   type PriorityCriterionQuestionField,
   type PriorityCriterionSolutionKey,
 } from '../components/priority-criterion-questions'
+import {
+  PROCEDURE_ASSESSMENT_OPTIONS,
+  PROCEDURE_ASSESSMENT_QUESTIONS,
+  type ProcedureAssessmentCommentKey,
+  type ProcedureAssessmentQuestionField,
+} from '../components/procedure-assessment-questions'
 import {
   RISK_FACTOR_KEYS,
   type RiskFactorKey,
@@ -1418,6 +1427,175 @@ export function toPriorityCriterionInput(
     question3: Number(data.question3) as PriorityCriterionInput['question3'],
     question4: Number(data.question4) as PriorityCriterionInput['question4'],
     question5: Number(data.question5) as PriorityCriterionInput['question5'],
+    answers,
+  }
+}
+
+/** The longest sector, valuer and rated turn: a `varchar(255)` of the API. */
+export const MAX_PROCEDURE_ASSESSMENT_TEXT_LENGTH = 255
+
+/** `question1Description` to `question5Description`, in the questions' order. */
+const PROCEDURE_ASSESSMENT_COMMENT_KEYS: readonly ProcedureAssessmentCommentKey[] =
+  PROCEDURE_ASSESSMENT_QUESTIONS.map(({ commentKey }) => commentKey)
+
+/**
+ * Mirrors the API rules of an Avaliação de Risco Ergonômico de Tarefas write
+ * (FR-003, FR-016): the activity chosen among the listed ones, a real date,
+ * not compared with the periods, the sector, the valuer and the rated turn not
+ * blank after the trim and of at most 255 code points, each of the 5 questions
+ * answered with Sim (`'1'`) or Não (`'0'`), R-8, and each comment optional, of
+ * at most 5,000 code points, whatever the answer (R-10). The answers stay as
+ * their radio groups hold them, as strings: `toProcedureAssessmentInput` turns
+ * them into numbers. Area and fabric are shown by the view only: kept as they
+ * come, never sent. The API stays the authority, including whether the
+ * activity still exists.
+ */
+export function makeProcedureAssessmentSchema(tv: Translate) {
+  const requiredText = (requiredMessage: string) =>
+    z
+      .string()
+      .refine((value) => value.trim().length > 0, { message: requiredMessage })
+      .refine(
+        (value) => answerLength(value) <= MAX_PROCEDURE_ASSESSMENT_TEXT_LENGTH,
+        {
+          message: tv('textTooLong', {
+            max: MAX_PROCEDURE_ASSESSMENT_TEXT_LENGTH,
+          }),
+        }
+      )
+
+  const comment = z
+    .string()
+    .refine((value) => answerLength(value) <= MAX_EVALUATION_TEXT_LENGTH, {
+      message: tv('textTooLong', { max: MAX_EVALUATION_TEXT_LENGTH }),
+    })
+
+  const questions = Object.fromEntries(
+    PROCEDURE_ASSESSMENT_QUESTIONS.map(({ field }) => [
+      field,
+      z
+        .string()
+        .refine(
+          (value) =>
+            PROCEDURE_ASSESSMENT_OPTIONS.some(
+              (option) => String(option.value) === value
+            ),
+          { message: tv('choiceRequired') }
+        ),
+    ])
+  ) as Record<ProcedureAssessmentQuestionField, z.ZodString>
+
+  return z.object({
+    activity_id: z.string().min(1, tv('activityRequired')),
+    assessment_date: z
+      .string()
+      .refine(isCalendarDay, tv('assessmentDateRequired')),
+    sector: requiredText(tv('sectorRequired')),
+    valuer: requiredText(tv('valuerRequired')),
+    rated_turn: requiredText(tv('ratedTurnRequired')),
+    location: z.object({ area: z.string(), fabric: z.string() }),
+    ...questions,
+    answers: z.object(
+      shapeOf(PROCEDURE_ASSESSMENT_COMMENT_KEYS, comment) as Record<
+        ProcedureAssessmentCommentKey,
+        typeof comment
+      >
+    ),
+  })
+}
+
+export type ProcedureAssessmentFormData = z.output<
+  ReturnType<typeof makeProcedureAssessmentSchema>
+>
+
+/**
+ * An empty Avaliação de Risco Ergonômico de Tarefas: no field, no question
+ * answered (a new record starts with no option chosen) and no comment.
+ */
+export function procedureAssessmentFormDefaultValues(): ProcedureAssessmentFormData {
+  return {
+    activity_id: '',
+    assessment_date: '',
+    sector: '',
+    valuer: '',
+    rated_turn: '',
+    location: { area: '', fabric: '' },
+    question1: '',
+    question2: '',
+    question3: '',
+    question4: '',
+    question5: '',
+    answers: shapeOf(PROCEDURE_ASSESSMENT_COMMENT_KEYS, '') as Record<
+      ProcedureAssessmentCommentKey,
+      string
+    >,
+  }
+}
+
+/**
+ * A stored Avaliação de Risco Ergonômico de Tarefas as the form holds it, with
+ * the current area and fabric of its activity for the view (R-6): each answer
+ * as the value of its radio, so Não stays `'0'` and never reads as no answer,
+ * and an absent comment (`null`) as a blank text area.
+ */
+export function toProcedureAssessmentFormValues(
+  record: ProcedureAssessment
+): ProcedureAssessmentFormData {
+  return {
+    activity_id: record.activity.id,
+    assessment_date: record.assessment_date,
+    sector: record.sector,
+    valuer: record.valuer,
+    rated_turn: record.rated_turn,
+    location: { area: record.activity.area, fabric: record.activity.fabric },
+    question1: String(record.question1),
+    question2: String(record.question2),
+    question3: String(record.question3),
+    question4: String(record.question4),
+    question5: String(record.question5),
+    answers: Object.fromEntries(
+      PROCEDURE_ASSESSMENT_COMMENT_KEYS.map((key) => [
+        key,
+        record.answers[key] ?? '',
+      ])
+    ) as Record<ProcedureAssessmentCommentKey, string>,
+  }
+}
+
+/**
+ * The body of `POST`/`PUT /evaluations/procedure-assessments` (FR-008, FR-016):
+ * the date as typed, the sector, the valuer and the rated turn trimmed, each
+ * answer as the number the API stores, and the 5 comments trimmed, keeping
+ * their inner line breaks; a blank one goes as `null`, which the API stores as
+ * absent, so the `PUT` clears a comment that was emptied. Area and fabric are
+ * never sent.
+ */
+export function toProcedureAssessmentInput(
+  data: ProcedureAssessmentFormData
+): ProcedureAssessmentInput {
+  const answers = Object.fromEntries(
+    PROCEDURE_ASSESSMENT_COMMENT_KEYS.map(
+      (key): [ProcedureAssessmentCommentKey, string | null] => [
+        key,
+        data.answers[key]?.trim() || null,
+      ]
+    )
+  ) as ProcedureAssessmentInputAnswers
+
+  return {
+    activity_id: data.activity_id,
+    // Calendar day goes as typed (`YYYY-MM-DD`), never through Date.
+    assessment_date: data.assessment_date,
+    sector: data.sector.trim(),
+    valuer: data.valuer.trim(),
+    rated_turn: data.rated_turn.trim(),
+    // Only a valid form is sent: each value is `1` or `0`, the `enum` of the
+    // contract.
+    question1: Number(data.question1) as ProcedureAssessmentInput['question1'],
+    question2: Number(data.question2) as ProcedureAssessmentInput['question2'],
+    question3: Number(data.question3) as ProcedureAssessmentInput['question3'],
+    question4: Number(data.question4) as ProcedureAssessmentInput['question4'],
+    question5: Number(data.question5) as ProcedureAssessmentInput['question5'],
     answers,
   }
 }
