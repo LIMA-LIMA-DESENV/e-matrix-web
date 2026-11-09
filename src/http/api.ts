@@ -421,6 +421,7 @@ export const EvaluationTypeItemType = {
   checklist: 'checklist',
   ergonomic_work_analysis: 'ergonomic_work_analysis',
   change_assessment: 'change_assessment',
+  procedure_assessment: 'procedure_assessment',
 } as const;
 
 /**
@@ -438,6 +439,7 @@ export const EvaluationTypeItemCode = {
   CDIA: 'CDIA',
   AETA: 'AETA',
   AMP: 'AMP',
+  AP: 'AP',
 } as const;
 
 /**
@@ -4295,6 +4297,306 @@ export interface ErgonomicWorkAnalysisInput {
      * @nullable
      */
   answers?: ErgonomicWorkAnalysisInputAnswers;
+}
+
+/**
+ * An item of the AP listing (the Avaliação de Risco Ergonômico de Tarefas, the Diversos tab of the legacy evaluations). The activity is the one shown for projects: as it is now, without area nor fabric. The five questions and the comments are only in the detail.
+ */
+export interface ProcedureAssessmentItem {
+  id: string;
+  /**
+     * Sequential number of the APs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AP-<number>, derived and never stored */
+  code: string;
+  activity: ImprovementProjectActivity;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  /**
+     * The sector, typed freely ('Setor'), with no link to the areas
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * Who evaluated, typed freely ('Avaliador')
+     * @maxLength 255
+     */
+  valuer: string;
+  /**
+     * The shift evaluated, typed freely ('Turno avaliado')
+     * @maxLength 255
+     */
+  rated_turn: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * A risk factor is evident in the activity (question 1 of the form): 1 Sim, 0 Não
+ */
+export type ProcedureAssessmentQuestion1 = typeof ProcedureAssessmentQuestion1[keyof typeof ProcedureAssessmentQuestion1];
+
+
+export const ProcedureAssessmentQuestion1 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * The furniture is adequate (question 2 of the form): 1 Sim, 0 Não
+ */
+export type ProcedureAssessmentQuestion2 = typeof ProcedureAssessmentQuestion2[keyof typeof ProcedureAssessmentQuestion2];
+
+
+export const ProcedureAssessmentQuestion2 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * The lighting provides comfort (question 3 of the form): 1 Sim, 0 Não
+ */
+export type ProcedureAssessmentQuestion3 = typeof ProcedureAssessmentQuestion3[keyof typeof ProcedureAssessmentQuestion3];
+
+
+export const ProcedureAssessmentQuestion3 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Equipment is available to lift or carry parts above 20 kg (question 4 of the form): 1 Sim, 0 Não
+ */
+export type ProcedureAssessmentQuestion4 = typeof ProcedureAssessmentQuestion4[keyof typeof ProcedureAssessmentQuestion4];
+
+
+export const ProcedureAssessmentQuestion4 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Adequate tools are available for manual assembly or adjustment (question 5 of the form): 1 Sim, 0 Não
+ */
+export type ProcedureAssessmentQuestion5 = typeof ProcedureAssessmentQuestion5[keyof typeof ProcedureAssessmentQuestion5];
+
+
+export const ProcedureAssessmentQuestion5 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * The five comments, in the order of the questions. Plain text with its line breaks, null when absent; a stored key outside the catalog is never answered.
+ */
+export interface ProcedureAssessmentAnswers {
+  /**
+     * Caso sim, qual fator de risco identificado?
+     * @maxLength 5000
+     * @nullable
+     */
+  question1Description: string | null;
+  /**
+     * Caso não, qual mobiliário está inadequado e por quê?
+     * @maxLength 5000
+     * @nullable
+     */
+  question2Description: string | null;
+  /**
+     * Caso não, está escuro ou muito claro?
+     * @maxLength 5000
+     * @nullable
+     */
+  question3Description: string | null;
+  /**
+     * Caso não, é feito manual?
+     * @maxLength 5000
+     * @nullable
+     */
+  question4Description: string | null;
+  /**
+     * Caso não, é feito manual? É repetitivo o trabalho?
+     * @maxLength 5000
+     * @nullable
+     */
+  question5Description: string | null;
+}
+
+/**
+ * An AP with its five answers and its comments. The activity also answers its current area and fabric. There is no score, classification or highlight of the answers.
+ */
+export interface ProcedureAssessment {
+  id: string;
+  /**
+     * Sequential number of the APs, never changed nor handed out again
+     * @minimum 1
+     */
+  number: number;
+  /** AP-<number>, derived and never stored */
+  code: string;
+  activity: EvaluationActivityLocation;
+  /** Calendar day, YYYY-MM-DD; not required to fall in a period */
+  assessment_date: string;
+  /**
+     * The sector, typed freely ('Setor'), with no link to the areas
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * Who evaluated, typed freely ('Avaliador')
+     * @maxLength 255
+     */
+  valuer: string;
+  /**
+     * The shift evaluated, typed freely ('Turno avaliado')
+     * @maxLength 255
+     */
+  rated_turn: string;
+  /** A risk factor is evident in the activity (question 1 of the form): 1 Sim, 0 Não */
+  question1: ProcedureAssessmentQuestion1;
+  /** The furniture is adequate (question 2 of the form): 1 Sim, 0 Não */
+  question2: ProcedureAssessmentQuestion2;
+  /** The lighting provides comfort (question 3 of the form): 1 Sim, 0 Não */
+  question3: ProcedureAssessmentQuestion3;
+  /** Equipment is available to lift or carry parts above 20 kg (question 4 of the form): 1 Sim, 0 Não */
+  question4: ProcedureAssessmentQuestion4;
+  /** Adequate tools are available for manual assembly or adjustment (question 5 of the form): 1 Sim, 0 Não */
+  question5: ProcedureAssessmentQuestion5;
+  created_at: string;
+  updated_at: string;
+  answers: ProcedureAssessmentAnswers;
+}
+
+/**
+ * Required: a risk factor is evident in the activity (question 1 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused
+ */
+export type ProcedureAssessmentInputQuestion1 = typeof ProcedureAssessmentInputQuestion1[keyof typeof ProcedureAssessmentInputQuestion1];
+
+
+export const ProcedureAssessmentInputQuestion1 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Required: the furniture is adequate (question 2 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused
+ */
+export type ProcedureAssessmentInputQuestion2 = typeof ProcedureAssessmentInputQuestion2[keyof typeof ProcedureAssessmentInputQuestion2];
+
+
+export const ProcedureAssessmentInputQuestion2 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Required: the lighting provides comfort (question 3 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused
+ */
+export type ProcedureAssessmentInputQuestion3 = typeof ProcedureAssessmentInputQuestion3[keyof typeof ProcedureAssessmentInputQuestion3];
+
+
+export const ProcedureAssessmentInputQuestion3 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Required: equipment is available to lift or carry parts above 20 kg (question 4 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused
+ */
+export type ProcedureAssessmentInputQuestion4 = typeof ProcedureAssessmentInputQuestion4[keyof typeof ProcedureAssessmentInputQuestion4];
+
+
+export const ProcedureAssessmentInputQuestion4 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Required: adequate tools are available for manual assembly or adjustment (question 5 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused
+ */
+export type ProcedureAssessmentInputQuestion5 = typeof ProcedureAssessmentInputQuestion5[keyof typeof ProcedureAssessmentInputQuestion5];
+
+
+export const ProcedureAssessmentInputQuestion5 = {
+  NUMBER_1: 1,
+  NUMBER_0: 0,
+} as const;
+
+/**
+ * Absent or null is the same as {}: no comment at all. Each comment is optional whatever the answer of its question, and is plain text, trimmed, keeping its inner line breaks as they came, at most 5000 characters (code points), or null; null and empty texts are stored as absent. A key outside the five comments, or a value that is neither a string nor null, is refused
+ * @nullable
+ */
+export type ProcedureAssessmentInputAnswers = {
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question1Description?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question2Description?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question3Description?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question4Description?: string | null;
+  /**
+     * @maxLength 5000
+     * @nullable
+     */
+  question5Description?: string | null;
+} | null;
+
+/**
+ * The fields of an AP creation or update, as JSON. Any other top-level field (id, number, code, area, fabric, created_at, created_by...) is ignored; the number comes from the sequence and the authorship from the token.
+ */
+export interface ProcedureAssessmentInput {
+  /** An existing activity (see GET /evaluations/procedure-assessments/activities) */
+  activity_id: string;
+  /** Required: a real calendar day, YYYY-MM-DD; it is not compared with the periods */
+  assessment_date: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  sector: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  valuer: string;
+  /**
+     * Required: trimmed, not empty, at most 255 characters (code points)
+     * @minLength 1
+     * @maxLength 255
+     */
+  rated_turn: string;
+  /** Required: a risk factor is evident in the activity (question 1 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused */
+  question1: ProcedureAssessmentInputQuestion1;
+  /** Required: the furniture is adequate (question 2 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused */
+  question2: ProcedureAssessmentInputQuestion2;
+  /** Required: the lighting provides comfort (question 3 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused */
+  question3: ProcedureAssessmentInputQuestion3;
+  /** Required: equipment is available to lift or carry parts above 20 kg (question 4 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused */
+  question4: ProcedureAssessmentInputQuestion4;
+  /** Required: adequate tools are available for manual assembly or adjustment (question 5 of the form): 1 Sim, 0 Não. The JSON number 1 or 0; a string (even "1"), a boolean (even true) or another number is refused */
+  question5: ProcedureAssessmentInputQuestion5;
+  /**
+     * Absent or null is the same as {}: no comment at all. Each comment is optional whatever the answer of its question, and is plain text, trimmed, keeping its inner line breaks as they came, at most 5000 characters (code points), or null; null and empty texts are stored as absent. A key outside the five comments, or a value that is neither a string nor null, is refused
+     * @nullable
+     */
+  answers?: ProcedureAssessmentInputAnswers;
 }
 
 export type PostSessionsBody = {
@@ -20482,4 +20784,743 @@ export const useDeleteEvaluationsErgonomicWorkAnalysesIdPhoto = <TError = ErrorR
         TContext
       > => {
       return useMutation(getDeleteEvaluationsErgonomicWorkAnalysesIdPhotoMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsProcedureAssessmentsResponse200 = {
+  data: ProcedureAssessmentItem[]
+  status: 200
+}
+
+export type getEvaluationsProcedureAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsProcedureAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsProcedureAssessmentsResponseSuccess = (getEvaluationsProcedureAssessmentsResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsProcedureAssessmentsResponseError = (getEvaluationsProcedureAssessmentsResponse401 | getEvaluationsProcedureAssessmentsResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsProcedureAssessmentsResponse = (getEvaluationsProcedureAssessmentsResponseSuccess | getEvaluationsProcedureAssessmentsResponseError)
+
+export const getGetEvaluationsProcedureAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/procedure-assessments`
+}
+
+/**
+ * Every AP of the installation (the Avaliação de Risco Ergonômico de Tarefas, the Diversos tab of the legacy evaluations), with no slice by period and no pagination: a period_id is ignored. Ordered by created_at descending and then by number descending. Each item carries the activity as it is now, without its area nor fabric. The five questions and the comments are only in the detail. Requires only an authenticated user, so any role, and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary List procedure assessments (AP)
+ */
+export const getEvaluationsProcedureAssessments = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsProcedureAssessmentsResponse> => {
+
+  return customFetch<getEvaluationsProcedureAssessmentsResponse>(getGetEvaluationsProcedureAssessmentsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsProcedureAssessmentsQueryKey = () => {
+    return [
+    `/evaluations/procedure-assessments`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsProcedureAssessmentsQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsProcedureAssessmentsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>> = ({ signal }) => getEvaluationsProcedureAssessments({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsProcedureAssessmentsQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>>
+export type GetEvaluationsProcedureAssessmentsQueryError = ErrorResponse
+
+
+export function useGetEvaluationsProcedureAssessments<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessments<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessments<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List procedure assessments (AP)
+ */
+
+export function useGetEvaluationsProcedureAssessments<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessments>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsProcedureAssessmentsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type postEvaluationsProcedureAssessmentsResponse201 = {
+  data: ProcedureAssessment
+  status: 201
+}
+
+export type postEvaluationsProcedureAssessmentsResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postEvaluationsProcedureAssessmentsResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postEvaluationsProcedureAssessmentsResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type postEvaluationsProcedureAssessmentsResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type postEvaluationsProcedureAssessmentsResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type postEvaluationsProcedureAssessmentsResponseSuccess = (postEvaluationsProcedureAssessmentsResponse201) & {
+  headers: Headers;
+};
+export type postEvaluationsProcedureAssessmentsResponseError = (postEvaluationsProcedureAssessmentsResponse400 | postEvaluationsProcedureAssessmentsResponse401 | postEvaluationsProcedureAssessmentsResponse403 | postEvaluationsProcedureAssessmentsResponse404 | postEvaluationsProcedureAssessmentsResponse413) & {
+  headers: Headers;
+};
+
+export type postEvaluationsProcedureAssessmentsResponse = (postEvaluationsProcedureAssessmentsResponseSuccess | postEvaluationsProcedureAssessmentsResponseError)
+
+export const getPostEvaluationsProcedureAssessmentsUrl = () => {
+
+
+
+
+  return `/evaluations/procedure-assessments`
+}
+
+/**
+ * Creates an AP from a JSON body. The number is the next one of the AP sequence, taken inside the INSERT, and is never handed out again, not even after the AP is deleted. created_by and updated_by are the authenticated user and are never answered. The activity is locked (shared) inside the transaction before the INSERT, so a concurrent deletion of the activity either counts the new AP (409 there) or finished first (400 here), never a foreign key violation. A comment is always optional and is never compared with the answer of its question. Answers the same body as GET /evaluations/procedure-assessments/{id}. Not idempotent: sending it again creates another AP. Requires the user or admin role and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary Create procedure assessment (AP)
+ */
+export const postEvaluationsProcedureAssessments = async (procedureAssessmentInput: ProcedureAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<postEvaluationsProcedureAssessmentsResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postEvaluationsProcedureAssessmentsResponse>(getPostEvaluationsProcedureAssessmentsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(procedureAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPostEvaluationsProcedureAssessmentsMutationKey = () => ['postEvaluationsProcedureAssessments'] as const;
+
+export const getPostEvaluationsProcedureAssessmentsMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>, TError,PostEvaluationsProcedureAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>, TError,PostEvaluationsProcedureAssessmentsMutationVariables, TContext> => {
+
+const mutationKey = getPostEvaluationsProcedureAssessmentsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>, PostEvaluationsProcedureAssessmentsMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postEvaluationsProcedureAssessments(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostEvaluationsProcedureAssessmentsMutationResult = NonNullable<Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>>
+    export type PostEvaluationsProcedureAssessmentsMutationBody = ProcedureAssessmentInput
+    export type PostEvaluationsProcedureAssessmentsMutationError = ErrorResponse
+    export type PostEvaluationsProcedureAssessmentsMutationVariables = {data: ProcedureAssessmentInput}
+
+    /**
+ * @summary Create procedure assessment (AP)
+ */
+export const usePostEvaluationsProcedureAssessments = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>, TError,PostEvaluationsProcedureAssessmentsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postEvaluationsProcedureAssessments>>,
+        TError,
+        PostEvaluationsProcedureAssessmentsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostEvaluationsProcedureAssessmentsMutationOptions(options), queryClient);
+    }
+
+export type getEvaluationsProcedureAssessmentsActivitiesResponse200 = {
+  data: ImprovementProjectActivity[]
+  status: 200
+}
+
+export type getEvaluationsProcedureAssessmentsActivitiesResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsProcedureAssessmentsActivitiesResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsProcedureAssessmentsActivitiesResponseSuccess = (getEvaluationsProcedureAssessmentsActivitiesResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsProcedureAssessmentsActivitiesResponseError = (getEvaluationsProcedureAssessmentsActivitiesResponse401 | getEvaluationsProcedureAssessmentsActivitiesResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsProcedureAssessmentsActivitiesResponse = (getEvaluationsProcedureAssessmentsActivitiesResponseSuccess | getEvaluationsProcedureAssessmentsActivitiesResponseError)
+
+export const getGetEvaluationsProcedureAssessmentsActivitiesUrl = () => {
+
+
+
+
+  return `/evaluations/procedure-assessments/activities`
+}
+
+/**
+ * Returns id, code and name of every registered activity, ordered by code ignoring case, read through the Activities port: the source of the activity select of the Avaliação de Risco Ergonômico de Tarefas form. Nothing else of an activity is exposed. /activities stays restricted to admins; this route requires only an authenticated user, so any role, and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary List the activities an AP can belong to
+ */
+export const getEvaluationsProcedureAssessmentsActivities = async ( options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsProcedureAssessmentsActivitiesResponse> => {
+
+  return customFetch<getEvaluationsProcedureAssessmentsActivitiesResponse>(getGetEvaluationsProcedureAssessmentsActivitiesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsProcedureAssessmentsActivitiesQueryKey = () => {
+    return [
+    `/evaluations/procedure-assessments/activities`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsProcedureAssessmentsActivitiesQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsProcedureAssessmentsActivitiesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>> = ({ signal }) => getEvaluationsProcedureAssessmentsActivities({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsProcedureAssessmentsActivitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>>
+export type GetEvaluationsProcedureAssessmentsActivitiesQueryError = ErrorResponse
+
+
+export function useGetEvaluationsProcedureAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary List the activities an AP can belong to
+ */
+
+export function useGetEvaluationsProcedureAssessmentsActivities<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsActivities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsProcedureAssessmentsActivitiesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getEvaluationsProcedureAssessmentsIdResponse200 = {
+  data: ProcedureAssessment
+  status: 200
+}
+
+export type getEvaluationsProcedureAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getEvaluationsProcedureAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getEvaluationsProcedureAssessmentsIdResponseSuccess = (getEvaluationsProcedureAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type getEvaluationsProcedureAssessmentsIdResponseError = (getEvaluationsProcedureAssessmentsIdResponse401 | getEvaluationsProcedureAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getEvaluationsProcedureAssessmentsIdResponse = (getEvaluationsProcedureAssessmentsIdResponseSuccess | getEvaluationsProcedureAssessmentsIdResponseError)
+
+export const getGetEvaluationsProcedureAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/procedure-assessments/${id}`
+}
+
+/**
+ * One AP: the item of the listing plus its five questions, at their place in the header, its five comments and the activity with its current area and fabric, read in the same query as its code and name. An absent comment is null; a stored key outside the catalog is never answered. Requires only an authenticated user, so any role, and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary Get procedure assessment (AP)
+ */
+export const getEvaluationsProcedureAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getEvaluationsProcedureAssessmentsIdResponse> => {
+
+  return customFetch<getEvaluationsProcedureAssessmentsIdResponse>(getGetEvaluationsProcedureAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetEvaluationsProcedureAssessmentsIdQueryKey = (id: string,) => {
+    return [
+    `/evaluations/procedure-assessments/${id}`
+    ] as const;
+    }
+
+
+export const getGetEvaluationsProcedureAssessmentsIdQueryOptions = <TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetEvaluationsProcedureAssessmentsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>> = ({ signal }) => getEvaluationsProcedureAssessmentsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetEvaluationsProcedureAssessmentsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>>
+export type GetEvaluationsProcedureAssessmentsIdQueryError = ErrorResponse
+
+
+export function useGetEvaluationsProcedureAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetEvaluationsProcedureAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get procedure assessment (AP)
+ */
+
+export function useGetEvaluationsProcedureAssessmentsId<TData = Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError = ErrorResponse>(
+ id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvaluationsProcedureAssessmentsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetEvaluationsProcedureAssessmentsIdQueryOptions(id,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putEvaluationsProcedureAssessmentsIdResponse200 = {
+  data: ProcedureAssessment
+  status: 200
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponse413 = {
+  data: ErrorResponse
+  status: 413
+}
+
+export type putEvaluationsProcedureAssessmentsIdResponseSuccess = (putEvaluationsProcedureAssessmentsIdResponse200) & {
+  headers: Headers;
+};
+export type putEvaluationsProcedureAssessmentsIdResponseError = (putEvaluationsProcedureAssessmentsIdResponse400 | putEvaluationsProcedureAssessmentsIdResponse401 | putEvaluationsProcedureAssessmentsIdResponse403 | putEvaluationsProcedureAssessmentsIdResponse404 | putEvaluationsProcedureAssessmentsIdResponse413) & {
+  headers: Headers;
+};
+
+export type putEvaluationsProcedureAssessmentsIdResponse = (putEvaluationsProcedureAssessmentsIdResponseSuccess | putEvaluationsProcedureAssessmentsIdResponseError)
+
+export const getPutEvaluationsProcedureAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/procedure-assessments/${id}`
+}
+
+/**
+ * Replaces every field of an AP with the JSON body: the activity may change, the five answers are required again, and a comment left out of answers goes back to null (absent answers empties them all). A comment sent again is kept whatever the answer of its question. number, created_at and created_by never change; updated_by becomes the authenticated user and updated_at moves, also when nothing else changed. Inside the transaction the activity the AP will point at is locked (shared) and then the AP's row (for update), so two updates serialize and the last one wins. Answers the same body as GET /evaluations/procedure-assessments/{id}. Requires the user or admin role and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary Update procedure assessment (AP)
+ */
+export const putEvaluationsProcedureAssessmentsId = async (id: string,
+    procedureAssessmentInput: ProcedureAssessmentInput, options?: Parameters<typeof customFetch>[1]): Promise<putEvaluationsProcedureAssessmentsIdResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putEvaluationsProcedureAssessmentsIdResponse>(getPutEvaluationsProcedureAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(procedureAssessmentInput)
+  }
+);}
+
+
+
+
+
+export const getPutEvaluationsProcedureAssessmentsIdMutationKey = () => ['putEvaluationsProcedureAssessmentsId'] as const;
+
+export const getPutEvaluationsProcedureAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>, TError,PutEvaluationsProcedureAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>, TError,PutEvaluationsProcedureAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getPutEvaluationsProcedureAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>, PutEvaluationsProcedureAssessmentsIdMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  putEvaluationsProcedureAssessmentsId(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutEvaluationsProcedureAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>>
+    export type PutEvaluationsProcedureAssessmentsIdMutationBody = ProcedureAssessmentInput
+    export type PutEvaluationsProcedureAssessmentsIdMutationError = ErrorResponse
+    export type PutEvaluationsProcedureAssessmentsIdMutationVariables = {id: string;data: ProcedureAssessmentInput}
+
+    /**
+ * @summary Update procedure assessment (AP)
+ */
+export const usePutEvaluationsProcedureAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>, TError,PutEvaluationsProcedureAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putEvaluationsProcedureAssessmentsId>>,
+        TError,
+        PutEvaluationsProcedureAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutEvaluationsProcedureAssessmentsIdMutationOptions(options), queryClient);
+    }
+
+export type deleteEvaluationsProcedureAssessmentsIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteEvaluationsProcedureAssessmentsIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteEvaluationsProcedureAssessmentsIdResponse403 = {
+  data: ErrorResponse
+  status: 403
+}
+
+export type deleteEvaluationsProcedureAssessmentsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteEvaluationsProcedureAssessmentsIdResponseSuccess = (deleteEvaluationsProcedureAssessmentsIdResponse204) & {
+  headers: Headers;
+};
+export type deleteEvaluationsProcedureAssessmentsIdResponseError = (deleteEvaluationsProcedureAssessmentsIdResponse401 | deleteEvaluationsProcedureAssessmentsIdResponse403 | deleteEvaluationsProcedureAssessmentsIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteEvaluationsProcedureAssessmentsIdResponse = (deleteEvaluationsProcedureAssessmentsIdResponseSuccess | deleteEvaluationsProcedureAssessmentsIdResponseError)
+
+export const getDeleteEvaluationsProcedureAssessmentsIdUrl = (id: string,) => {
+
+
+
+
+  return `/evaluations/procedure-assessments/${id}`
+}
+
+/**
+ * Deletes an AP permanently; there is no soft delete. Its number is never handed out again. Deleting the only record linked to an activity frees that activity's deletion. Deleting the same AP again responds 404. The request has no body. The confirmation is the interface's responsibility; the API confirms nothing. Requires the user or admin role and procedure_assessment enabled by EVALUATION_TYPES.
+ * @summary Delete procedure assessment (AP)
+ */
+export const deleteEvaluationsProcedureAssessmentsId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<deleteEvaluationsProcedureAssessmentsIdResponse> => {
+
+  return customFetch<deleteEvaluationsProcedureAssessmentsIdResponse>(getDeleteEvaluationsProcedureAssessmentsIdUrl(id),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteEvaluationsProcedureAssessmentsIdMutationKey = () => ['deleteEvaluationsProcedureAssessmentsId'] as const;
+
+export const getDeleteEvaluationsProcedureAssessmentsIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>, TError,DeleteEvaluationsProcedureAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>, TError,DeleteEvaluationsProcedureAssessmentsIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteEvaluationsProcedureAssessmentsIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>, DeleteEvaluationsProcedureAssessmentsIdMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  deleteEvaluationsProcedureAssessmentsId(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteEvaluationsProcedureAssessmentsIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>>
+
+    export type DeleteEvaluationsProcedureAssessmentsIdMutationError = ErrorResponse
+    export type DeleteEvaluationsProcedureAssessmentsIdMutationVariables = {id: string}
+
+    /**
+ * @summary Delete procedure assessment (AP)
+ */
+export const useDeleteEvaluationsProcedureAssessmentsId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>, TError,DeleteEvaluationsProcedureAssessmentsIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteEvaluationsProcedureAssessmentsId>>,
+        TError,
+        DeleteEvaluationsProcedureAssessmentsIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteEvaluationsProcedureAssessmentsIdMutationOptions(options), queryClient);
     }
