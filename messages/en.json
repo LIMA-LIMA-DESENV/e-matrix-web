@@ -1284,7 +1284,8 @@
       "checklist": "In Loco Data Collection — Office",
       "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
       "change_assessment": "Evaluation of Changes / Projects",
-      "procedure_assessment": "Task Ergonomic Risk Assessment"
+      "procedure_assessment": "Task Ergonomic Risk Assessment",
+      "incident_investigation": "Incident / Accident Evaluation"
     },
     "types": {
       "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
@@ -1295,7 +1296,8 @@
       "checklist": "In Loco Data Collection — Office",
       "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
       "change_assessment": "Evaluation of Changes / Projects",
-      "procedure_assessment": "Task Ergonomic Risk Assessment"
+      "procedure_assessment": "Task Ergonomic Risk Assessment",
+      "incident_investigation": "Incident / Accident Evaluation"
     },
     "columns": {
       "code": "Code",
@@ -1645,6 +1647,19 @@
           "answer": "Answer",
           "comments": "Comments"
         }
+      },
+      "incidentInvestigation": {
+        "title": "Incident / Accident Evaluation",
+        "fields": {
+          "date": "Date",
+          "activity": "Activity",
+          "sector": "Sector",
+          "employee": "Employee",
+          "description": "Occurrence",
+          "ergonomicRiskFactors": "Ergonomic Risk Factors",
+          "comments": "Comments",
+          "image": "Image"
+        }
       }
     },
     "newErgonomicAnalysisInLoco": "New Data Collection — Production",
@@ -1656,6 +1671,7 @@
     "newErgonomicWorkAnalysis": "New Ergonomic Work Analysis – Office",
     "newChangeAssessment": "New Evaluation of Changes",
     "newProcedureAssessment": "New Task Ergonomic Risk Assessment",
+    "newIncidentInvestigation": "New Incident / Accident Evaluation",
     "actions": {
       "edit": "Edit"
     },
@@ -1685,6 +1701,7 @@
       "activityRequired": "Select the activity.",
       "assessmentDateRequired": "Enter a valid assessment date.",
       "textTooLong": "This field must have at most {max} characters.",
+      "descriptionRequired": "Enter the occurrence.",
       "nameRequired": "Enter the name.",
       "sectorRequired": "Enter the sector.",
       "checklistDateRequired": "Enter a valid date.",
@@ -2006,6 +2023,35 @@
         "no": "No"
       }
     },
+    "incidentInvestigationForm": {
+      "newDescription": "{type}: choose the activity and the date and describe the occurrence. The other fields are optional.",
+      "riskFactorsDescription": "The factors below are only a reference and are not marked. Describe in the text what applies.",
+      "sections": {
+        "identification": "Identification",
+        "occurrence": "Occurrence",
+        "riskFactors": "Ergonomic Risk Factors",
+        "commentsAndImage": "Comments and image"
+      },
+      "fields": {
+        "date": "Date",
+        "sector": "Sector",
+        "employee": "Employee",
+        "description": "Occurrence",
+        "ergonomicRiskFactors": "Risk factors observed",
+        "comments": "Comments",
+        "image": "Image"
+      }
+    },
+    "incidentInvestigationFields": {
+      "riskFactors": {
+        "excessiveForce": "Excessive force",
+        "inadequatePosture": "Inadequate posture",
+        "highRepetition": "High repetition",
+        "vibration": "Vibration",
+        "contactStress": "Contact stress",
+        "extremeTemperatures": "Extreme temperatures"
+      }
+    },
     "delete": {
       "action": "Delete",
       "title": "Delete evaluation",
@@ -2294,6 +2340,13 @@
     "procedureAssessmentQuestionAnswerRequired": "Answer Yes or No to every question.",
     "procedureAssessmentQuestionAnswerInvalid": "One of the answers is invalid. Choose Yes or No in each question.",
     "procedureAssessmentAnswersInvalid": "Some comments of the Task Ergonomic Risk Assessment are invalid. Review the texts (up to 5,000 characters) and try again.",
+    "incidentInvestigationNotFound": "Incident / Accident Evaluation not found.",
+    "incidentInvestigationActivityRequired": "Select the activity of the Incident / Accident Evaluation.",
+    "incidentInvestigationActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "incidentInvestigationDateInvalid": "Enter a valid date for the Incident / Accident Evaluation.",
+    "incidentInvestigationDescriptionRequired": "Enter the occurrence of the Incident / Accident Evaluation.",
+    "incidentInvestigationDescriptionTooLong": "The occurrence of the Incident / Accident Evaluation must have at most 5,000 characters.",
+    "incidentInvestigationAnswersInvalid": "Some fields of the Incident / Accident Evaluation are invalid. Review the sector and the employee (up to 255 characters), the risk factors and the comments (up to 5,000 characters) and try again.",
     "evaluationPhotoRequired": "Choose a photo to upload.",
     "evaluationPhotoTypeNotAllowed": "Photo type not accepted. Send a JPG or PNG image.",
     "evaluationPhotoEmpty": "The photo you sent is empty.",

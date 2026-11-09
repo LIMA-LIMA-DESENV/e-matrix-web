@@ -317,6 +317,18 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Invalid procedure assessment question answer.':
     'procedureAssessmentQuestionAnswerInvalid',
   'Invalid procedure assessment answers.': 'procedureAssessmentAnswersInvalid',
+  'Incident investigation not found.': 'incidentInvestigationNotFound',
+  'Incident investigation activity is required.':
+    'incidentInvestigationActivityRequired',
+  'Incident investigation activity not found.':
+    'incidentInvestigationActivityNotFound',
+  'Invalid incident investigation date.': 'incidentInvestigationDateInvalid',
+  'Incident investigation description is required.':
+    'incidentInvestigationDescriptionRequired',
+  'Incident investigation description is too long.':
+    'incidentInvestigationDescriptionTooLong',
+  'Invalid incident investigation answers.':
+    'incidentInvestigationAnswersInvalid',
   // The photo of any evaluation type that has one (D-3).
   'Evaluation photo is required.': 'evaluationPhotoRequired',
   'Evaluation photo type not allowed.': 'evaluationPhotoTypeNotAllowed',

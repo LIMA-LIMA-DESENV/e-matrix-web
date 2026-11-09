@@ -1284,7 +1284,8 @@
       "checklist": "Recopilación de Datos In Loco — Oficina",
       "ergonomic_work_analysis": "Análisis Ergonómico del Trabajo – Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos",
-      "procedure_assessment": "Evaluación de Riesgo Ergonómico de Tareas"
+      "procedure_assessment": "Evaluación de Riesgo Ergonómico de Tareas",
+      "incident_investigation": "Evaluación de Incidentes / Accidentes"
     },
     "types": {
       "ergonomic_analysis_in_loco": "Recopilación de Datos In Loco — Producción",
@@ -1295,7 +1296,8 @@
       "checklist": "Recopilación de Datos In Loco — Oficina",
       "ergonomic_work_analysis": "Análisis Ergonómico del Trabajo – Oficina",
       "change_assessment": "Evaluación de Cambios / Proyectos",
-      "procedure_assessment": "Evaluación de Riesgo Ergonómico de Tareas"
+      "procedure_assessment": "Evaluación de Riesgo Ergonómico de Tareas",
+      "incident_investigation": "Evaluación de Incidentes / Accidentes"
     },
     "columns": {
       "code": "Código",
@@ -1645,6 +1647,19 @@
           "answer": "Respuesta",
           "comments": "Comentarios"
         }
+      },
+      "incidentInvestigation": {
+        "title": "Evaluación de Incidentes / Accidentes",
+        "fields": {
+          "date": "Fecha",
+          "activity": "Actividad",
+          "sector": "Sector",
+          "employee": "Funcionario",
+          "description": "Ocurrencia",
+          "ergonomicRiskFactors": "Factores de Riesgo Ergonómico",
+          "comments": "Comentarios",
+          "image": "Imagen"
+        }
       }
     },
     "newErgonomicAnalysisInLoco": "Nueva Recopilación de Datos — Producción",
@@ -1656,6 +1671,7 @@
     "newErgonomicWorkAnalysis": "Nuevo Análisis Ergonómico del Trabajo – Oficina",
     "newChangeAssessment": "Nueva Evaluación de Cambios",
     "newProcedureAssessment": "Nueva Evaluación de Riesgo Ergonómico de Tareas",
+    "newIncidentInvestigation": "Nueva Evaluación de Incidentes / Accidentes",
     "actions": {
       "edit": "Modificar"
     },
@@ -1685,6 +1701,7 @@
       "activityRequired": "Seleccione la actividad.",
       "assessmentDateRequired": "Ingrese una fecha válida para la evaluación.",
       "textTooLong": "Este campo debe tener como máximo {max} caracteres.",
+      "descriptionRequired": "Ingrese la ocurrencia.",
       "nameRequired": "Ingrese el nombre.",
       "sectorRequired": "Ingrese el sector.",
       "checklistDateRequired": "Ingrese una fecha válida.",
@@ -2006,6 +2023,35 @@
         "no": "No"
       }
     },
+    "incidentInvestigationForm": {
+      "newDescription": "{type}: elija la actividad y la fecha y describa la ocurrencia. Los demás campos son opcionales.",
+      "riskFactorsDescription": "Los factores siguientes son solo una referencia y no se marcan. Describa en el texto lo que corresponda.",
+      "sections": {
+        "identification": "Identificación",
+        "occurrence": "Ocurrencia",
+        "riskFactors": "Factores de Riesgo Ergonómico",
+        "commentsAndImage": "Comentarios e imagen"
+      },
+      "fields": {
+        "date": "Fecha",
+        "sector": "Sector",
+        "employee": "Funcionario",
+        "description": "Ocurrencia",
+        "ergonomicRiskFactors": "Factores de riesgo observados",
+        "comments": "Comentarios",
+        "image": "Imagen"
+      }
+    },
+    "incidentInvestigationFields": {
+      "riskFactors": {
+        "excessiveForce": "Fuerza excesiva",
+        "inadequatePosture": "Postura inadecuada",
+        "highRepetition": "Repetición alta",
+        "vibration": "Vibración",
+        "contactStress": "Tensión de contacto",
+        "extremeTemperatures": "Temperaturas extremas"
+      }
+    },
     "delete": {
       "action": "Eliminar",
       "title": "Eliminar evaluación",
@@ -2294,6 +2340,13 @@
     "procedureAssessmentQuestionAnswerRequired": "Responda Sí o No en todas las preguntas.",
     "procedureAssessmentQuestionAnswerInvalid": "Una de las respuestas no es válida. Elija Sí o No en cada pregunta.",
     "procedureAssessmentAnswersInvalid": "Algunos comentarios de la Evaluación de Riesgo Ergonómico de Tareas no son válidos. Revise los textos (hasta 5.000 caracteres) e intente nuevamente.",
+    "incidentInvestigationNotFound": "Evaluación de Incidentes / Accidentes no encontrada.",
+    "incidentInvestigationActivityRequired": "Seleccione la actividad de la Evaluación de Incidentes / Accidentes.",
+    "incidentInvestigationActivityNotFound": "La actividad elegida ya no existe. Seleccione otra actividad.",
+    "incidentInvestigationDateInvalid": "Ingrese una fecha válida para la Evaluación de Incidentes / Accidentes.",
+    "incidentInvestigationDescriptionRequired": "Ingrese la ocurrencia de la Evaluación de Incidentes / Accidentes.",
+    "incidentInvestigationDescriptionTooLong": "La ocurrencia de la Evaluación de Incidentes / Accidentes debe tener como máximo 5.000 caracteres.",
+    "incidentInvestigationAnswersInvalid": "Algunos campos de la Evaluación de Incidentes / Accidentes no son válidos. Revise el sector y el funcionario (hasta 255 caracteres), los factores de riesgo y los comentarios (hasta 5.000 caracteres) e intente nuevamente.",
     "evaluationPhotoRequired": "Elija una foto para enviar.",
     "evaluationPhotoTypeNotAllowed": "Tipo de foto no aceptado. Envíe una imagen JPG o PNG.",
     "evaluationPhotoEmpty": "La foto enviada está vacía.",
