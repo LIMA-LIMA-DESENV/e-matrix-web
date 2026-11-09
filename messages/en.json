@@ -1283,7 +1283,8 @@
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
       "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
-      "change_assessment": "Evaluation of Changes / Projects"
+      "change_assessment": "Evaluation of Changes / Projects",
+      "procedure_assessment": "Task Ergonomic Risk Assessment"
     },
     "types": {
       "ergonomic_analysis_in_loco": "In Loco Data Collection — Production",
@@ -1293,7 +1294,8 @@
       "hit_list": "Hit List",
       "checklist": "In Loco Data Collection — Office",
       "ergonomic_work_analysis": "Ergonomic Work Analysis – Office",
-      "change_assessment": "Evaluation of Changes / Projects"
+      "change_assessment": "Evaluation of Changes / Projects",
+      "procedure_assessment": "Task Ergonomic Risk Assessment"
     },
     "columns": {
       "code": "Code",
@@ -1625,6 +1627,24 @@
         "actions": "Actions",
         "valuer": "Assessor",
         "signature": "Signature"
+      },
+      "procedureAssessment": {
+        "title": "Task Ergonomic Risk Assessment",
+        "fields": {
+          "activity": "Activity",
+          "date": "Date",
+          "area": "Area",
+          "fabric": "Fabric",
+          "sector": "Sector",
+          "valuer": "Assessor",
+          "ratedTurn": "Assessed shift"
+        },
+        "columns": {
+          "number": "Number",
+          "question": "Question",
+          "answer": "Answer",
+          "comments": "Comments"
+        }
       }
     },
     "newErgonomicAnalysisInLoco": "New Data Collection — Production",
@@ -1635,6 +1655,7 @@
     "newChecklist": "New Data Collection — Office",
     "newErgonomicWorkAnalysis": "New Ergonomic Work Analysis – Office",
     "newChangeAssessment": "New Evaluation of Changes",
+    "newProcedureAssessment": "New Task Ergonomic Risk Assessment",
     "actions": {
       "edit": "Edit"
     },
@@ -1670,6 +1691,7 @@
       "shiftSchedulesRequired": "Enter the shift schedule.",
       "timesPerShiftInvalid": "Enter a number greater than or equal to zero.",
       "valuerRequired": "Enter the valuer.",
+      "ratedTurnRequired": "Enter the assessed shift.",
       "notesRequired": "Enter the notes.",
       "riskFactorTotalInvalid": "Enter a number greater than or equal to zero.",
       "tooManyRows": "The table must have at most {max} rows.",
@@ -1955,6 +1977,35 @@
         "solution5": "Work organization solutions"
       }
     },
+    "procedureAssessmentForm": {
+      "newDescription": "{type}: choose the activity, fill in the identification and answer Yes or No to the 5 questions. The comments are optional.",
+      "editDescription": "{type}: change the fields, the answers and the comments of the evaluation, including the activity. A comment left empty has no answer.",
+      "sections": {
+        "identification": "Identification",
+        "questions": "Questions"
+      },
+      "questionsDescription": "Answer Yes or No to each question; all of them are required. The comment is always optional."
+    },
+    "procedureAssessmentQuestions": {
+      "questions": {
+        "question1": "Does the activity under analysis show any ergonomic risk factors? (Excessive force, High repetition, Inadequate posture, Contact stress, Vibration, Extreme temperatures)",
+        "question2": "Is the furniture adequate? (Workbench height, seats, tables, reach to machines, control panels or actuation buttons)",
+        "question3": "Does the lighting provide comfort?",
+        "question4": "Is equipment available for lifting or carrying parts heavier than 20 kg?",
+        "question5": "Are adequate tools available to perform manual assembly or adjustment activities?"
+      },
+      "comments": {
+        "question1Description": "If so, which risk factor is identified?",
+        "question2Description": "If not, which furniture is inadequate and why?",
+        "question3Description": "If not, is it too dark or too bright?",
+        "question4Description": "If not, is it done manually?",
+        "question5Description": "If not, is it done manually? Is the work repetitive?"
+      },
+      "options": {
+        "yes": "Yes",
+        "no": "No"
+      }
+    },
     "delete": {
       "action": "Delete",
       "title": "Delete evaluation",
@@ -2230,6 +2281,19 @@
     "priorityCriterionQuestionAnswerRequired": "Answer every question of the ergonomic risk assessment.",
     "priorityCriterionQuestionAnswerInvalid": "One of the answers of the ergonomic risk assessment is invalid. Choose one of the options of each question.",
     "priorityCriterionAnswersInvalid": "Some solutions of the Priority Criterion are invalid. Review the texts (up to 5,000 characters) and try again.",
+    "procedureAssessmentNotFound": "Task Ergonomic Risk Assessment not found.",
+    "procedureAssessmentActivityRequired": "Select the activity of the Task Ergonomic Risk Assessment.",
+    "procedureAssessmentActivityNotFound": "The chosen activity no longer exists. Select another activity.",
+    "procedureAssessmentDateInvalid": "Enter a valid date for the Task Ergonomic Risk Assessment.",
+    "procedureAssessmentSectorRequired": "Enter the sector of the Task Ergonomic Risk Assessment.",
+    "procedureAssessmentSectorTooLong": "The sector of the Task Ergonomic Risk Assessment must have at most 255 characters.",
+    "procedureAssessmentValuerRequired": "Enter the assessor of the Task Ergonomic Risk Assessment.",
+    "procedureAssessmentValuerTooLong": "The assessor of the Task Ergonomic Risk Assessment must have at most 255 characters.",
+    "procedureAssessmentRatedTurnRequired": "Enter the assessed shift of the Task Ergonomic Risk Assessment.",
+    "procedureAssessmentRatedTurnTooLong": "The assessed shift of the Task Ergonomic Risk Assessment must have at most 255 characters.",
+    "procedureAssessmentQuestionAnswerRequired": "Answer Yes or No to every question.",
+    "procedureAssessmentQuestionAnswerInvalid": "One of the answers is invalid. Choose Yes or No in each question.",
+    "procedureAssessmentAnswersInvalid": "Some comments of the Task Ergonomic Risk Assessment are invalid. Review the texts (up to 5,000 characters) and try again.",
     "evaluationPhotoRequired": "Choose a photo to upload.",
     "evaluationPhotoTypeNotAllowed": "Photo type not accepted. Send a JPG or PNG image.",
     "evaluationPhotoEmpty": "The photo you sent is empty.",

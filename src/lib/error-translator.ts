@@ -294,6 +294,29 @@ const API_ERROR_KEYS: Record<string, ErrorKey> = {
   'Invalid priority criterion question answer.':
     'priorityCriterionQuestionAnswerInvalid',
   'Invalid priority criterion answers.': 'priorityCriterionAnswersInvalid',
+  'Procedure assessment not found.': 'procedureAssessmentNotFound',
+  'Procedure assessment activity is required.':
+    'procedureAssessmentActivityRequired',
+  'Procedure assessment activity not found.':
+    'procedureAssessmentActivityNotFound',
+  'Invalid procedure assessment date.': 'procedureAssessmentDateInvalid',
+  'Procedure assessment sector is required.':
+    'procedureAssessmentSectorRequired',
+  'Procedure assessment sector is too long.':
+    'procedureAssessmentSectorTooLong',
+  'Procedure assessment valuer is required.':
+    'procedureAssessmentValuerRequired',
+  'Procedure assessment valuer is too long.':
+    'procedureAssessmentValuerTooLong',
+  'Procedure assessment rated turn is required.':
+    'procedureAssessmentRatedTurnRequired',
+  'Procedure assessment rated turn is too long.':
+    'procedureAssessmentRatedTurnTooLong',
+  'Procedure assessment question answer is required.':
+    'procedureAssessmentQuestionAnswerRequired',
+  'Invalid procedure assessment question answer.':
+    'procedureAssessmentQuestionAnswerInvalid',
+  'Invalid procedure assessment answers.': 'procedureAssessmentAnswersInvalid',
   // The photo of any evaluation type that has one (D-3).
   'Evaluation photo is required.': 'evaluationPhotoRequired',
   'Evaluation photo type not allowed.': 'evaluationPhotoTypeNotAllowed',

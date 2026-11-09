@@ -1283,7 +1283,8 @@
       "hit_list": "Hit List",
       "checklist": "Coleta de Dados In Loco — Escritório",
       "ergonomic_work_analysis": "Análise Ergonômica do Trabalho – Escritório",
-      "change_assessment": "Avaliação de Mudanças / Projetos"
+      "change_assessment": "Avaliação de Mudanças / Projetos",
+      "procedure_assessment": "Avaliação de Risco Ergonômico de Tarefas"
     },
     "types": {
       "ergonomic_analysis_in_loco": "Coleta de Dados In Loco — Produção",
@@ -1293,7 +1294,8 @@
       "hit_list": "Hit List",
       "checklist": "Coleta de Dados In Loco — Escritório",
       "ergonomic_work_analysis": "Análise Ergonômica do Trabalho – Escritório",
-      "change_assessment": "Avaliação de Mudanças / Projetos"
+      "change_assessment": "Avaliação de Mudanças / Projetos",
+      "procedure_assessment": "Avaliação de Risco Ergonômico de Tarefas"
     },
     "columns": {
       "code": "Código",
@@ -1625,6 +1627,24 @@
         "actions": "Ações",
         "valuer": "Avaliador",
         "signature": "Assinatura"
+      },
+      "procedureAssessment": {
+        "title": "Avaliação de Risco Ergonômico de Tarefas",
+        "fields": {
+          "activity": "Atividade",
+          "date": "Data",
+          "area": "Área",
+          "fabric": "Fábrica",
+          "sector": "Setor",
+          "valuer": "Avaliador",
+          "ratedTurn": "Turno avaliado"
+        },
+        "columns": {
+          "number": "Número",
+          "question": "Pergunta",
+          "answer": "Resposta",
+          "comments": "Comentários"
+        }
       }
     },
     "newErgonomicAnalysisInLoco": "Nova Coleta de Dados — Produção",
@@ -1635,6 +1655,7 @@
     "newChecklist": "Nova Coleta de Dados — Escritório",
     "newErgonomicWorkAnalysis": "Nova Análise Ergonômica do Trabalho – Escritório",
     "newChangeAssessment": "Nova Avaliação de Mudanças",
+    "newProcedureAssessment": "Nova Avaliação de Risco Ergonômico de Tarefas",
     "actions": {
       "edit": "Alterar"
     },
@@ -1670,6 +1691,7 @@
       "shiftSchedulesRequired": "Informe o horário dos turnos.",
       "timesPerShiftInvalid": "Informe um número maior ou igual a zero.",
       "valuerRequired": "Informe o avaliador.",
+      "ratedTurnRequired": "Informe o turno avaliado.",
       "notesRequired": "Informe as observações.",
       "riskFactorTotalInvalid": "Informe um número maior ou igual a zero.",
       "tooManyRows": "A tabela deve ter no máximo {max} linhas.",
@@ -1955,6 +1977,35 @@
         "solution5": "Soluções de organização do trabalho"
       }
     },
+    "procedureAssessmentForm": {
+      "newDescription": "{type}: escolha a atividade, preencha a identificação e responda Sim ou Não nas 5 perguntas. Os comentários são opcionais.",
+      "editDescription": "{type}: altere os campos, as respostas e os comentários da avaliação, inclusive a atividade. Um comentário esvaziado fica sem resposta.",
+      "sections": {
+        "identification": "Identificação",
+        "questions": "Perguntas"
+      },
+      "questionsDescription": "Responda Sim ou Não em cada pergunta; todas são obrigatórias. O comentário é sempre opcional."
+    },
+    "procedureAssessmentQuestions": {
+      "questions": {
+        "question1": "A atividade em análise evidencia algum fator de risco ergonômico? (Força excessiva, Repetição alta, Postura Inadequada, Estresse de contato, Vibração, Temperaturas extremas)",
+        "question2": "O mobiliário está adequado? (Altura de bancada, assentos, mesas, alcance em máquinas ou painel de controle ou botões de acionamento)",
+        "question3": "A iluminação proporciona conforto?",
+        "question4": "São disponibilizados equipamentos para içamento ou carregamento de peças maiores que 20 kg?",
+        "question5": "São disponibilizadas ferramentas adequadas para execução de atividades manuais de montagens ou ajustes?"
+      },
+      "comments": {
+        "question1Description": "Caso sim, qual fator de risco identificado?",
+        "question2Description": "Caso não, qual mobiliário está inadequado e por quê?",
+        "question3Description": "Caso não, está escuro ou muito claro?",
+        "question4Description": "Caso não, é feito manual?",
+        "question5Description": "Caso não, é feito manual? É repetitivo o trabalho?"
+      },
+      "options": {
+        "yes": "Sim",
+        "no": "Não"
+      }
+    },
     "delete": {
       "action": "Excluir",
       "title": "Excluir avaliação",
@@ -2230,6 +2281,19 @@
     "priorityCriterionQuestionAnswerRequired": "Responda todas as perguntas da avaliação do risco ergonômico.",
     "priorityCriterionQuestionAnswerInvalid": "Uma das respostas da avaliação do risco ergonômico é inválida. Escolha uma das opções de cada pergunta.",
     "priorityCriterionAnswersInvalid": "Algumas soluções do Critério de Prioridade são inválidas. Revise os textos (até 5.000 caracteres) e tente novamente.",
+    "procedureAssessmentNotFound": "Avaliação de Risco Ergonômico de Tarefas não encontrada.",
+    "procedureAssessmentActivityRequired": "Selecione a atividade da Avaliação de Risco Ergonômico de Tarefas.",
+    "procedureAssessmentActivityNotFound": "A atividade escolhida não existe mais. Selecione outra atividade.",
+    "procedureAssessmentDateInvalid": "Informe uma data válida para a Avaliação de Risco Ergonômico de Tarefas.",
+    "procedureAssessmentSectorRequired": "Informe o setor da Avaliação de Risco Ergonômico de Tarefas.",
+    "procedureAssessmentSectorTooLong": "O setor da Avaliação de Risco Ergonômico de Tarefas deve ter no máximo 255 caracteres.",
+    "procedureAssessmentValuerRequired": "Informe o avaliador da Avaliação de Risco Ergonômico de Tarefas.",
+    "procedureAssessmentValuerTooLong": "O avaliador da Avaliação de Risco Ergonômico de Tarefas deve ter no máximo 255 caracteres.",
+    "procedureAssessmentRatedTurnRequired": "Informe o turno avaliado da Avaliação de Risco Ergonômico de Tarefas.",
+    "procedureAssessmentRatedTurnTooLong": "O turno avaliado da Avaliação de Risco Ergonômico de Tarefas deve ter no máximo 255 caracteres.",
+    "procedureAssessmentQuestionAnswerRequired": "Responda Sim ou Não em todas as perguntas.",
+    "procedureAssessmentQuestionAnswerInvalid": "Uma das respostas é inválida. Escolha Sim ou Não em cada pergunta.",
+    "procedureAssessmentAnswersInvalid": "Alguns comentários da Avaliação de Risco Ergonômico de Tarefas são inválidos. Revise os textos (até 5.000 caracteres) e tente novamente.",
     "evaluationPhotoRequired": "Escolha uma foto para enviar.",
     "evaluationPhotoTypeNotAllowed": "Tipo de foto não aceito. Envie uma imagem JPG ou PNG.",
     "evaluationPhotoEmpty": "A foto enviada está vazia.",
