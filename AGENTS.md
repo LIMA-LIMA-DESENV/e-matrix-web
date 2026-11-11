@@ -64,6 +64,7 @@ src/
 │   ├── files/            # Shared photo pieces: PhotoPreview (see Photos)
 │   ├── auth/             # Public auth page card and ClassicLogo (round legacy logo, classic only)
 │   ├── shell/            # Authenticated shell: nav-items, AccountMenu, ShellContent, ModernShell, ClassicShell (classic-shell.tsx)
+│   ├── tour/             # Guided tour: tour-steps (pure data), TourProvider/useTour, TourOverlay, HelpButton, wide-screen (see Guided Tour)
 │   ├── language-switcher.tsx
 │   └── layout-switcher.tsx
 ├── contexts/             # AuthContext, LayoutPreferenceContext
@@ -533,6 +534,77 @@ rendered only by classic elements (the access screens use
 `LayoutSwitcher` in both layouts; in the classic one they are a single white
 panel with the round logo (`ClassicLogo`, a CSS background, never an `<img>`)
 and `Copyright` shows the legacy footer text.
+
+## Guided Tour
+
+The legacy tour (`bootstrap-tour`) lives in `src/components/tour`, with no
+library. The Ajuda button (`HelpButton`, in both headers, before the
+language) is the only way to start it: no route, URL parameter or first
+access does. It is not rendered while `user.mustChangePassword`.
+
+- `tour-steps.ts`, without React: `buildTourSteps({ isAdmin, hasEvaluations })`
+  returns the steps in the legacy order, each with its key, route, target
+  (`none`, `sidebar` or `nav:<key>`), title and paragraphs. Parâmetros exists
+  only for an administrator and Avaliações only while it is in the menu
+  (`useVisibleNavItems()`).
+- `tour-context.tsx`: `TourProvider` (mounted by `(app)/layout.tsx`) and
+  `useTour()`. The list is built on the click and kept until the tour ends,
+  so an index never changes its step. Entering a step navigates to its route
+  unless the path already starts with it (which covers the redirects of
+  `/projetos`, `/avaliacoes` and `/parametros`). **Nothing is stored**: no
+  cookie, `localStorage`, `sessionStorage` or request, so a reload ends the
+  tour.
+- `tour-overlay.tsx`: with the tour active only, a portal above `z-50` that
+  darkens and blocks the page and shows the step as a centered modal dialog
+  (`Modal*` and `Button` of `components/ui`): Anterior and Continuar
+  together, Sair apart, Esc ends, Tab stays on the card's buttons, each step
+  takes the focus, and the focus goes back to Ajuda at the end.
+- The shells mark what a step points at with `data-tour-target`: `sidebar`
+  on the `<aside>` (which is also what scrolls the menu) and `nav:<key>` on
+  each menu item (`navItems` in both shells, `adminItems` in the modern
+  sidebar). The tour finds its target only by this attribute, so keep it
+  when the menu changes. From 1024px on
+  (`matchMedia('(min-width: 1024px)')`, the `lg` where the sidebar is fixed),
+  a step with a target shows it through a cutout of the dark layer (a
+  `clip-path` over the target's rectangle; the target changes neither layer
+  nor style and stays out of reach of the pointer) and has the card to the
+  right of the sidebar, whole inside the window. The target is measured on
+  every frame while the step is open, so the cutout and the card follow a
+  resize, the menu's scroll and the classic sidebar's width, and an item
+  hidden by the menu's scroll is scrolled into view. Below 1024px, on the
+  steps without a target, and when the target has been missing for 1 second,
+  the card is centered; crossing 1024px swaps the presentation on the same
+  step.
+- Two things only the classic layout does, both on the screen alone. On the
+  Parâmetros step, from 1024px on (`useIsWideScreen()` of
+  `tour/wide-screen.ts`), `ClassicShell` holds the Administração
+  `DropdownMenu` open (`open`, ignoring every close request) and its item
+  carries `nav:parameters`; a target outside the sidebar has the card on its
+  side with more room, here the left. And while the tour is active the
+  sidebar is shown expanded: `(app)/layout.tsx` gives the shell and
+  `classicContentClassNames` "preference collapsed **and** tour inactive",
+  never calling `setSidebarCollapsed` nor writing `EMATRIX_SIDEBAR`.
+- The tour also ends by itself, on the open screen and without navigating:
+  when the path stops starting with the step's route **after** having
+  reached it (the browser's Back button; the tour's own navigations run in
+  a transition and never end it on the way, and a superseded one that still
+  lands, such as the redirect of `/projetos` after a quick Anterior, is
+  answered with a `router.replace` to the step's route: only a route the
+  tour asked for since the last `popstate` is taken for its own), when the
+  layout changes
+  (`TourOverlay`, from the `isClassic` it is given) and when the session
+  ends (the layout stops rendering the provider). While the session warning
+  is on the screen, `(app)/layout.tsx` passes `isSuspended` and the layer is
+  not rendered; it comes back on the same step.
+- The tour needs no animation. What it shows or sets off turns its
+  transition off under `prefers-reduced-motion: reduce`
+  (`motion-reduce:transition-none`): the Ajuda button, the card's buttons and
+  the width of the classic sidebar and content, which the tour expands.
+- The texts are the `tour` namespace of the three catalogs, with `<b>`
+  resolved by `t.rich`; the titles of the module steps use `nav.<key>` inside
+  `tour.moduleTitle`. `steps.navigation.collapseHint` shows only in the
+  classic layout, whose sidebar collapses: `(app)/layout.tsx` tells the
+  overlay, so `components/tour` never reads the layout nor uses `classic:`.
 
 ## Photos
 
