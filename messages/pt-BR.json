@@ -136,6 +136,60 @@
     "renew": "Continuar sessão",
     "renewing": "Renovando..."
   },
+  "tour": {
+    "help": "Ajuda",
+    "previous": "Anterior",
+    "next": "Continuar",
+    "exit": "Sair",
+    "moduleTitle": "Tour - {module}",
+    "appTitle": "Tour - E-Matrix",
+    "steps": {
+      "welcome": {
+        "title": "Bem-vindo!",
+        "body": "O <b>E-Matrix</b> é um sistema desenvolvido para gestão em ergonomia abrangendo monitoramento dos trabalhos ergonômicos nas empresas."
+      },
+      "navigation": {
+        "body": "Esta é a barra de navegação principal, nela é possível acessar todas as telas e funcionalidades do <b>E-Matrix</b>.",
+        "collapseHint": "Quando você se acostumar com os itens do menu é possível minimizá-la."
+      },
+      "managementPlan": {
+        "body": "O Plano de Gestão do <b>E-Matrix</b> é a ferramenta para administração e monitoramento de todos os trabalhos ergonômicos feitos pela empresa, abrangendo o planejamento e a implementação em 4 níveis de evolução ao longo de períodos pré-determinados."
+      },
+      "programs": {
+        "intro": "O Programa do <b>E-Matrix</b> é a ferramenta para monitoramento das ações feitas pelo Programa de Ergonomia da empresa. Existem 5 itens de monitoramento:",
+        "items": "Treinamento e avaliadores em ergonomia, comunicações e especificações de materiais, avaliações ergonômicas e priorização de ações, projetos de melhoria e verificações de eficácia das ações implementadas.",
+        "score": "Cada item recebe uma pontuação de até 100%, e com os 5 itens completos, o Programa recebe a pontuação máxima de 5 pontos."
+      },
+      "documents": {
+        "body": "Nesta área é possível armazenar e compartilhar documentos gerados no processo de ergonomia gerido pelo <b>E-Matrix</b>."
+      },
+      "projects": {
+        "body": "O registro dos projetos pode ser feito no <b>E-Matrix</b> e é possível visualizar o histórico de melhorias contínuas aplicadas pelo Programa de Ergonomia na empresa."
+      },
+      "trainings": {
+        "materials": "Os treinamentos disponibilizados no <b>E-Matrix</b> destinam-se a funcionários da produção, dos escritórios e novos funcionários, também estão disponíveis materiais para treinamento básico e avançado em ergonomia.",
+        "record": "É possível fazer o registro do treinamento aplicado com data, responsável e anexar a lista de presença para evidência da aplicação desse conteúdo."
+      },
+      "meetings": {
+        "body": "No desenvolvimento do Programa de ergonomia na empresa é possível registrar no <b>E-Matrix</b> as reuniões que acontecem com data, responsável e anexar a lista de presença para evidência dos assuntos abordados."
+      },
+      "evaluations": {
+        "scope": "As avaliações do <b>E-Matrix</b> permitem o registro de todas as análises ergonômicas do trabalho realizadas na empresa em diversas áreas: produção, escritórios, projetos, etc.",
+        "database": "O registro dessas avaliações é feito pelo <b>E-Matrix</b> e isso cria um banco de dados para a empresa ter disponível para qualquer demanda."
+      },
+      "matrix": {
+        "result": "A matriz é o resultado de todos os registros feitos no sistema: avaliações, projetos e verificações de eficácia das melhorias implementadas pelo Programa de Ergonomia.",
+        "maps": "No <b>E-Matrix</b> a empresa visualiza e registra o seu mapeamento de riscos ergonômicos e o mapeamento de projetos para controle desses riscos identificados e analisados.",
+        "filter": "O levantamento pode ser filtrado por função e área da empresa."
+      },
+      "parameters": {
+        "body": "Ao registrar em parâmetros as atividades laborais da empresa, todas as avaliações e projetos sincronizam esses registros na matriz e os resultados e gráficos são gerados de acordo com esses dados no <b>E-Matrix</b>."
+      },
+      "farewell": {
+        "body": "Muito obrigado por sua atenção. Qualquer dúvida ou sugestão entre em contato <b>E-Matrix</b>."
+      }
+    }
+  },
   "dashboard": {
     "greeting": "Olá, {name}",
     "description": "Este é o novo E-Matrix. Os módulos do sistema legado estão sendo migrados um a um e aparecerão no menu conforme ficarem prontos.",

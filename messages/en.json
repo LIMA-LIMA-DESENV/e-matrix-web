@@ -136,6 +136,60 @@
     "renew": "Keep session",
     "renewing": "Renewing..."
   },
+  "tour": {
+    "help": "Help",
+    "previous": "Previous",
+    "next": "Continue",
+    "exit": "Exit",
+    "moduleTitle": "Tour - {module}",
+    "appTitle": "Tour - E-Matrix",
+    "steps": {
+      "welcome": {
+        "title": "Welcome!",
+        "body": "The <b>E-Matrix</b> is a system developed for management in ergonomics, encompassing monitoring of ergonomic work in companies."
+      },
+      "navigation": {
+        "body": "This is the main navigation bar, you can access all the screens and features of the <b>E-Matrix</b>.",
+        "collapseHint": "When you get used to the menu items you can minimize it."
+      },
+      "managementPlan": {
+        "body": "The <b>E-Matrix</b> Management Plan is the tool for administration and monitoring of all ergonomic work done by the company, covering planning and implementation in 4 levels of evolution over predetermined periods."
+      },
+      "programs": {
+        "intro": "The <b>E-Matrix</b> Program is the tool for monitoring the actions taken by the company's Ergonomics Program. There are 5 monitoring items:",
+        "items": "Training and evaluators in ergonomics, communications and material specifications, ergonomic assessments and prioritization of actions, improvement projects and effectiveness checks of implemented actions.",
+        "score": "Each item receives a score of up to 100%, and with the 5 complete items, the Program receives the maximum score of 5 points."
+      },
+      "documents": {
+        "body": "In this area it is possible to store and share documents generated in the process of ergonomics managed by <b>E-Matrix</b>."
+      },
+      "projects": {
+        "body": "Project registration can be done in the <b>E-Matrix</b> and you can view the history of continuous improvement applied by the company's Ergonomics Program."
+      },
+      "trainings": {
+        "materials": "<b>E-Matrix</b> Trainings are designed for production staff, offices and new employees, materials for basic and advanced ergonomics training are also available.",
+        "record": "It is possible to record the applied training with date, responsible and attach the attendance list for evidence of the application of this content."
+      },
+      "meetings": {
+        "body": "In the development of the Ergonomics Program in the company it is possible to register in the <b>E-Matrix</b> the meetings that happen, with date, responsible, and attach the attendance list for evidence of the subjects addressed."
+      },
+      "evaluations": {
+        "scope": "<b>E-Matrix</b> Evaluations allow you to record all the ergonomic analysis of the work performed in the company in several areas: production, offices, projects, etc.",
+        "database": "These evaluations are saved on <b>E-Matrix</b> and this creates a database for the company to have available for any demand."
+      },
+      "matrix": {
+        "result": "The matrix is the result of all the records made in the system: evaluations, projects and effectiveness checks of the improvements implemented by the Ergonomics Program.",
+        "maps": "In <b>E-Matrix</b> the company visualizes and registers its ergonomic risk and projects mapping to control these risks identified and analyzed.",
+        "filter": "The survey can be filtered by function and area of the company."
+      },
+      "parameters": {
+        "body": "By recording the company's work activities into parameters, all evaluations and projects synchronize these records in the matrix and the results and graphs are generated according to this data in the <b>E-Matrix</b>."
+      },
+      "farewell": {
+        "body": "Thank you for your attention. Any questions or suggestions please contact <b>E-Matrix</b>."
+      }
+    }
+  },
   "dashboard": {
     "greeting": "Hello, {name}",
     "description": "This is the new E-Matrix. The legacy modules are being migrated one by one and will show up in the menu as they are ready.",
