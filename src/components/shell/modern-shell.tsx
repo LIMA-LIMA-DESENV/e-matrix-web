@@ -11,6 +11,7 @@ import { LayoutSwitcher } from '@/components/layout-switcher'
 import { AccountMenu } from '@/components/shell/account-menu'
 import { adminItems, type NavItem } from '@/components/shell/nav-items'
 import { useVisibleNavItems } from '@/components/shell/use-nav-items'
+import { HelpButton } from '@/components/tour/help-button'
 import { useAuth } from '@/contexts/AuthContext'
 
 const linkClasses = {
@@ -59,6 +60,7 @@ export function ModernShell() {
       return (
         <span
           key={item.key}
+          data-tour-target={`nav:${item.key}`}
           aria-disabled="true"
           title={t('comingSoon')}
           className={`${linkClasses.base} ${linkClasses.pending}`}
@@ -82,6 +84,7 @@ export function ModernShell() {
       <Link
         key={item.key}
         href={item.href}
+        data-tour-target={`nav:${item.key}`}
         onClick={() => setIsMobileMenuOpen(false)}
         className={`${linkClasses.base} ${isActive ? linkClasses.active : linkClasses.idle}`}
       >
@@ -103,6 +106,7 @@ export function ModernShell() {
       )}
 
       <aside
+        data-tour-target="sidebar"
         className={`fixed top-0 left-0 z-50 flex h-screen w-64 flex-col gap-2 overflow-y-auto bg-ematrix-dark p-4 shadow-xl transition-transform duration-300 lg:translate-x-0 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
@@ -151,12 +155,15 @@ export function ModernShell() {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* Below `sm` the gaps get tighter, so the header still fits a 375px
+            screen with the Ajuda button. */}
+        <div className="flex items-center gap-1 sm:gap-3">
+          <HelpButton className="text-on-surface-variant" />
           <LanguageSwitcher className="text-on-surface-variant" />
           <LayoutSwitcher className="text-on-surface-variant" />
 
           <AccountMenu
-            className="flex items-center gap-3 border-l border-outline-variant/60 pl-4"
+            className="flex items-center gap-1 border-l border-outline-variant/60 pl-2 sm:gap-3 sm:pl-4"
             classNames={{
               trigger:
                 'flex items-center gap-1 rounded-lg px-2 py-1 text-right transition-colors hover:bg-surface-container-high',

@@ -14,6 +14,8 @@ import {
   modernContentClassNames,
 } from '@/components/shell/modern-shell'
 import { ShellContent } from '@/components/shell/shell-content'
+import { TourProvider, useTour } from '@/components/tour/tour-context'
+import { TourOverlay } from '@/components/tour/tour-overlay'
 import {
   Button,
   ModalBody,
@@ -24,6 +26,47 @@ import {
 } from '@/components/ui'
 import { useAuth } from '@/contexts/AuthContext'
 import { useLayoutPreference } from '@/contexts/LayoutPreferenceContext'
+
+/**
+ * The shell and the page, inside the `TourProvider`. The classic sidebar is
+ * collapsed on the screen only with the preference collapsed and the tour
+ * inactive: the tour shows it expanded and never touches the preference nor
+ * its cookie.
+ */
+function Shell({
+  isClassic,
+  children,
+}: {
+  isClassic: boolean
+  children: React.ReactNode
+}) {
+  const { isSidebarCollapsed: prefersSidebarCollapsed } = useLayoutPreference()
+  const { step } = useTour()
+  const isSidebarCollapsed = prefersSidebarCollapsed && step === null
+
+  return (
+    <>
+      {/* The shell is a sibling of the content, so swapping it keeps the page
+          mounted (NFR-002): only the classes and the footer change. */}
+      {isClassic ? (
+        <ClassicShell isSidebarCollapsed={isSidebarCollapsed} />
+      ) : (
+        <ModernShell />
+      )}
+      <ShellContent
+        key="content"
+        classNames={
+          isClassic
+            ? classicContentClassNames(isSidebarCollapsed)
+            : modernContentClassNames
+        }
+        footer={isClassic ? <ClassicFooter /> : null}
+      >
+        {children}
+      </ShellContent>
+    </>
+  )
+}
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const ts = useTranslations('session')
@@ -37,7 +80,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     renewSession,
     isRenewingSession,
   } = useAuth()
-  const { layout, isSidebarCollapsed } = useLayoutPreference()
+  const { layout } = useLayoutPreference()
   const [remainingSessionMs, setRemainingSessionMs] = useState<number | null>(
     null
   )
@@ -111,64 +154,55 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     : 0
 
   return (
-    // The classic shell draws its background image behind this wrapper.
-    <div
-      className={
-        isClassic
-          ? 'font-body text-on-surface'
-          : 'bg-surface font-body text-on-surface'
-      }
-    >
-      {showSessionWarning && (
-        <>
-          <ModalOverlay />
-          <ModalContent className="max-w-md">
-            <ModalTitle>{ts('expiringTitle')}</ModalTitle>
-            <ModalBody className="space-y-3">
-              <p className="text-sm text-on-surface-variant">
-                {ts('expiringDescription', {
-                  seconds: remainingSessionSeconds,
-                })}
-              </p>
-              <p className="text-sm text-on-surface-variant">
-                {ts('expiringHint')}
-              </p>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                type="button"
-                variant="outline"
-                color="primary"
-                onClick={() => signOut()}
-              >
-                {ts('signOutNow')}
-              </Button>
-              <Button
-                type="button"
-                onClick={() => void renewSession()}
-                disabled={isRenewingSession}
-              >
-                {isRenewingSession ? ts('renewing') : ts('renew')}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </>
-      )}
-
-      {/* The shell is a sibling of the content, so swapping it keeps the page
-          mounted (NFR-002): only the classes and the footer change. */}
-      {isClassic ? <ClassicShell /> : <ModernShell />}
-      <ShellContent
-        key="content"
-        classNames={
+    <TourProvider>
+      {/* The classic shell draws its background image behind this wrapper. */}
+      <div
+        className={
           isClassic
-            ? classicContentClassNames(isSidebarCollapsed)
-            : modernContentClassNames
+            ? 'font-body text-on-surface'
+            : 'bg-surface font-body text-on-surface'
         }
-        footer={isClassic ? <ClassicFooter /> : null}
       >
-        {children}
-      </ShellContent>
-    </div>
+        {showSessionWarning && (
+          <>
+            <ModalOverlay />
+            <ModalContent className="max-w-md">
+              <ModalTitle>{ts('expiringTitle')}</ModalTitle>
+              <ModalBody className="space-y-3">
+                <p className="text-sm text-on-surface-variant">
+                  {ts('expiringDescription', {
+                    seconds: remainingSessionSeconds,
+                  })}
+                </p>
+                <p className="text-sm text-on-surface-variant">
+                  {ts('expiringHint')}
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  color="primary"
+                  onClick={() => signOut()}
+                >
+                  {ts('signOutNow')}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={() => void renewSession()}
+                  disabled={isRenewingSession}
+                >
+                  {isRenewingSession ? ts('renewing') : ts('renew')}
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </>
+        )}
+
+        <Shell isClassic={isClassic}>{children}</Shell>
+      </div>
+      {/* The session warning takes the place of the tour (FR-024). */}
+      <TourOverlay isClassic={isClassic} isSuspended={showSessionWarning} />
+    </TourProvider>
   )
 }
